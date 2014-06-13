@@ -24,8 +24,8 @@ See the [sources](/appengine-hello) for [`google/appengine-ruby-hello`](https://
 
 The image assumes that your application:
 
-- has a [Gemfile](http://bundler.io/gemfile.html) for [bundler](http://bundler.io) and the Gemfile contains rack.
-- has config.ru for Rack.
+- has a [`Gemfile`](http://bundler.io/gemfile.html) for [bundler](http://bundler.io) and the Gemfile contains rack.
+- has a [`config.ru`](https://github.com/rack/rack/wiki/%28tutorial%29-rackup-howto) for Rack.
 
 When building your application docker image, `ONBUILD` triggers:
 

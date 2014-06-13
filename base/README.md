@@ -19,4 +19,4 @@ It serves as a base for the [`google/ruby-runtime`](https://index.docker.io/u/go
 
 - Run the following command in your application directory:
 
-        docker build -t my/app .
+        docker build -t app .
