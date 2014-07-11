@@ -6,16 +6,23 @@ It serves as a base for the [`google/ruby-runtime`](https://index.docker.io/u/go
 
 ## Usage
 
-- Create a Dockerfile in your ruby application directory with the following content:
+- Create a Gemfile in your ruby application directory with at least the following content.
+
+         gem 'rack'
+
+You can add other configurations to the Gemfile as you want.
+
+- Create a Dockerfile in the same directory with the following content.
 
         FROM google/ruby
 
         WORKDIR /app
-        RUN gem install rack
+        ADD Gemfile /app/Gemfile
+        RUN ["/usr/bin/bundle", "install"]
         ADD . /app
         
         CMD []
-        ENTRYPOINT ["/usr/local/bin/rackup", "/app/config.ru"]
+        ENTRYPOINT ["/usr/bin/bundle", "exec", "rackup", "/app/config.ru"]
 
 - Run the following command in your application directory:
 
