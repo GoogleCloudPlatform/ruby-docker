@@ -8,6 +8,7 @@ EXPOSE 8080
 
 WORKDIR /app
 ONBUILD ADD Gemfile /app/Gemfile
+ONBUILD ADD Gemfile.lock /app/Gemfile.lock
 ONBUILD RUN ["/usr/bin/bundle", "install"]
 ONBUILD ADD . /app
 ENTRYPOINT ["/usr/bin/bundle", "exec", "unicorn", "-c", "unicorn.conf", "config.ru"]
