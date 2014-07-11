@@ -7,4 +7,5 @@ ONBUILD ADD . /app
 
 EXPOSE 8080
 CMD []
-ENTRYPOINT ["/usr/bin/bundle", "exec", "rackup", "-p", "8080", "/app/config.ru"]
+ENV APPSERVER webrick
+ENTRYPOINT /usr/bin/bundle exec rackup -p 8080 /app/config.ru -s $APPSERVER

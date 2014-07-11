@@ -32,7 +32,11 @@ When building your application docker image, `ONBUILD` triggers:
 - Installes gems specified in the Gemfile and leverage docker caching appropriately
 - Copy the application sources under the `/app` directory in the container
 
-The image uses WEBrick as the application server by default.  You can overwrite it by adding mongrel/thin/puma to Gemfile
-and/or overwriting ENTRYPOINT in your Dockerfile like
+The image uses WEBrick as the application server by default.
+You can overwrite it by adding mongrel/thin/puma to Gemfile and configuring in your Dockerfile like
+
+        ENV APPSERVER puma
+
+Or you can just overwrite ENTRYPOINT in your Dockerfile like
 
         ENTRYPOINT ["/usr/local/bin/bundle", "exec", "unicorn", "-c", "unicorn.conf", "config.ru"]
