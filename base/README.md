@@ -18,6 +18,7 @@ You can add other configurations to the Gemfile as you want.
 
         WORKDIR /app
         ADD Gemfile /app/Gemfile
+        ADD Gemfile.lock /app/Gemfile.lock
         RUN ["/usr/bin/bundle", "install"]
         ADD . /app
         

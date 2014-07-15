@@ -24,12 +24,12 @@ See the [sources](/hello) for [`google/ruby-hello`](https://index.docker.io/u/go
 
 The image assumes that your application:
 
-- has a [Gemfile](http://bundler.io/gemfile.html) for [bundler](http://bundler.io) and the Gemfile contains rack.
+- has a [`Gemfile`](http://bundler.io/gemfile.html) and its corresponding `Gemfile.lock` for [bundler](http://bundler.io), and the Gemfile contains rack.
 - has config.ru for Rack.
 
 When building your application docker image, `ONBUILD` triggers:
 
-- Installes gems specified in the Gemfile and leverage docker caching appropriately
+- Installs gems specified in the Gemfile and leverage docker caching appropriately
 - Copy the application sources under the `/app` directory in the container
 
 The image uses WEBrick as the application server by default.
