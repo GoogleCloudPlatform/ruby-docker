@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+ruby '2.1.2'
+
+gem 'rack'
+
+## Uncomment the line if you want to use thin.
+# gem 'thin'
