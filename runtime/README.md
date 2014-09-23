@@ -24,12 +24,12 @@ See the [sources](/hello) for [`google/ruby-hello`](https://index.docker.io/u/go
 
 The image assumes that your application:
 
-- has a [`Gemfile`](http://bundler.io/gemfile.html) and its corresponding `Gemfile.lock` for [bundler](http://bundler.io), and the Gemfile contains rack.
-- has config.ru for Rack.
+- has a [`Gemfile`](http://bundler.io/gemfile.html) file and its corresponding `Gemfile.lock` for [bundler](http://bundler.io), and the `Gemfile` contains `rack`.
+- has a `config.ru` file for Rack.
 
 When building your application docker image, `ONBUILD` triggers:
 
-- Installs gems specified in the Gemfile and leverage docker caching appropriately
+- Installs gems specified in the `Gemfile` and leverage docker caching appropriately
 - Copy the application sources under the `/app` directory in the container
 
 The image uses WEBrick as the application server by default.
@@ -37,6 +37,6 @@ You can overwrite it by adding mongrel/thin/puma to Gemfile and configuring in y
 
         ENV APPSERVER puma
 
-Or you can just overwrite ENTRYPOINT in your Dockerfile like
+Or you can just overwrite `ENTRYPOINT` in your Dockerfile like
 
         ENTRYPOINT ["/usr/local/bin/bundle", "exec", "unicorn", "-c", "unicorn.conf", "config.ru"]
