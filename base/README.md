@@ -2,7 +2,7 @@
 
 [`google/ruby`](https://index.docker.io/u/google/ruby) is a [docker](https://docker.io) base image that bundles the stable version of [ruby](http://www.ruby-lang.org) installed from source.
 
-It serves as a base for the [`google/ruby-runtime`](https://index.docker.io/u/google/ruby-runtime) and [`google/appengine-ruby`](https://index.docker.io/u/google/appengine-ruby) image.
+It serves as a base for the [`google/ruby-runtime`](https://index.docker.io/u/google/ruby-runtime) image.
 
 ## Usage
 
