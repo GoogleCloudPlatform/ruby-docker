@@ -10,4 +10,5 @@ EXPOSE 8080
 CMD []
 ENV APPSERVER webrick
 ENV RACK_ENV production
-ENTRYPOINT /usr/bin/bundle exec rackup -p 8080 /app/config.ru -s $APPSERVER -E $RACK_ENV
+ENTRYPOINT /usr/bin/bundle exec rackup \
+    -p 8080 /app/config.ru -s $APPSERVER -E $RACK_ENV
