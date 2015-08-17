@@ -1,7 +1,8 @@
-FROM google/debian:wheezy
+FROM gcr.io/google_appengine/base
 
-RUN apt-get update && \
-    apt-get install -qy --no-install-recommends \
+# Install dependencies
+RUN apt-get update -y && \
+    apt-get install -y -q --no-install-recommends \
         autoconf \
         build-essential \
         ca-certificates \
@@ -17,7 +18,8 @@ RUN apt-get update && \
         libyaml-dev \
         libz-dev \
         systemtap && \
-    apt-get clean
+    apt-get clean && \
+    rm /var/lib/apt/lists/*_*
 RUN mkdir -p /usr/src && \
     curl http://ftp.ruby-lang.org/pub/ruby/2.1/ruby-2.1.6.tar.bz2 | \
         tar -C /usr/src -xj
