@@ -20,11 +20,13 @@ RUN apt-get update -y && \
         systemtap && \
     apt-get clean && \
     rm /var/lib/apt/lists/*_*
+
+# Install the latest MRI and bundler.
 RUN mkdir -p /usr/src && \
-    curl http://ftp.ruby-lang.org/pub/ruby/2.1/ruby-2.1.6.tar.bz2 | \
+    curl http://cache.ruby-lang.org/pub/ruby/2.2/ruby-2.2.2.tar.bz2 | \
         tar -C /usr/src -xj
-RUN cd /usr/src/ruby-2.1.6 && \
+RUN cd /usr/src/ruby-2.2.2 && \
     autoconf && \
     ./configure --prefix=/usr --disable-install-doc && \
     make && make install && make clean
-RUN gem install -q --no-rdoc --no-ri bundler --version 1.10.4
+RUN /usr/bin/gem install -q --no-rdoc --no-ri bundler --version 1.10.6
