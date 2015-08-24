@@ -1,4 +1,4 @@
-FROM gcr.io/google_appengine/ruby
+FROM google/ruby-runtime
 
-## Uncomment the line if you want to use puma.
-# ENV RACK_HANDLER puma
+## Uncomment the line if you want to use thin.
+# ENV APPSERVER thin

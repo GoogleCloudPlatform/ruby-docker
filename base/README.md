@@ -1,43 +1,30 @@
 # google/ruby
 
-`gcr.io/google_appengine/ruby` is a [docker](https://docker.com) base image that bundles stable versions of [Ruby](http://ruby-lang.org) and [Bundler](http://bundler.io), and makes it easy to containerize standard [Rack](http://rack.github.io) applications.
+[`google/ruby`](https://index.docker.io/u/google/ruby) is a [docker](https://docker.io) base image that bundles the stable version of [ruby](http://www.ruby-lang.org) installed from source.
+
+It serves as a base for the [`google/ruby-runtime`](https://index.docker.io/u/google/ruby-runtime) image.
 
 ## Usage
 
-- Create a Dockerfile in your ruby application directory with the following content.
+- Create a Gemfile in your ruby application directory with at least the following content.
 
-        FROM gcr.io/google_appengine/ruby
+         gem 'rack'
 
-- Ensure your application has at least the following standard ruby application files.
+You can add other configurations to the Gemfile as you want.
 
-    - `Gemfile` (with at least the Rack gem)
-    - `Gemfile.lock`
-    - `config.ru`
+- Create a Dockerfile in the same directory with the following content.
+
+        FROM google/ruby
+
+        WORKDIR /app
+        ADD Gemfile /app/Gemfile
+        ADD Gemfile.lock /app/Gemfile.lock
+        RUN ["/usr/bin/bundle", "install"]
+        ADD . /app
+        
+        CMD []
+        ENTRYPOINT ["/usr/bin/bundle", "exec", "rackup", "/app/config.ru"]
 
 - Run the following command in your application directory:
 
-        docker build -t my/app .
-
-## Notes
-
-When building your application's docker image, `ONBUILD` performs the following:
-
-- It installs the gems specified in your `Gemfile.lock`
-- It copies all files in the current directory (besides any skipped due to
-  a `.dockerignore` file) into the container.
-- It sets the `ENTRYPOINT` to run rackup on port 8080.
-
-By default, your application is run in the Webrick web server. If you want to
-run in an alternate server, include it in your `Gemfile` and set the
-`RACK_HANDLER` environment variable to specify the server to use. For example,
-to run in Puma, include the `puma` gem in your `Gemfile`, and include the
-following in your application's Dockerfile:
-
-    ENV RACK_HANDLER puma
-
-By default, the rack environment is set to `production`. To use a different
-environment, set the `RACK_ENV` environment variable in your Dockerfile, e.g.:
-
-    ENV RACK_ENV staging
-
-You may also override the `ENTRYPOINT` in your Dockerfile.
+        docker build -t app .
