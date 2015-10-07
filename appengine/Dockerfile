@@ -31,7 +31,7 @@ RUN apt-get update -y && \
     rm /var/lib/apt/lists/*_*
 
 # Install node
-RUN mkdir /nodejs && curl https://nodejs.org/dist/v4.0.0/node-v4.0.0-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+RUN mkdir /nodejs && curl https://nodejs.org/dist/v4.1.2/node-v4.1.2-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH /nodejs/bin:$PATH
 
 # Install rbenv
@@ -40,20 +40,23 @@ RUN git clone https://github.com/sstephenson/rbenv.git /rbenv && \
     git clone https://github.com/sstephenson/ruby-build.git /rbenv/plugins/ruby-build
 ENV PATH /rbenv/shims:/rbenv/bin:$PATH
 
-# Preinstalled runtimes
-RUN rbenv install 2.0.0-p647
-RUN rbenv install 2.1.7
-RUN rbenv install 2.2.3
-RUN rbenv rehash
+# Preinstall ruby runtimes.
+# The LAST version in the list is set as the default.
+ENV PREINSTALLED_RUBY_VERSIONS 2.0.0-p647 2.1.7 2.2.3
+RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
+    rbenv install $V; \
+    rbenv rehash; \
+    rbenv global $V; \
+    done
 
-# Install bundler
-RUN RBENV_VERSION=2.0.0-p647 gem install -q --no-rdoc --no-ri bundler --version 1.10.6
-RUN RBENV_VERSION=2.1.7 gem install -q --no-rdoc --no-ri bundler --version 1.10.6
-RUN RBENV_VERSION=2.2.3 gem install -q --no-rdoc --no-ri bundler --version 1.10.6
-RUN rbenv rehash
-
-# Default ruby runtime
-RUN rbenv global 2.2.3
+# Preinstall bundler and foreman gems
+ENV BUNDLER_VERSION 1.10.6
+ENV FOREMAN_VERSION 0.78.0
+RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
+    RBENV_VERSION=$V gem install -q --no-rdoc --no-ri bundler --version $BUNDLER_VERSION; \
+    RBENV_VERSION=$V gem install -q --no-rdoc --no-ri foreman --version $FOREMAN_VERSION; \
+    rbenv rehash; \
+    done
 
 # Common configuration for any ENTRYPOINT
 WORKDIR /app
