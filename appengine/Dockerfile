@@ -8,7 +8,7 @@ FROM gcr.io/google_appengine/base
 # gems      dependencies
 # ------------------------------------------------------------------
 # curb      libcurl3, libcurl3-gnutls, libcurl4-openssl-dev
-# pg        libpq
+# pg        libpq-dev
 # rmagick   libmagickwand-dev
 # nokogiri  libxml2-dev
 # sqlite3   libsqlite3-dev
