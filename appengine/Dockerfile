@@ -11,6 +11,9 @@ FROM gcr.io/google_appengine/base
 # curb      libcurl3, libcurl3-gnutls, libcurl4-openssl-dev
 # pg        libpq
 # rmagick   libmagickwand-dev
+# nokogiri  libxml2-dev
+# sqlite3   libsqlite3-dev
+# mysql2    libmysqlclient-dev
 
 RUN apt-get update -y && \
     apt-get install -y -q --no-install-recommends \
