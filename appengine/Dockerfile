@@ -4,7 +4,6 @@ FROM gcr.io/google_appengine/base
 
 # Install dependencies for Ruby
 # Also installs dependencies for the following common gems:
-# nokogiri, sqlite3, mysql2
 # 
 # gems      dependencies
 # ------------------------------------------------------------------
