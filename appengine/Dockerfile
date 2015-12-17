@@ -4,13 +4,13 @@ FROM gcr.io/google_appengine/base
 
 # Install dependencies for Ruby
 # Also installs dependencies for the following common gems:
-# 
+#
 # gems      dependencies
 # ------------------------------------------------------------------
 # curb      libcurl3, libcurl3-gnutls, libcurl4-openssl-dev
 # pg        libpq-dev
 # rmagick   libmagickwand-dev
-# nokogiri  libxml2-dev
+# nokogiri  libxml2-dev, libxslt-dev
 # sqlite3   libsqlite3-dev
 # mysql2    libmysqlclient-dev
 
@@ -31,6 +31,7 @@ RUN apt-get update -y && \
         libyaml-dev \
         libz-dev \
         libxml2-dev \
+        libxslt-dev \
         libsqlite3-dev \
         libmysqlclient-dev \
         libpq-dev \
@@ -54,7 +55,7 @@ ENV PATH /rbenv/shims:/rbenv/bin:$PATH
 
 # Preinstall ruby runtimes.
 # The LAST version in the list is set as the default.
-ENV PREINSTALLED_RUBY_VERSIONS 2.0.0-p647 2.1.7 2.2.3
+ENV PREINSTALLED_RUBY_VERSIONS 2.0.0-p648 2.1.8 2.2.3 2.2.4
 RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
     rbenv install $V; \
     rbenv rehash; \
@@ -62,13 +63,16 @@ RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
     done
 
 # Preinstall bundler and foreman gems
-ENV BUNDLER_VERSION 1.10.6
+ENV BUNDLER_VERSION 1.11.2
 ENV FOREMAN_VERSION 0.78.0
 RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
     RBENV_VERSION=$V gem install -q --no-rdoc --no-ri bundler --version $BUNDLER_VERSION; \
     RBENV_VERSION=$V gem install -q --no-rdoc --no-ri foreman --version $FOREMAN_VERSION; \
     rbenv rehash; \
     done
+# Tell nokogiri >=1.6 to install using system libraries, for faster builds
+RUN bundle config build.nokogiri --use-system-libraries
+ENV NOKOGIRI_USE_SYSTEM_LIBRARIES 1
 
 # Common configuration for any ENTRYPOINT
 WORKDIR /app
@@ -79,4 +83,4 @@ CMD []
 # Default ENTRYPOINT
 ENV RACK_HANDLER webrick
 ENV RACK_ENV production
-ENTRYPOINT bundle exec rackup -p $PORT /app/config.ru -s $RACK_HANDLER -E $RACK_ENV
+ENTRYPOINT bundle exec rackup -p $PORT config.ru -s $RACK_HANDLER -E $RACK_ENV
