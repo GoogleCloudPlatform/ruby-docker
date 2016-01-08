@@ -44,7 +44,7 @@ RUN apt-get update -y && \
     rm /var/lib/apt/lists/*_*
 
 # Install node
-RUN mkdir /nodejs && curl https://nodejs.org/dist/v4.2.2/node-v4.2.2-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+RUN mkdir /nodejs && curl https://nodejs.org/dist/v5.4.0/node-v5.4.0-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH /nodejs/bin:$PATH
 
 # Install rbenv
@@ -55,7 +55,7 @@ ENV PATH /rbenv/shims:/rbenv/bin:$PATH
 
 # Preinstall ruby runtimes.
 # The LAST version in the list is set as the default.
-ENV PREINSTALLED_RUBY_VERSIONS 2.0.0-p648 2.1.8 2.2.3 2.2.4
+ENV PREINSTALLED_RUBY_VERSIONS 2.0.0-p648 2.1.8 2.2.3 2.2.4 2.3.0
 RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
     rbenv install $V; \
     rbenv rehash; \
