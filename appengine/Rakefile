@@ -1,0 +1,13 @@
+require "#{::File.dirname(__FILE__)}/test_helper.rb"
+
+$VERBOSE = true
+
+task :default => [:test]
+
+task :build do
+  TestHelper.build_base_image
+end
+
+task :test => [:build] do
+  TestHelper.run_tests(::ENV['TESTCASE'])
+end
