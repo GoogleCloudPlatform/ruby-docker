@@ -1,0 +1,19 @@
+$VERBOSE = true
+
+task :default => [:test]
+
+task :build do
+  ::Dir.chdir(::File.dirname(__FILE__)) do
+    puts("docker build -t appengine-ruby-base .")
+    unless system("docker build -t appengine-ruby-base .")
+      raise "Exit code #{$?} when running docker build"
+    end
+  end
+end
+
+task :test => [:build] do
+  ::ARGV.replace([])
+  ::Dir.glob("#{::File.dirname(__FILE__)}/test/tc_*.rb").each do |test_file|
+    load test_file
+  end
+end
