@@ -1,13 +1,19 @@
-require "#{::File.dirname(__FILE__)}/test_helper.rb"
-
 $VERBOSE = true
 
 task :default => [:test]
 
 task :build do
-  TestHelper.build_base_image
+  ::Dir.chdir(::File.dirname(__FILE__)) do
+    puts("docker build -t appengine-ruby-base .")
+    unless system("docker build -t appengine-ruby-base .")
+      raise "Exit code #{$?} when running docker build"
+    end
+  end
 end
 
 task :test => [:build] do
-  TestHelper.run_tests(::ENV['TESTCASE'])
+  ::ARGV = []
+  ::Dir.glob("#{::File.dirname(__FILE__)}/test/tc_*.rb").each do |test_file|
+    load test_file
+  end
 end

@@ -58,6 +58,7 @@ ENV PATH /rbenv/shims:/rbenv/bin:$PATH
 # Preinstall ruby runtimes.
 # The LAST version in the list is set as the default.
 ENV PREINSTALLED_RUBY_VERSIONS 2.0.0-p648 2.1.8 2.2.4 2.3.0
+ENV RUBY_CONFIGURE_OPTS --disable-install-doc
 RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
     rbenv install -v $V; \
     rbenv rehash; \
