@@ -12,7 +12,7 @@ task :build do
 end
 
 task :test => [:build] do
-  ::ARGV = []
+  ::ARGV.replace([])
   ::Dir.glob("#{::File.dirname(__FILE__)}/test/tc_*.rb").each do |test_file|
     load test_file
   end
