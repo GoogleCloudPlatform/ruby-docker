@@ -1,0 +1,13 @@
+require "rake/testtask"
+
+::Dir.chdir(::File.dirname(__FILE__))
+
+task :default => [:build, :test]
+
+task :build do
+  sh("docker build -t appengine-ruby-base .")
+end
+
+Rake::TestTask.new do |t|
+  t.test_files = FileList['test/tc_*.rb']
+end
