@@ -21,7 +21,7 @@ This image is designed for Ruby Rack applications. It does the following:
   assuming that an appropriate `/app/config.ru` is present.
 
 The following tasks are _not_ handled by this base image, and should be
-performed by your inherited Dockerfile:
+performed by your inheriting Dockerfile:
 
 - Use rbenv to install a custom ruby runtime, if desired.
 - Install any native libraries needed by required gems.
