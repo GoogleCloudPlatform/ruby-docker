@@ -1,5 +1,5 @@
 require "minitest/autorun"
-require_relative "test_helper.rb"
+require_relative "test_helper"
 
 
 # Basic tests on the content of the base image

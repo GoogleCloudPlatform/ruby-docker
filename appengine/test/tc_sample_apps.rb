@@ -1,5 +1,5 @@
 require "minitest/autorun"
-require_relative "test_helper.rb"
+require_relative "test_helper"
 
 
 # Tests of a bunch of sample apps. Treats every subdirectory of the test
