@@ -28,9 +28,8 @@ class TestSampleApps < ::Minitest::Test
   def run_app_test(dirname)
     puts("**** Testing app: #{dirname}")
     ::Dir.chdir(::File.join(::File.dirname(__FILE__), dirname)) do |dir|
-      num = rand(1000000)
-      container = "ruby-app-#{num}"
-      image = "appengine-ruby-test-#{num}"
+      container = "ruby-app-#{dirname}"
+      image = "appengine-ruby-test-#{dirname}"
       begin
         assert_cmd_succeeds "docker build -t #{image} ."
         begin
