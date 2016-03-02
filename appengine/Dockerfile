@@ -82,5 +82,5 @@ ENV PORT 8080
 CMD []
 
 # Default ENTRYPOINT
-ENV RACK_ENV production
+ENV RACK_ENV deployment
 ENTRYPOINT bundle exec rackup -p $PORT config.ru -E $RACK_ENV
