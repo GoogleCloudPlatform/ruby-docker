@@ -1,4 +1,4 @@
-FROM google/debian:wheezy
+FROM gcr.io/google_appengine/base
 
 RUN apt-get update && \
     apt-get install -qy --no-install-recommends \
