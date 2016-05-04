@@ -77,6 +77,11 @@ RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
 RUN bundle config build.nokogiri --use-system-libraries
 ENV NOKOGIRI_USE_SYSTEM_LIBRARIES 1
 
+# Temporarily replace ImageMagick policy file with one that fixes
+# CVE-2016-3714
+RUN mkdir -p /etc/ImageMagick-6 && rm -f /etc/ImageMagick-6/policy.xml
+COPY files/policy.xml /etc/ImageMagick-6/
+
 # Common configuration for any ENTRYPOINT
 WORKDIR /app
 EXPOSE 8080
