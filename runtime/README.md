@@ -1,10 +1,10 @@
 # google/ruby-runtime
 
-[`google/ruby-runtime`](https://index.docker.io/u/google/ruby-runtime) is a [docker](https://docker.io) base image that makes it easy to dockerize standard [Rack](http://rack.github.io) application.
+[`google/ruby-runtime`](https://hub.docker.com/r/google/ruby-runtime/) is a [docker](https://docker.io) base image that makes it easy to dockerize standard [Rack](http://rack.github.io) application.
 
 It can automatically bundle a Rack application and its dependencies with a single line Dockerfile.
 
-It is based on [`google/ruby`](https://index.docker.io/u/google/ruby) base image.
+It is based on [`google/ruby`](https://hub.docker.com/r/google/ruby/) base image.
 
 ## Usage
 
@@ -18,7 +18,7 @@ It is based on [`google/ruby`](https://index.docker.io/u/google/ruby) base image
 
 ## Sample
   
-See the [sources](/hello) for [`google/ruby-hello`](https://index.docker.io/u/google/ruby-hello) based on this image.
+See the [sources](/hello) for [`google/ruby-hello`](https://hub.docker.com/r/google/ruby-hello/) based on this image.
 
 ## Notes
 
