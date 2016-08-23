@@ -46,7 +46,7 @@ RUN apt-get update -y && \
     rm /var/lib/apt/lists/*_*
 
 # Install node
-RUN mkdir /nodejs && curl https://nodejs.org/dist/v5.7.1/node-v5.7.1-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+RUN mkdir /nodejs && curl https://nodejs.org/dist/v6.4.0/node-v6.4.0-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH /nodejs/bin:$PATH
 
 # Install rbenv
@@ -65,12 +65,10 @@ RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
     rbenv global $V; \
     done
 
-# Preinstall bundler and foreman gems
-ENV BUNDLER_VERSION 1.11.2
-ENV FOREMAN_VERSION 0.78.0
+# Preinstall bundler gem
+ENV BUNDLER_VERSION 1.12.5
 RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
     RBENV_VERSION=$V gem install -q --no-rdoc --no-ri bundler --version $BUNDLER_VERSION; \
-    RBENV_VERSION=$V gem install -q --no-rdoc --no-ri foreman --version $FOREMAN_VERSION; \
     rbenv rehash; \
     done
 # Tell nokogiri >=1.6 to install using system libraries, for faster builds
@@ -78,7 +76,7 @@ RUN bundle config build.nokogiri --use-system-libraries
 ENV NOKOGIRI_USE_SYSTEM_LIBRARIES 1
 
 # Temporarily replace ImageMagick policy file with one that fixes
-# CVE-2016-3714
+# CVE-2016-3714 and others.
 RUN mkdir -p /etc/ImageMagick-6 && rm -f /etc/ImageMagick-6/policy.xml
 COPY files/policy.xml /etc/ImageMagick-6/
 
