@@ -5,7 +5,7 @@ require "rake/testtask"
 task :default => [:build, :test]
 
 task :build do
-  sh("docker build -t appengine-ruby-base .")
+  sh("docker build --pull --no-cache -t appengine-ruby-base .")
 end
 
 Rake::TestTask.new do |t|
