@@ -7,8 +7,8 @@ ENV MESSAGE \\n\
 \\n\
   If you want to deploy a Ruby application to Google App Engine, you can\\n\
   simply specify "runtime: ruby" in your app.yaml configuration file.\\n\
-  If you'd like to extend the Ruby for App Engine runtime, you can use\\n\
-  gcr.io/google_appengine/ruby as your base image.\\n\
+  If you'd like to extend the Ruby runtime for App Engine, use\\n\
+  "gcr.io/google_appengine/ruby" as the base image.\\n\
   See http://cloud.google.com/ruby for more information on running Ruby on\\n\
   Google Cloud Platform.\\n\
 \\n\
