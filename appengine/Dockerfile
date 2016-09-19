@@ -41,9 +41,7 @@ RUN apt-get update -y && \
         libcurl3-gnutls \
         libcurl4-openssl-dev \
         libmagickwand-dev \
-        systemtap && \
-    apt-get clean && \
-    rm /var/lib/apt/lists/*_*
+        systemtap
 
 # Install node
 RUN mkdir /nodejs && curl https://nodejs.org/dist/v6.4.0/node-v6.4.0-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
@@ -55,22 +53,22 @@ RUN git clone https://github.com/sstephenson/rbenv.git /rbenv && \
     git clone https://github.com/sstephenson/ruby-build.git /rbenv/plugins/ruby-build
 ENV PATH /rbenv/shims:/rbenv/bin:$PATH
 
-# Preinstall ruby runtimes.
-# The LAST version in the list is set as the default.
-ENV PREINSTALLED_RUBY_VERSIONS 2.1.8 2.2.4 2.3.0
-ENV RUBY_CONFIGURE_OPTS --disable-install-doc
-RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
-    rbenv install -v $V; \
-    rbenv rehash; \
-    rbenv global $V; \
-    done
-
-# Preinstall bundler gem
+# Preinstalled default ruby version.
+ENV RBENV_VERSION 2.3.1
 ENV BUNDLER_VERSION 1.12.5
-RUN for V in $PREINSTALLED_RUBY_VERSIONS; do \
-    RBENV_VERSION=$V gem install -q --no-rdoc --no-ri bundler --version $BUNDLER_VERSION; \
-    rbenv rehash; \
-    done
+
+# Install the default ruby binary and bundler.
+RUN (echo "deb http://packages.cloud.google.com/apt ruby-runtime-jessie main" \
+      | tee /etc/apt/sources.list.d/ruby-runtime-jessie.list) && \
+    (curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+      | apt-key add -) && \
+    apt-get update -y && \
+    apt-get install -y -q gcp-ruby-$RBENV_VERSION && \
+    rbenv rehash && \
+    rbenv global $RBENV_VERSION && \
+    gem install -q --no-rdoc --no-ri bundler --version $BUNDLER_VERSION && \
+    rbenv rehash
+
 # Tell nokogiri >=1.6 to install using system libraries, for faster builds
 RUN bundle config build.nokogiri --use-system-libraries
 ENV NOKOGIRI_USE_SYSTEM_LIBRARIES 1
@@ -79,6 +77,9 @@ ENV NOKOGIRI_USE_SYSTEM_LIBRARIES 1
 # CVE-2016-3714 and others.
 RUN mkdir -p /etc/ImageMagick-6 && rm -f /etc/ImageMagick-6/policy.xml
 COPY files/policy.xml /etc/ImageMagick-6/
+
+# Clean up apt
+RUN apt-get clean && rm -f /var/lib/apt/lists/*_*
 
 # Common configuration for any ENTRYPOINT
 WORKDIR /app

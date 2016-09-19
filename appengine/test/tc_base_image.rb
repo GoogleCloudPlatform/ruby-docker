@@ -12,7 +12,7 @@ class TestBaseImage < ::Minitest::Test
   def test_ruby_installation
     assert_cmd_output(
       "docker run --entrypoint=ruby appengine-ruby-base --version",
-      /^ruby 2\.3\.0/)
+      /^ruby 2\.3\.1/)
   end
 
 end
