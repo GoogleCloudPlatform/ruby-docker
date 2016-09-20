@@ -54,7 +54,7 @@ RUN git clone https://github.com/sstephenson/rbenv.git /rbenv && \
 ENV PATH /rbenv/shims:/rbenv/bin:$PATH
 
 # Preinstalled default ruby version.
-ENV RBENV_VERSION 2.3.1
+ENV DEFAULT_RUBY_VERSION 2.3.1
 ENV BUNDLER_VERSION 1.12.5
 
 # Install the default ruby binary and bundler.
@@ -63,9 +63,9 @@ RUN (echo "deb http://packages.cloud.google.com/apt ruby-runtime-jessie main" \
     (curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
       | apt-key add -) && \
     apt-get update -y && \
-    apt-get install -y -q gcp-ruby-$RBENV_VERSION && \
+    apt-get install -y -q gcp-ruby-$DEFAULT_RUBY_VERSION && \
     rbenv rehash && \
-    rbenv global $RBENV_VERSION && \
+    rbenv global $DEFAULT_RUBY_VERSION && \
     gem install -q --no-rdoc --no-ri bundler --version $BUNDLER_VERSION && \
     rbenv rehash
 
