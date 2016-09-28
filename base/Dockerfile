@@ -1,4 +1,4 @@
-FROM gcr.io/google_appengine/base
+FROM gcr.io/google_appengine/debian8
 
 RUN apt-get update && \
     apt-get install -qy --no-install-recommends \
