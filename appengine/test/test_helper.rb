@@ -38,4 +38,43 @@ module TestHelper
       " (exit code #{exit_code}) when executing \"#{cmd}\""
   end
 
+  # Assert that the given docker run command produces the given output.
+  # Automatically cleans up the generated container.
+  def assert_docker_output(args, expectation, container_root="generic")
+    number = "%.08x" % rand(0x100000000)
+    container = "ruby-test-container-#{container_root}-#{number}"
+    begin
+      assert_cmd_output("docker run --name #{container} #{args}", expectation)
+    ensure
+      execute_cmd("docker rm #{container}")
+    end
+  end
+
+  # Runs a docker container as a daemon. Yields the container name.
+  # Automatically kills and removes the container afterward.
+  def run_docker_daemon(args, container_root="generic")
+    number = "%.08x" % rand(0x100000000)
+    container = "ruby-test-container-#{container_root}-#{number}"
+    begin
+      assert_cmd_succeeds("docker run --name #{container} -d #{args}")
+      yield container
+    ensure
+      execute_cmd("docker kill #{container}")
+      execute_cmd("docker rm #{container}")
+    end
+  end
+
+  # Build a docker image with the given arguments. Yields the image name.
+  # Automatically cleans up the generated image afterward.
+  def build_docker_image(args, image_root="generic")
+    number = "%.08x" % rand(0x100000000)
+    image = "ruby-test-image-#{image_root}-#{number}"
+    begin
+      assert_cmd_succeeds("docker build -t #{image} #{args} .")
+      yield image
+    ensure
+      execute_cmd("docker rmi #{image}")
+    end
+  end
+
 end

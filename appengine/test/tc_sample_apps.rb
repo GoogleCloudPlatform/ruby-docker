@@ -15,8 +15,10 @@ class TestSampleApps < ::Minitest::Test
 
   include TestHelper
 
+  APPS_DIR = ::File.join(::File.dirname(__FILE__), "sample_apps")
 
-  ::Dir.glob("#{::File.dirname(__FILE__)}/*/Dockerfile").each do |dockerfile|
+
+  ::Dir.glob("#{APPS_DIR}/*/Dockerfile").each do |dockerfile|
     test_dir = ::File.dirname(dockerfile)
     base_name = ::File.basename(test_dir)
     define_method("test_#{base_name}") do
@@ -27,20 +29,11 @@ class TestSampleApps < ::Minitest::Test
 
   def run_app_test(dirname)
     puts("**** Testing app: #{dirname}")
-    ::Dir.chdir(::File.join(::File.dirname(__FILE__), dirname)) do |dir|
-      container = "ruby-app-#{dirname}"
-      image = "appengine-ruby-test-#{dirname}"
-      begin
-        assert_cmd_succeeds "docker build -t #{image} ."
-        begin
-          assert_cmd_succeeds "docker run -d -p 8080:8080 --name #{container} #{image}"
-          assert_cmd_output("curl -s -S http://127.0.0.1:8080/", "ruby app", 5)
-        ensure
-          execute_cmd "docker kill #{container}"
-          execute_cmd "docker rm #{container}"
+    ::Dir.chdir(::File.join(APPS_DIR, dirname)) do |dir|
+      build_docker_image("", dirname) do |image|
+        run_docker_daemon("-p 8080:8080 #{image}") do |container|
+          assert_cmd_output("curl -s -S http://127.0.0.1:8080/", "ruby app", 10)
         end
-      ensure
-        execute_cmd "docker rmi #{image}"
       end
     end
   end
