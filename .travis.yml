@@ -9,4 +9,5 @@ before_install:
   - gem install minitest
 
 script:
-  - rake -f appengine/Rakefile
+  - travis_retry rake -f appengine/Rakefile build
+  - rake -f appengine/Rakefile test
