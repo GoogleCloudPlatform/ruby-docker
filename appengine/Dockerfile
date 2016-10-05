@@ -44,7 +44,7 @@ RUN apt-get update -y && \
         systemtap
 
 # Install node
-RUN mkdir /nodejs && curl https://nodejs.org/dist/v6.4.0/node-v6.4.0-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+RUN mkdir /nodejs && curl https://nodejs.org/dist/v6.7.0/node-v6.7.0-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH /nodejs/bin:$PATH
 
 # Install rbenv
@@ -55,7 +55,7 @@ ENV PATH /rbenv/shims:/rbenv/bin:$PATH
 
 # Preinstalled default ruby version.
 ENV DEFAULT_RUBY_VERSION 2.3.1
-ENV BUNDLER_VERSION 1.12.5
+ENV BUNDLER_VERSION 1.13.2
 
 # Install the default ruby binary and bundler.
 RUN (echo "deb http://packages.cloud.google.com/apt ruby-runtime-jessie main" \
