@@ -3,5 +3,8 @@ steps:
     args: ['build', '--pull', '--no-cache', '-t', '${IMAGE}', '.']
   - name: gcr.io/nick-cloudbuild/structure_test
     args: ['--image', '${IMAGE}', '-v', '--config', '/workspace/test/test_base_image.json']
+  - name: gcr.io/nick-cloudbuild/rake
+    args: []
+
 images:
   - '${IMAGE}'
