@@ -1,9 +1,9 @@
 steps:
   - name: gcr.io/cloud-builders/docker
     args: ['build', '--pull', '--no-cache', '-t', '${IMAGE}', '.']
-  - name: gcr.io/nick-cloudbuild/structure_test
+  - name: gcr.io/gcp-runtimes/structure_test
     args: ['--image', '${IMAGE}', '-v', '--config', '/workspace/test/test_base_image.json']
-  - name: gcr.io/nick-cloudbuild/rake
+  - name: gcr.io/gcp-runtimes/rake
     args: []
 
 images:

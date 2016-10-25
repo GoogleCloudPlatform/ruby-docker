@@ -32,7 +32,7 @@ class TestSampleApps < ::Minitest::Test
     ::Dir.chdir(::File.join(APPS_DIR, dirname)) do |dir|
       build_docker_image("", dirname) do |image|
         run_docker_daemon("-p 8080:8080 #{image}") do |container|
-          assert_cmd_output("curl -s -S http://127.0.0.1:8080/", "ruby app", 10)
+          assert_cmd_output("docker run --link #{container}:#{container} gcr.io/google-appengine/debian8 /bin/bash -c 'apt-get -qq update > /dev/null 2>&1; apt-get -qq -y install curl > /dev/null 2>&1; curl -s -S #{container}:8080/'", "ruby app", 15)
         end
       end
     end
