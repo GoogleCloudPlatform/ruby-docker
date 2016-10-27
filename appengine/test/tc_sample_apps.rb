@@ -32,7 +32,7 @@ class TestSampleApps < ::Minitest::Test
     ::Dir.chdir(::File.join(APPS_DIR, dirname)) do |dir|
       build_docker_image("", dirname) do |image|
         run_docker_daemon("-p 8080:8080 #{image}") do |container|
-          assert_cmd_output("curl -s -S http://127.0.0.1:8080/", "ruby app", 10)
+          assert_cmd_output("docker exec #{container} curl -s -S http://127.0.0.1:8080", "ruby app", 10)
         end
       end
     end
