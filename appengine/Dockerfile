@@ -55,7 +55,7 @@ ENV PATH /rbenv/shims:/rbenv/bin:$PATH
 
 # Preinstalled default ruby version.
 ENV DEFAULT_RUBY_VERSION 2.3.1
-ENV BUNDLER_VERSION 1.13.2
+ENV BUNDLER_VERSION 1.13.6
 
 # Install the default ruby binary and bundler.
 RUN (echo "deb http://packages.cloud.google.com/apt ruby-runtime-jessie main" \
