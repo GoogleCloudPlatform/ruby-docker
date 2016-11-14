@@ -26,5 +26,5 @@
 			"command": ["ruby", "-e", "puts ENV[\"RAILS_ENV\"]"],
 			"expectedOutput": ["production\n"]
 		}
-	],
+	]
 }
