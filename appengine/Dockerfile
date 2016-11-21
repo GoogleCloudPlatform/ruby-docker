@@ -57,8 +57,11 @@ ENV PATH /rbenv/shims:/rbenv/bin:$PATH
 ENV DEFAULT_RUBY_VERSION 2.3.1
 ENV BUNDLER_VERSION 1.13.6
 
+# Set ruby runtime distribution
+ARG RUNTIME_DISTRIBUTION="ruby-runtime-jessie"
+
 # Install the default ruby binary and bundler.
-RUN (echo "deb http://packages.cloud.google.com/apt ruby-runtime-jessie main" \
+RUN (echo "deb http://packages.cloud.google.com/apt ${RUNTIME_DISTRIBUTION} main" \
       | tee /etc/apt/sources.list.d/ruby-runtime-jessie.list) && \
     (curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
       | apt-key add -) && \
