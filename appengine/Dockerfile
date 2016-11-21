@@ -18,6 +18,7 @@ FROM gcr.io/google_appengine/debian8
 
 RUN apt-get update -y && \
     apt-get install -y -q --no-install-recommends \
+        apt-utils \
         autoconf \
         build-essential \
         ca-certificates \
