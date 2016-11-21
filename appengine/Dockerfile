@@ -91,5 +91,6 @@ CMD []
 ENV RACK_ENV=production \
     RAILS_ENV=production \
     APP_ENV=production \
-    RAILS_SERVE_STATIC_FILES=true
+    RAILS_SERVE_STATIC_FILES=true \
+    RAILS_LOG_TO_STDOUT=true
 ENTRYPOINT bundle exec rackup -p $PORT config.ru -E $RACK_ENV
