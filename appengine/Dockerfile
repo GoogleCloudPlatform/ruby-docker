@@ -55,7 +55,7 @@ RUN git clone https://github.com/sstephenson/rbenv.git /rbenv && \
 ENV PATH /rbenv/shims:/rbenv/bin:$PATH
 
 # Preinstalled default ruby version.
-ENV DEFAULT_RUBY_VERSION 2.3.1
+ENV DEFAULT_RUBY_VERSION 2.3.3
 ENV BUNDLER_VERSION 1.13.6
 
 # Set ruby runtime distribution
