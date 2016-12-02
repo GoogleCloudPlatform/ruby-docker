@@ -24,6 +24,7 @@ RUN apt-get update -y && \
         ca-certificates \
         curl \
         git \
+        file \
         libffi-dev \
         libgdbm-dev \
         libgmp-dev \
