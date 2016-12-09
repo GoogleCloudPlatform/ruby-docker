@@ -26,5 +26,13 @@
 			"command": ["ruby", "-e", "puts ENV[\"RAILS_ENV\"]"],
 			"expectedOutput": ["production\n"]
 		}
+	],
+	"licenseTests": [
+		{
+			"debian": true,
+			"files": [
+				"/nodejs/LICENSE"
+			]
+		}
 	]
 }
