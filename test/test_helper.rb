@@ -32,15 +32,14 @@ module TestHelper
   # Flunks if it does not succeed and produce output matching the given
   # expectation (string or regex) within the given timeout in seconds.
   def assert_cmd_output(cmd, expectation, timeout=0)
+    expectations = Array(expectation)
     actual = ""
     exit_code = 0
     0.upto(timeout) do |iter|
       puts cmd
       actual = `#{cmd}`
       exit_code = $?.exitstatus
-      if exit_code == 0 && (expectation == nil || expectation === actual)
-        return actual
-      end
+      return actual if exit_code == 0 && expectations.all? { |e| e === actual }
       puts("...expected result did not arrive yet (iteration #{iter})...")
       sleep(1)
     end
