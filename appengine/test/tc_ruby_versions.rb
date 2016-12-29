@@ -1,5 +1,5 @@
 require "minitest/autorun"
-require_relative "test_helper"
+require_relative "../../test/test_helper"
 
 
 # Tests of the supported ruby versions. Ensures that all supported ruby
