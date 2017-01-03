@@ -9,7 +9,7 @@ before_install:
   - gem install minitest
 
 script:
-  - travis_retry rake -f appengine/Rakefile build
-  - rake -f appengine/Rakefile test
+  - travis_retry rake -f appengine/Rakefile build:local
+  - rake -f appengine/Rakefile test:only
   - travis_retry rake -f builder/Rakefile build:local
   - rake -f builder/Rakefile test:only
