@@ -11,3 +11,5 @@ before_install:
 script:
   - travis_retry rake -f appengine/Rakefile build:local
   - rake -f appengine/Rakefile test:only
+  - travis_retry rake -f builder/Rakefile build:local
+  - rake -f builder/Rakefile test:only
