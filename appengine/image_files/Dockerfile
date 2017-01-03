@@ -81,7 +81,7 @@ ENV NOKOGIRI_USE_SYSTEM_LIBRARIES 1
 # Temporarily replace ImageMagick policy file with one that fixes
 # CVE-2016-3714 and others.
 RUN mkdir -p /etc/ImageMagick-6 && rm -f /etc/ImageMagick-6/policy.xml
-COPY files/policy.xml /etc/ImageMagick-6/
+COPY policy.xml /etc/ImageMagick-6/
 
 # Clean up apt
 RUN apt-get clean && rm -f /var/lib/apt/lists/*_*
