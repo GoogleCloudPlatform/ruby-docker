@@ -21,22 +21,30 @@ class BuildScript
   DEFAULT_ENTRYPOINT = "bundle exec rackup -p $PORT"
 
   def initialize args
-    @build = BuildInfo.new args
+    @base_image_tag = DEFAULT_BASE_IMAGE_TAG
+    @enable_packages = false
+    @build = BuildInfo.new args do |opts|
+      opts.on "--base-image-tag=TAG" do |tag|
+        @base_image_tag = tag
+      end
+      opts.on "--enable-packages" do
+        @enable_packages = true
+      end
+    end
     @build.banner "ruby-gen-dockerfile", <<~DESCRIPTION
       Generates a Dockerfile for this Ruby application.
     DESCRIPTION
   end
 
   def main
-    base_image_tag =
-        @build.runtime_config["base_image_tag"] || DEFAULT_BASE_IMAGE_TAG
-    packages = @build.runtime_config["packages"] || []
+    packages = @build.runtime_config["packages"] if @enable_packages
+    packages ||= []
     entrypoint =
         @build.runtime_config["entrypoint"] ||
         @build.app_yaml["entrypoint"] ||
         DEFAULT_ENTRYPOINT
     @build.write_file "Dockerfile",
-                      base_image_tag: base_image_tag,
+                      base_image_tag: @base_image_tag,
                       ruby_version: @build.ruby_version,
                       packages: packages,
                       entrypoint: entrypoint

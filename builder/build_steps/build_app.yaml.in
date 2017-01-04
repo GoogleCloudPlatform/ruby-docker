@@ -1,6 +1,6 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--pull', '--no-cache', '-t', '$IMAGE', '-f', 'build_app/Dockerfile', '.']
+    args: ['build', '--pull', '--no-cache', '-t', 'gcr.io/$PROJECT/ruby-build-app:$TAG', '-f', 'build_app/Dockerfile', '.']
 
 images:
-  - '$IMAGE'
+  - 'gcr.io/$PROJECT/ruby-build-app:$TAG'

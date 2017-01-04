@@ -12,12 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Use the Ruby base image to get Ruby and its dependencies.
-FROM gcr.io/google_appengine/ruby
+# This builder may need to run Rails build commands, so it uses the Ruby base
+# image to get Ruby and its dependencies.
+FROM gcr.io/google_appengine/ruby:$BASE_TAG
 
-# Install the build script and dockerfile templates.
-RUN mkdir /buildstep
-COPY gen_dockerfile/ /buildstep/
+# Install cloud_sql_proxy in case it is needed by Rails asset precompilation.
+RUN mkdir /buildstep && mkdir /cloudsql
+RUN curl https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 \
+        > /buildstep/cloud_sql_proxy \
+    && chmod a+x /buildstep/cloud_sql_proxy
+
+# Install the build scripts.
+COPY build_app/ /buildstep/
 COPY shared/ /buildstep/
 RUN mv /buildstep/run_build_step.sh /buildstep/run_build_step \
     && chmod a+x /buildstep/run_build_step

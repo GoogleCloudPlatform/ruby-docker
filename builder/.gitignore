@@ -1,5 +1,6 @@
 test/tmp
-tmp
+pipeline
 build_steps/gen_dockerfile.yaml
 build_steps/build_app.yaml
-ruby.yaml
+build_steps/gen_dockerfile/Dockerfile
+build_steps/build_app/Dockerfile
