@@ -52,6 +52,7 @@ class BuildInfo
       opts.on "--rbenv-dir=PATH" do |path|
         @rbenv_dir = ::File.absolute_path path
       end
+      yield opts if block_given?
     end.parse! args
     @app_yaml = ::Psych.load_file "#{@workspace_dir}/app.yaml" rescue {}
     @runtime_config = @app_yaml["runtime_config"] || {}

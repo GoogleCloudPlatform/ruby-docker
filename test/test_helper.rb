@@ -9,13 +9,14 @@ module TestHelper
   end
 
   # Assert that the given file contents matches the given string or regex.
-  def assert_file_contents(path, expectation)
+  def assert_file_contents(path, expectations)
     contents = ::IO.read(path)
-    if expectation === contents
-      contents
-    else
-      flunk "File #{path} did not contain #{expectation.inspect}"
+    Array(expectations).each do |expectation|
+      unless expectation === contents
+        flunk "File #{path} did not contain #{expectation.inspect}"
+      end
     end
+    contents
   end
 
   # Assert that execution of the given command produces a zero exit code.

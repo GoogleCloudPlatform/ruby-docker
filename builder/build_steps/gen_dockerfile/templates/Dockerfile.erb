@@ -52,8 +52,8 @@ RUN if test -f Gemfile.lock; then \
       && rbenv rehash; \
     fi
 
-# BUG: Reset entrypoint to override base image.
+# Reset entrypoint to override anything set by base image.
 ENTRYPOINT []
 
-# Start application on port $PORT.
-CMD <%= @entrypoint %>
+# Command to start application.
+CMD exec <%= @entrypoint %>

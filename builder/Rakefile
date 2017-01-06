@@ -17,72 +17,44 @@ require "erb"
 
 STEPS = ["build_app", "gen_dockerfile"]
 DEFAULT_PROJECT = "cloud-builders"
+DEFAULT_TAG = "latest"
 
 ::Dir.chdir(::File.dirname __FILE__)
 
-def image_for_step step
-  "ruby-#{step.gsub '_', '-'}"
-end
-
 STEPS.each do |step|
-  step_image = image_for_step step
-
-  desc "Build local docker image for #{step_image}"
-  task "build:#{step}:local", :name do |t, args|
-    name = args[:name] || step_image
+  desc "Build local docker image for #{step}"
+  task "build:#{step}:local", :image do |t, args|
+    image = args[:image] || "ruby-#{step.gsub '_', '-'}"
     ::Dir.chdir "build_steps" do
-      sh "docker build --pull --no-cache -t #{name} -f #{step}/Dockerfile ."
+      sh "sed -e 's/$BASE_TAG/latest/g'" \
+        " < #{step}/Dockerfile.in > #{step}/Dockerfile"
+      sh "docker build --pull --no-cache -t #{image} -f #{step}/Dockerfile ."
     end
   end
 
-  desc "Build #{step_image} to a given project"
-  task "build:#{step}:project", :project, :tag do |t, args|
-    project = args[:project]
-    fail "Project name required" unless project
-    tag = args[:tag] || "latest"
-    sh "./build_#{step}.sh gcr.io/#{project}/#{step_image}:#{tag}"
-  end
-
-  desc "Build #{step_image} to a given tag on the canonical image path"
-  task "build:#{step}:tag", :tag do |t, args|
-    tag = args[:tag]
-    fail "Tag name required" unless tag
-    sh "./build_#{step}.sh gcr.io/#{DEFAULT_PROJECT}/#{step_image}:#{tag}"
+  desc "Build #{step} to a given tag and project"
+  task "build:#{step}", :tag, :project do |t, args|
+    tag = args[:tag] || DEFAULT_TAG
+    project = args[:project] || DEFAULT_PROJECT
+    sh "./build_#{step}.sh #{tag} #{project}"
   end
 end
 
 desc "Build local docker image for all steps"
 task "build:local" => STEPS.map { |step| "build:#{step}:local" }
 
-desc "Build all steps to a given project"
-task "build:project", :project, :tag do |t, args|
-  project = args[:project]
-  fail "Project name required" unless project
-  tag = args[:tag] || "latest"
-  STEPS.each do |step|
-    step_image = image_for_step step
-    sh "./build_#{step}.sh gcr.io/#{project}/#{step_image}:#{tag}"
-  end
-end
-
-desc "Build all steps to a given tag on the canonical image path"
-task "build:tag", :tag do |t, args|
-  tag = args[:tag]
-  fail "Tag name required" unless tag
-  STEPS.each do |step|
-    step_image = image_for_step step
-    sh "./build_#{step}.sh gcr.io/#{DEFAULT_PROJECT}/#{step_image}:#{tag}"
-  end
-end
-
 desc "Generate pipeline ruby.yaml"
-task "gen_pipeline", :project, :tag do |t, args|
+task "build:pipeline", :tag, :project do |t, args|
+  tag = args[:tag] || DEFAULT_TAG
   project = args[:project] || DEFAULT_PROJECT
-  tag = args[:tag] || "latest"
-  sh "cat ruby.yaml.in | " \
-    "sed -e \"s|\\$PROJECT|#{project}|g\" | " \
-    "sed -e \"s|\\$TAG|#{tag}|g\" | " \
-    "cat > ruby.yaml"
+  sh "./build_pipeline.sh #{tag} #{project}"
+end
+
+desc "Build the pipeline and all steps to a given tag and project"
+task "build", :tag, :project do |t, args|
+  tag = args[:tag] || DEFAULT_TAG
+  project = args[:project] || DEFAULT_PROJECT
+  sh "./build.sh #{tag} #{project}"
 end
 
 Rake::TestTask.new "test:only" do |t|

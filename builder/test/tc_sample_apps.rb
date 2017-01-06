@@ -54,10 +54,14 @@ class TestSampleApps < ::Minitest::Test
     end
 
     assert_docker_output \
-        "-v #{TMP_DIR}:/workspace -w /workspace ruby-gen-dockerfile -t",
+        "-v #{TMP_DIR}:/workspace -w /workspace ruby-gen-dockerfile -t" \
+          " --base-image-tag=my-test-tag",
         nil
     assert_file_contents "#{TMP_DIR}/Dockerfile",
-        /ARG REQUESTED_RUBY_VERSION="#{ruby_version}"/
+        [
+          /ARG REQUESTED_RUBY_VERSION="#{ruby_version}"/,
+          /FROM gcr\.io\/google_appengine\/ruby:my-test-tag/
+        ]
     assert_file_contents "#{TMP_DIR}/.dockerignore", /Dockerfile/
 
     assert_docker_output \
