@@ -25,7 +25,7 @@ RUN apt-get update -y && \
         curl \
         git \
         file \
-	imagemagick \
+        imagemagick \
         libffi-dev \
         libgdbm-dev \
         libgmp-dev \
