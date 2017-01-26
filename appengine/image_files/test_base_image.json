@@ -25,6 +25,11 @@
 			"name": "test_rails_env_var",
 			"command": ["ruby", "-e", "puts ENV[\"RAILS_ENV\"]"],
 			"expectedOutput": ["production\n"]
+		},
+		{
+			"name": "test_imagemagick_installation",
+			"command": ["convert", "-version"],
+			"expectedOutput": ["Version: ImageMagick [0-9]+\\.\\d+.*"]
 		}
 	],
 	"licenseTests": [
