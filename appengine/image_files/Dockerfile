@@ -87,16 +87,16 @@ COPY policy.xml /etc/ImageMagick-6/
 # Clean up apt
 RUN apt-get clean && rm -f /var/lib/apt/lists/*_*
 
-# Common configuration for any ENTRYPOINT
-WORKDIR /app
-EXPOSE 8080
-ENV PORT 8080
-CMD []
-
-# Default ENTRYPOINT
+# Common environment variables for framework configuration
 ENV RACK_ENV=production \
     RAILS_ENV=production \
     APP_ENV=production \
     RAILS_SERVE_STATIC_FILES=true \
     RAILS_LOG_TO_STDOUT=true
-ENTRYPOINT bundle exec rackup -p $PORT config.ru -E $RACK_ENV
+
+# Initialize entrypoint
+WORKDIR /app
+EXPOSE 8080
+ENV PORT=8080
+ENTRYPOINT []
+CMD []
