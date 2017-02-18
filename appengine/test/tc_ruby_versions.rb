@@ -36,6 +36,8 @@ class TestRubyVersions < ::Minitest::Test
     "2.3.1",
     "2.3.2",
     "2.3.3",
+    # 2.4.x versions are currently supported.
+    "2.4.0",
     # Test for no requested version (i.e. fall back to default)
     ""
   ]
