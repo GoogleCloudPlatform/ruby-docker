@@ -60,7 +60,7 @@ class TestSampleApps < ::Minitest::Test
     assert_file_contents "#{TMP_DIR}/Dockerfile",
         [
           /ARG REQUESTED_RUBY_VERSION="#{ruby_version}"/,
-          /FROM gcr\.io\/google_appengine\/ruby:my-test-tag/
+          /FROM gcr\.io\/google-appengine\/ruby:my-test-tag/
         ]
     assert_file_contents "#{TMP_DIR}/.dockerignore", /Dockerfile/
 

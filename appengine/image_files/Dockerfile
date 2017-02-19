@@ -2,7 +2,7 @@
 # Dockerfiles for App Engine Ruby apps should inherit FROM this image.
 
 # The base image installs a version of Debian.
-FROM gcr.io/google_appengine/debian8
+FROM gcr.io/google-appengine/debian8
 
 # Install dependencies for Ruby
 # Also installs dependencies for the following common gems:

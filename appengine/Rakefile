@@ -1,6 +1,6 @@
 require "rake/testtask"
 
-DEFAULT_PROJECT = "google_appengine"
+DEFAULT_PROJECT = "google-appengine"
 
 ::Dir.chdir ::File.dirname __FILE__
 
