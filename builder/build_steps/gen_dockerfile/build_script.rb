@@ -17,7 +17,7 @@
 require_relative "build_info.rb"
 
 class BuildScript
-  DEFAULT_BASE_IMAGE_TAG = "latest"
+  DEFAULT_BASE_IMAGE_TAG = "staging"
   DEFAULT_ENTRYPOINT = "bundle exec rackup -p $PORT"
 
   def initialize args
@@ -37,7 +37,7 @@ class BuildScript
   end
 
   def main
-    packages = @build.runtime_config["packages"] if @enable_packages
+    packages = @build.app_yaml["packages"] if @enable_packages
     packages ||= []
     entrypoint =
         @build.runtime_config["entrypoint"] ||
