@@ -14,7 +14,7 @@
 
 # This builder may need to run Rails build commands, so it uses the Ruby base
 # image to get Ruby and its dependencies.
-FROM gcr.io/google_appengine/ruby:$BASE_TAG
+FROM gcr.io/google-appengine/ruby:$BASE_TAG
 
 # Install cloud_sql_proxy in case it is needed by Rails asset precompilation.
 RUN mkdir /buildstep && mkdir /cloudsql

@@ -1,6 +1,6 @@
-# gcr.io/google_appengine/ruby
+# gcr.io/google-appengine/ruby
 
-[`gcr.io/google_appengine/ruby`](http://cloud.google.com/ruby) is a
+[`gcr.io/google-appengine/ruby`](http://cloud.google.com/ruby) is a
 [Docker](https://docker.com) base image that bundles stable versions of
 [Ruby](http://ruby-lang.org) and [Bundler](http://bundler.io), and makes it
 easy to containerize standard [Rack](http://rack.github.io) applications. It
@@ -55,7 +55,7 @@ might include the following files:
 Next, create a Dockerfile in your ruby application directory with the following
 content.
 
-    FROM gcr.io/google_appengine/ruby
+    FROM gcr.io/google-appengine/ruby
     COPY . /app/
     RUN bundle install && rbenv rehash
     CMD ["bundle", "exec", "rackup", "--port=$PORT", "--env=$RACK_ENV"]
