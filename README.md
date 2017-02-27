@@ -1,7 +1,21 @@
-ruby-docker
-===========
+# Ruby Runtime for Google Cloud Platform
 
-This repository contains the source for the `gcr.io/google-appengine/ruby`
-[Docker](https://docker.com) image. This image is used as a base image for
-Ruby applications running on Google App Engine Flex. For more information,
-see https://cloud.google.com/ruby
+[![Travis-CI Build Status](https://travis-ci.org/GoogleCloudPlatform/ruby-docker.svg)](https://travis-ci.org/GoogleCloudPlatform/ruby-docker/)
+
+This repository contains the source for the Ruby runtime for
+[Google App Engine Flexible](https://cloud.google.com/appengine/docs/flexible/).
+It comprises:
+
+* The base image `gcr.io/google-appengine/ruby` in the `appengine` directory.
+* The Ruby runtime build pipeline in the `builder` directory.
+
+For more information on using the Ruby runtime, see
+https://cloud.google.com/ruby
+
+## Contributing changes
+
+* See [CONTRIB.md](CONTRIB.md)
+
+## License
+
+* See [LICENSE](LICENSE)
