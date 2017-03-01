@@ -60,6 +60,8 @@ may use the following Dockerfile:
 See the next section on the design of the base image for more information on
 what your Dockerfile should do.
 
+For a full example on deploying a Ruby application to Google Container Engine, see [this tutorial](https://cloud.google.com/ruby/tutorials/bookshelf-on-container-engine).
+
 ## About the Ruby image
 
 ### Base image contents
