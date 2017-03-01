@@ -1,7 +1,7 @@
 steps:
+  - name: 'gcr.io/$PROJECT/ruby-build-app:$TAG'
   - name: 'gcr.io/$PROJECT/ruby-gen-dockerfile:$TAG'
     args: ['--base-image-tag', '$TAG', '--enable-packages']
-  - name: 'gcr.io/$PROJECT/ruby-build-app:$TAG'
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_OUTPUT_IMAGE', '.']
 images:

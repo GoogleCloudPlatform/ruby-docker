@@ -13,4 +13,5 @@ fi
 
 mkdir -p pipeline
 sed -e "s|\$PROJECT|${PROJECT}|g; s|\$TAG|${TAG}|g" \
-  < ruby.yaml.in > pipeline/ruby.yaml
+  < ruby.yaml.in > pipeline/ruby-$TAG.yaml
+echo -n $TAG > pipeline/ruby.version
