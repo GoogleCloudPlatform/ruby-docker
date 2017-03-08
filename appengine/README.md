@@ -1,7 +1,6 @@
-# gcr.io/google-appengine/ruby
+# [Base Image](http://cloud.google.com/ruby)
 
-[`gcr.io/google-appengine/ruby`](http://cloud.google.com/ruby) is a
-[Docker](https://docker.com) base image that bundles stable versions of
+This is a [Docker](https://docker.com) base image that bundles stable versions of
 [Ruby](http://ruby-lang.org) and [Bundler](http://bundler.io), and makes it
 easy to containerize standard [Rack](http://rack.github.io) applications. It
 is used primarily as the base image for deploying Ruby applications to
@@ -9,6 +8,10 @@ is used primarily as the base image for deploying Ruby applications to
 It may also be used as a base image for running applications on
 [Google Container Engine](https://cloud.google.com/container-engine) or any
 other Docker host.
+
+The image can be found at `l.gcr.io/google/ruby`
+(or at `gcr.io/google-appengine/ruby` for deploying applications
+to Google App Engine Flex).
 
 ## Usage
 
@@ -48,7 +51,7 @@ For example, if you have a Rack-based application with a `config.ru` file, you
 may use the following Dockerfile:
 
     # Use the Ruby base image
-    FROM gcr.io/google-appengine/ruby:latest
+    FROM l.gcr.io/google/ruby:latest
 
     # Copy application files and install the bundle
     COPY . /app/
@@ -104,7 +107,7 @@ performed by your downstream Dockerfile:
 ### Building the base image
 
 Google regularly builds and releases this image at
-`gcr.io/google-appengine/ruby`.
+`l.gcr.io/google/ruby` and `gcr.io/google-appengine/ruby`.
 
 You may build the image yourself using the provided Rake tasks. To build the
 image locally:

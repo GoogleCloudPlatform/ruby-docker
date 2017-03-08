@@ -6,7 +6,7 @@ This repository contains the source for the Ruby runtime for
 [Google App Engine Flexible](https://cloud.google.com/appengine/docs/flexible/).
 It comprises:
 
-* The base image `gcr.io/google-appengine/ruby` in the `appengine` directory.
+* The base image in the `appengine` directory.
 * The Ruby runtime build pipeline in the `builder` directory.
 
 For more information on using the Ruby runtime, see
