@@ -9,10 +9,6 @@ It comprises:
 * The base image in the `appengine` directory.
 * The Ruby runtime build pipeline in the `builder` directory.
 
-The image can be found at `l.gcr.io/google/ruby`
-(or at `gcr.io/google-appengine/ruby` for deploying applications
-to Google App Engine Flex).
-
 For more information on using the Ruby runtime, see
 https://cloud.google.com/ruby
 
