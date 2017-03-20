@@ -55,7 +55,7 @@ class TestSampleApps < ::Minitest::Test
 
     assert_docker_output \
         "-v #{TMP_DIR}:/workspace -w /workspace ruby-gen-dockerfile -t" \
-          " --base-image-tag=my-test-tag",
+          " --base-image=gcr.io/google-appengine/ruby:my-test-tag",
         nil
     assert_file_contents "#{TMP_DIR}/Dockerfile",
         [

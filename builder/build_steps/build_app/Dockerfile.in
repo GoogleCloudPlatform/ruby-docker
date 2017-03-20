@@ -25,8 +25,6 @@ RUN curl https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 \
 # Install the build scripts.
 COPY build_app/ /buildstep/
 COPY shared/ /buildstep/
-RUN mv /buildstep/run_build_step.sh /buildstep/run_build_step \
-    && chmod a+x /buildstep/run_build_step
 
 # The entry point runs the build script.
-ENTRYPOINT ["/buildstep/run_build_step"]
+ENTRYPOINT ["/buildstep/run_build_step.sh"]
