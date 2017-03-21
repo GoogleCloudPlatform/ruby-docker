@@ -4,9 +4,9 @@
 # * A number of packages needed by the Ruby runtime and by gems
 #   commonly used in Ruby web apps (such as libsqlite3)
 # * A recent version of NodeJS
-# * A recent version of the standard Ruby runtime to use by default
+# * A recent version of the standard Ruby interpreter to use by default
 # * The bundler gem
-FROM gcr.io/google-appengine/ruby:<%= @base_image_tag %>
+FROM <%= @base_image %>
 
 # If your application requires a specific ruby version (compatible with rbenv),
 # set it here. Leave blank to use the currently recommended default.
@@ -14,7 +14,7 @@ ARG REQUESTED_RUBY_VERSION="<%= @ruby_version %>"
 
 # If your application requires additional Debian packages, include their names
 # here, space-delimited.
-ARG ADDITIONAL_PACKAGES="<%= @packages.join(' ') %>"
+ARG ADDITIONAL_PACKAGES="<%= @packages %>"
 
 # Set up package installs if it is possible we need it.
 RUN if test -n "$REQUESTED_RUBY_VERSION" -o -n "$ADDITIONAL_PACKAGES"; then \

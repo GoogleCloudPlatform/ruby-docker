@@ -19,6 +19,7 @@ require "psych"
 class BuildInfo
   DEFAULT_WORKSPACE_DIR = "/workspace"
   DEFAULT_RBENV_DIR = "/rbenv"
+  DEFAULT_APP_YAML_PATH = "app.yaml"
 
   class ErbSandbox
     def run template, data={}
@@ -33,7 +34,8 @@ class BuildInfo
   attr_reader :builder_dir
   attr_reader :workspace_dir
   attr_reader :rbenv_dir
-  attr_reader :app_yaml
+  attr_reader :app_yaml_path
+  attr_reader :app_config
   attr_reader :runtime_config
   attr_reader :ruby_version
 
@@ -54,8 +56,10 @@ class BuildInfo
       end
       yield opts if block_given?
     end.parse! args
-    @app_yaml = ::Psych.load_file "#{@workspace_dir}/app.yaml" rescue {}
-    @runtime_config = @app_yaml["runtime_config"] || {}
+    @app_yaml_path = ::ENV["GAE_APPLICATION_YAML_PATH"] || DEFAULT_APP_YAML_PATH
+    @app_config =
+      ::Psych.load_file "#{@workspace_dir}/#{@app_yaml_path}" rescue {}
+    @runtime_config = @app_config["runtime_config"] || {}
     @ruby_version = ::File.read("#{@workspace_dir}/.ruby-version") rescue ''
     @ruby_version.strip!
     ::Dir.chdir workspace_dir
@@ -68,6 +72,10 @@ class BuildInfo
       file.write content
     end
     log "Wrote #{filename}"
+  end
+
+  def file_exists? filename
+    ::File.exist? "#{workspace_dir}/#{filename}"
   end
 
   def log s

@@ -17,15 +17,15 @@
 require_relative "build_info.rb"
 
 class BuildScript
-  DEFAULT_BASE_IMAGE_TAG = "staging"
+  DEFAULT_BASE_IMAGE = "gcr.io/google-appengine/ruby:staging"
   DEFAULT_ENTRYPOINT = "bundle exec rackup -p $PORT"
 
   def initialize args
-    @base_image_tag = DEFAULT_BASE_IMAGE_TAG
+    @base_image = DEFAULT_BASE_IMAGE
     @enable_packages = false
     @build = BuildInfo.new args do |opts|
-      opts.on "--base-image-tag=TAG" do |tag|
-        @base_image_tag = tag
+      opts.on "--base-image=IMAGE" do |image|
+        @base_image = image
       end
       opts.on "--enable-packages" do
         @enable_packages = true
@@ -37,18 +37,21 @@ class BuildScript
   end
 
   def main
-    packages = @build.app_yaml["packages"] if @enable_packages
+    packages = @build.app_config["packages"] if @enable_packages
     packages ||= []
     entrypoint =
         @build.runtime_config["entrypoint"] ||
-        @build.app_yaml["entrypoint"] ||
+        @build.app_config["entrypoint"] ||
         DEFAULT_ENTRYPOINT
     @build.write_file "Dockerfile",
-                      base_image_tag: @base_image_tag,
+                      base_image: @base_image,
                       ruby_version: @build.ruby_version,
-                      packages: packages,
+                      packages: packages.join(' '),
                       entrypoint: entrypoint
-    @build.write_file ".dockerignore"
+    unless @build.file_exists? ".dockerignore"
+      @build.write_file ".dockerignore",
+                        gae_application_yaml_path: @build.app_yaml_path
+    end
     @build.cleanup_file_perms
   end
 end

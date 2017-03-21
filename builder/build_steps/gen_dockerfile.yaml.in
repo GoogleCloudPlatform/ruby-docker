@@ -1,5 +1,5 @@
 steps:
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: 'gcr.io/cloud-builders/docker:latest'
     args: ['build', '--pull', '--no-cache', '-t', 'gcr.io/$PROJECT/ruby-gen-dockerfile:$TAG', '-f', 'gen_dockerfile/Dockerfile', '.']
 
 images:

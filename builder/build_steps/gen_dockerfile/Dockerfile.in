@@ -19,8 +19,6 @@ FROM gcr.io/google-appengine/ruby:$BASE_TAG
 RUN mkdir /buildstep
 COPY gen_dockerfile/ /buildstep/
 COPY shared/ /buildstep/
-RUN mv /buildstep/run_build_step.sh /buildstep/run_build_step \
-    && chmod a+x /buildstep/run_build_step
 
 # The entry point runs the build script.
-ENTRYPOINT ["/buildstep/run_build_step"]
+ENTRYPOINT ["/buildstep/run_build_step.sh"]
