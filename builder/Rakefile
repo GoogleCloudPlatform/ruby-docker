@@ -16,8 +16,8 @@ require "rake/testtask"
 require "erb"
 
 STEPS = ["build_app", "gen_dockerfile"]
-DEFAULT_PROJECT = "cloud-builders"
-DEFAULT_TAG = "latest"
+DEFAULT_BASE_IMAGE_TAG = "latest"
+DEFAULT_BUILDER_TAG = "same"
 
 ::Dir.chdir(::File.dirname __FILE__)
 
@@ -26,17 +26,17 @@ STEPS.each do |step|
   task "build:#{step}:local", :image do |t, args|
     image = args[:image] || "ruby-#{step.gsub '_', '-'}"
     ::Dir.chdir "build_steps" do
-      sh "sed -e 's/$BASE_TAG/latest/g'" \
+      sh "sed -e 's/$BASE_IMAGE_TAG/latest/g'" \
         " < #{step}/Dockerfile.in > #{step}/Dockerfile"
       sh "docker build --pull --no-cache -t #{image} -f #{step}/Dockerfile ."
     end
   end
 
   desc "Build #{step} to a given tag and project"
-  task "build:#{step}", :tag, :project do |t, args|
-    tag = args[:tag] || DEFAULT_TAG
-    project = args[:project] || DEFAULT_PROJECT
-    sh "./build_#{step}.sh #{tag} #{project}"
+  task "build:#{step}", :base_image_tag, :builder_tag do |t, args|
+    base_image_tag = args[:base_image_tag] || DEFAULT_BASE_IMAGE_TAG
+    builder_tag = args[:builder_tag] || DEFAULT_BUILDER_TAG
+    sh "./build_step.sh #{step} -i #{base_image_tag} -t #{builder_tag}"
   end
 end
 
@@ -44,17 +44,10 @@ desc "Build local docker image for all steps"
 task "build:local" => STEPS.map { |step| "build:#{step}:local" }
 
 desc "Generate pipeline ruby.yaml"
-task "build:pipeline", :tag, :project do |t, args|
-  tag = args[:tag] || DEFAULT_TAG
-  project = args[:project] || DEFAULT_PROJECT
-  sh "./build_pipeline.sh #{tag} #{project}"
-end
-
-desc "Build the pipeline and all steps to a given tag and project"
-task "build", :tag, :project do |t, args|
-  tag = args[:tag] || DEFAULT_TAG
-  project = args[:project] || DEFAULT_PROJECT
-  sh "./build.sh #{tag} #{project}"
+task "build:pipeline", :base_image_tag, :builder_tag do |t, args|
+  base_image_tag = args[:base_image_tag] || DEFAULT_BASE_IMAGE_TAG
+  builder_tag = args[:builder_tag] || DEFAULT_BUILDER_TAG
+  sh "./build_pipeline.sh #{base_image_tag} #{builder_tag}"
 end
 
 Rake::TestTask.new "test:only" do |t|
