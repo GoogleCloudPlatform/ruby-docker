@@ -1,6 +1,6 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker:latest'
-    args: ['build', '--pull', '--no-cache', '-t', 'gcr.io/$PROJECT/ruby-gen-dockerfile:$TAG', '-f', 'gen_dockerfile/Dockerfile', '.']
+    args: ['build', '--pull', '--no-cache', '-t', 'gcr.io/$PROJECT/ruby/gen-dockerfile:$BUILDER_TAG', '-f', 'gen_dockerfile/Dockerfile', '.']
 
 images:
-  - 'gcr.io/$PROJECT/ruby-gen-dockerfile:$TAG'
+  - 'gcr.io/$PROJECT/ruby/gen-dockerfile:$BUILDER_TAG'
