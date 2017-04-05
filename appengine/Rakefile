@@ -8,7 +8,8 @@ desc "Build local docker image for base image"
 task "build:local", :name do |t, args|
   name = args[:name] || "appengine-ruby-base"
   ::Dir.chdir "image_files" do
-    sh "docker build --pull --no-cache -t #{name} ."
+    sh "docker build --pull --no-cache -t #{name}" +
+      " --build-arg RUNTIME_DISTRIBUTION=ruby-runtime-jessie-unstable ."
   end
 end
 
