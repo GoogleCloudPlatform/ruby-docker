@@ -11,17 +11,7 @@ class TestRubyVersions < ::Minitest::Test
     # 2.0 is obsolete, but we keep it for testing patchlevel notation and
     # installation from source.
     "2.0.0-p648",
-    # 2.1.x versions are currently supported.
-    "2.1.0",
-    "2.1.1",
-    "2.1.2",
-    "2.1.3",
-    "2.1.4",
-    "2.1.5",
-    "2.1.6",
-    "2.1.7",
-    "2.1.8",
-    "2.1.9",
+    # 2.1.x versions are currently deprecated.
     "2.1.10",
     # 2.2.x versions are currently supported.
     "2.2.0",
@@ -31,11 +21,13 @@ class TestRubyVersions < ::Minitest::Test
     "2.2.4",
     "2.2.5",
     "2.2.6",
+    "2.2.7",
     # 2.3.x versions are currently supported.
     "2.3.0",
     "2.3.1",
     "2.3.2",
     "2.3.3",
+    "2.3.4",
     # 2.4.x versions are currently supported.
     "2.4.0",
     "2.4.1",
