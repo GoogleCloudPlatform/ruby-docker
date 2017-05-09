@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+require "json"
 require_relative "build_info.rb"
 
 class BuildScript
@@ -98,9 +99,12 @@ class BuildScript
     @cloudsql_proxy_pid = nil
     proxy_ok = false
     begin
+      auth_token = get_auth_token
+      project_id = get_project_id
       @build.log "Starting CloudSQL Proxy..."
-      io = ::IO.popen "#{@build.builder_dir}/cloud_sql_proxy -dir=/cloudsql",
-          "r", err: [:child, :out]
+      cmd = "#{@build.builder_dir}/cloud_sql_proxy -dir=/cloudsql " +
+        "-token='#{auth_token}' -projects=#{project_id}"
+      io = ::IO.popen cmd, "r", err: [:child, :out]
       @cloudsql_proxy_pid = io.pid
       io.each_line do |line|
         @build.log line
@@ -130,6 +134,24 @@ class BuildScript
       @build.log "Running build script: #{script}"
       @build.ensure_cmd script
     end
+  end
+
+  def get_auth_token
+    cmd = 'curl -H "Metadata-Flavor: Google" http://metadata.google.internal/' +
+      'computeMetadata/v1/instance/service-accounts/default/token'
+    json = `#{cmd}`
+    raise "Unable to get auth token" unless json.start_with? '{"'
+    token_data = JSON.parse json
+    @build.log "Access token expires in #{token_data["expires_in"]} secs."
+    token_data["access_token"]
+  end
+
+  def get_project_id
+    cmd = 'curl -H "Metadata-Flavor: Google" http://metadata.google.internal/' +
+      'computeMetadata/v1/project/project-id'
+    result = `#{cmd}`
+    raise "Unable to get project ID" if result.start_with? '<!DOCTYPE'
+    result
   end
 end
 
