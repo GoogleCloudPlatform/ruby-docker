@@ -6,9 +6,10 @@ DIRNAME=$(dirname $0)
 
 BASE_IMAGE_TAG=$1
 BUILDER_TAG=$2
+UPLOAD_BUCKET=$3
 
 if [ -z "$BASE_IMAGE_TAG" -o -z "$BUILDER_TAG" ]; then
-  echo "Usage: ./build_pipeline.sh <base_image_tag> <builder_tag>" >&2
+  echo "Usage: ./build_pipeline.sh <base_image_tag> <builder_tag> [<bucket>]" >&2
   exit 1
 fi
 
@@ -38,3 +39,8 @@ mkdir -p $DIRNAME/pipeline
 sed -e "s|\$PROJECT|${PROJECT}|g; s|\$BUILDER_TAG|${BUILDER_TAG}|g; s|\$BASE_IMAGE_TAG|${BASE_IMAGE_TAG}|g" \
   < $DIRNAME/ruby.yaml.in > $DIRNAME/pipeline/ruby-$BUILDER_TAG.yaml
 echo -n $BUILDER_TAG > $DIRNAME/pipeline/ruby.version
+
+if [ -n "$UPLOAD_BUCKET" ]; then
+  gsutil cp $DIRNAME/pipeline/ruby-$BUILDER_TAG.yaml gs://$UPLOAD_BUCKET/ruby-$BUILDER_TAG.yaml
+  gsutil cp $DIRNAME/pipeline/ruby.version gs://$UPLOAD_BUCKET/ruby.version
+fi
