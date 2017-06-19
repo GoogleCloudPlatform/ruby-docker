@@ -12,4 +12,4 @@ fi
 
 cd image_files
 sed -e "s|\$IMAGE|${IMAGE}|g" < cloudbuild.yaml.in > cloudbuild.yaml
-gcloud beta container builds submit . --config=cloudbuild.yaml
+gcloud container builds submit . --config=cloudbuild.yaml
