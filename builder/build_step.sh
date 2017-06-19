@@ -53,7 +53,7 @@ shift $((OPTIND-1))
 
 if [ "$BASE_IMAGE_TAG" = "staging" -o "$BASE_IMAGE_TAG" = "latest" ]; then
   SYMBOL=$BASE_IMAGE_TAG
-  BASE_IMAGE_TAG=$(gcloud beta container images list-tags gcr.io/google-appengine/ruby --filter=tags=$BASE_IMAGE_TAG --format="get(tags)" | sed -n 's|.*\([0-9]\{4\}-*[01][0-9]-*[0123][0-9][-_]*[0-9]\{6\}\).*|\1|p')
+  BASE_IMAGE_TAG=$(gcloud container images list-tags gcr.io/google-appengine/ruby --filter=tags=$BASE_IMAGE_TAG --format="get(tags)" | sed -n 's|.*\([0-9]\{4\}-*[01][0-9]-*[0123][0-9][-_]*[0-9]\{6\}\).*|\1|p')
   echo "Setting BASE_IMAGE_TAG to ${SYMBOL}: $BASE_IMAGE_TAG" >&2
 fi
 if [ "$BUILDER_TAG" = "new" ]; then
@@ -72,7 +72,7 @@ if [ -z "$PROJECT" ]; then
   exit 1
 fi
 
-EXISTING=$(gcloud beta container images list-tags gcr.io/$PROJECT/ruby/$STEP_NAME --filter=tags=$BUILDER_TAG --format='get(tags)')
+EXISTING=$(gcloud container images list-tags gcr.io/$PROJECT/ruby/$STEP_NAME --filter=tags=$BUILDER_TAG --format='get(tags)')
 if [ -n "$EXISTING" ]; then
   echo "Tag $BUILDER_TAG for $STEP_NAME in project $PROJECT already exists. Aborting." >&2
   exit 1
@@ -83,11 +83,11 @@ sed -e "s|\$PROJECT|${PROJECT}|g; s|\$BUILDER_TAG|${BUILDER_TAG}|g" \
   < $STEP.yaml.in > $STEP.yaml
 sed -e "s|\$BASE_IMAGE_TAG|${BASE_IMAGE_TAG}|g" \
   < $STEP/Dockerfile.in > $STEP/Dockerfile
-gcloud beta container builds submit . --config=$STEP.yaml
+gcloud container builds submit . --config=$STEP.yaml
 popd
 
 if [ "$STAGING_FLAG" = "true" ]; then
-  gcloud beta container images add-tag \
+  gcloud container images add-tag \
     gcr.io/$PROJECT/ruby/$STEP_NAME:$BUILDER_TAG \
     gcr.io/$PROJECT/ruby/$STEP_NAME:staging -q
 fi
