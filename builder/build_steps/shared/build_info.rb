@@ -36,6 +36,7 @@ class BuildInfo
   attr_reader :rbenv_dir
   attr_reader :app_yaml_path
   attr_reader :app_config
+  attr_reader :env_variables
   attr_reader :runtime_config
   attr_reader :ruby_version
 
@@ -59,6 +60,7 @@ class BuildInfo
     @app_yaml_path = ::ENV["GAE_APPLICATION_YAML_PATH"] || DEFAULT_APP_YAML_PATH
     @app_config =
       ::Psych.load_file "#{@workspace_dir}/#{@app_yaml_path}" rescue {}
+    @env_variables = @app_config["env_variables"] || {}
     @runtime_config = @app_config["runtime_config"] || {}
     @ruby_version = ::File.read("#{@workspace_dir}/.ruby-version") rescue ''
     @ruby_version.strip!

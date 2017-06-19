@@ -31,6 +31,7 @@ class BuildScript
     unless build_scripts.empty?
       install_binaries
       install_bundle
+      setup_env_variables
       start_services
       run_build_scripts build_scripts
       stop_services
@@ -95,6 +96,12 @@ class BuildScript
     end
   end
 
+  def setup_env_variables
+    @build.env_variables.each do |k, v|
+      ENV[k.to_s] = v.to_s
+    end
+  end
+
   def start_services
     @cloudsql_proxy_pid = nil
     proxy_ok = false
@@ -123,9 +130,7 @@ class BuildScript
   def stop_services
     if @cloudsql_proxy_pid
       @build.log "Shutting down CloudSQL Proxy"
-      ::Process.kill "INT", @cloudsql_proxy_pid
-      ::Process.wait @cloudsql_proxy_pid
-      @build.log "CloudSQL Proxy is down"
+      ::Process.kill "KILL", @cloudsql_proxy_pid
     end
   end
 
