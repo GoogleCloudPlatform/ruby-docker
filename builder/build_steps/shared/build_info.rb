@@ -37,6 +37,7 @@ class BuildInfo
   attr_reader :app_yaml_path
   attr_reader :app_config
   attr_reader :env_variables
+  attr_reader :cloud_sql_instances
   attr_reader :runtime_config
   attr_reader :ruby_version
 
@@ -62,6 +63,8 @@ class BuildInfo
       ::Psych.load_file "#{@workspace_dir}/#{@app_yaml_path}" rescue {}
     @env_variables = @app_config["env_variables"] || {}
     @runtime_config = @app_config["runtime_config"] || {}
+    beta_settings = @app_config["beta_settings"] || {}
+    @cloud_sql_instances = Array(beta_settings["cloud_sql_instances"])
     @ruby_version = ::File.read("#{@workspace_dir}/.ruby-version") rescue ''
     @ruby_version.strip!
     ::Dir.chdir workspace_dir

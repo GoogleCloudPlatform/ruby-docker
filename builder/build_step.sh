@@ -11,7 +11,7 @@ BUILDER_TAG="same"
 STAGING_FLAG=
 
 show_usage() {
-  echo "Usage: ./build.sh <step> [-i <base-image-tag>] [-t <builder-tag>] [-s]" >&2
+  echo "Usage: ./build_step.sh <step> [-i <base-image-tag>] [-t <builder-tag>] [-s]" >&2
   echo '<step> can be either "build_app" or "gen_dockerfile"'
   echo "Flags:" >&2
   echo '  -i: set the base image tag (defaults to latest, or use "staging")' >&2

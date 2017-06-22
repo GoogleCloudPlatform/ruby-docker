@@ -38,9 +38,12 @@ $DIRNAME/build.sh -i $BASE_IMAGE_TAG -t $BUILDER_TAG
 mkdir -p $DIRNAME/pipeline
 sed -e "s|\$PROJECT|${PROJECT}|g; s|\$BUILDER_TAG|${BUILDER_TAG}|g; s|\$BASE_IMAGE_TAG|${BASE_IMAGE_TAG}|g" \
   < $DIRNAME/ruby.yaml.in > $DIRNAME/pipeline/ruby-$BUILDER_TAG.yaml
+sed -e "s|\$BUILDER_TAG|${BUILDER_TAG}|g" \
+  < $DIRNAME/runtimes.yaml.in > $DIRNAME/pipeline/runtimes.yaml
 echo -n $BUILDER_TAG > $DIRNAME/pipeline/ruby.version
 
 if [ -n "$UPLOAD_BUCKET" ]; then
   gsutil cp $DIRNAME/pipeline/ruby-$BUILDER_TAG.yaml gs://$UPLOAD_BUCKET/ruby-$BUILDER_TAG.yaml
+  gsutil cp $DIRNAME/pipeline/runtimes.yaml gs://$UPLOAD_BUCKET/runtimes.yaml
   gsutil cp $DIRNAME/pipeline/ruby.version gs://$UPLOAD_BUCKET/ruby.version
 fi
