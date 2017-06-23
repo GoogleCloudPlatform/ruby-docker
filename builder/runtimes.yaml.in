@@ -1,0 +1,6 @@
+schema_version: 1
+
+runtimes:
+  ruby:
+    target:
+      file: ruby-$BUILDER_TAG.yaml
