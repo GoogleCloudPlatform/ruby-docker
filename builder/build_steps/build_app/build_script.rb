@@ -69,16 +69,21 @@ class BuildScript
         @build.log "Installing additional packages into build container..."
         @build.ensure_cmd "apt-get install -y -q #{packages.join(' ')}"
       end
-      if !ruby_version.empty? &&
-          !::File.executable?("#{rbenv_dir}/versions/#{ruby_version}/bin/ruby")
-        @build.log "Installing Ruby #{ruby_version} into build container..."
-        unless @build.check_cmd "apt-get install -y -q gcp-ruby-#{ruby_version}"
-          ::Dir.chdir "#{rbenv_dir}/plugins/ruby-build" do
-            @build.log "Need to build Ruby #{ruby_version} from source..."
-            @build.ensure_cmd "git pull"
-            @build.ensure_cmd "rbenv install -s #{ruby_version}"
+      unless ruby_version.empty?
+        unless ::File.executable? \
+            "#{rbenv_dir}/versions/#{ruby_version}/bin/ruby"
+          @build.log "Installing Ruby #{ruby_version} into build container..."
+          unless @build.check_cmd \
+              "apt-get install -y -q gcp-ruby-#{ruby_version}"
+            ::Dir.chdir "#{rbenv_dir}/plugins/ruby-build" do
+              @build.log "Need to build Ruby #{ruby_version} from source..."
+              @build.ensure_cmd "git pull"
+              @build.ensure_cmd "rbenv install -s #{ruby_version}"
+            end
           end
         end
+        ENV.delete "RBENV_VERSION"
+        ENV["PATH"] = "#{rbenv_dir}/shims:#{ENV['PATH']}"
         @build.ensure_cmd "rbenv global #{ruby_version}"
         @build.log "Installing bundler..."
         @build.ensure_cmd "gem install -q --no-rdoc --no-ri bundler" \
