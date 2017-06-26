@@ -63,8 +63,8 @@ RUN git clone https://github.com/sstephenson/rbenv.git $RBENV_ROOT && \
 ENV PATH $RBENV_ROOT/shims:$RBENV_ROOT/bin:$PATH
 
 # Preinstalled default ruby version.
-ENV DEFAULT_RUBY_VERSION 2.3.3
-ENV BUNDLER_VERSION 1.14.6
+ENV DEFAULT_RUBY_VERSION 2.3.4
+ENV BUNDLER_VERSION 1.15.1
 
 # Set ruby runtime distribution
 ARG RUNTIME_DISTRIBUTION="ruby-runtime-jessie"
