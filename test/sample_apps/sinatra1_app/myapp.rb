@@ -5,7 +5,7 @@ require "google/cloud/monitoring/v3"
 require 'open3'
 
 # Grab project_id from gcloud sdk
-project_id = ENV["GOOGLE_CLOUD_PROJECT"]
+project_id = ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id
 fail "ENV GOOGLE_CLOUD_PROJECT missing." unless project_id
 # service_name = "sinatra_sample_app"
 # serivce_version = ENV['USER']
