@@ -33,7 +33,7 @@ set :port, 8080
 set :show_exceptions, true
 
 get '/' do
-  "ruby app"
+  "Hello World!"
 end
 
 get '/system' do
@@ -53,15 +53,48 @@ route :get, :post, '/exception' do
   "Error submitted."
 end
 
-route :get, :post, '/log' do
-  logger.info {{log_key: "Test log from sinatra app"}}
+route :get, :post, '/logging_standard' do
+  request.body.rewind
+  request_payload = JSON.parse request.body.read
+
+  token = request_payload["token"]
+  level = request_payload["level"].to_sym
+
+  logger.add level, token
   "Log entry submitted"
 end
 
+route :get, :post, "/logging_custom" do
+  request.body.rewind
+  request_payload = JSON.parse request.body.read
+
+  token = request_payload["token"]
+  level = request_payload["level"].to_sym
+  log_name = request_payload["log_name"]
+
+  logging = Google::Cloud::Logging.new
+  resource = Google::Cloud::Logging::Middleware.build_monitored_resource
+
+  entry = logging.entry.tap do |e|
+    e.payload = token
+    e.log_name = log_name
+    e.severity = level
+    e.resource = resource
+  end
+
+  logging.write_entries entry
+end
+
 route :get, :post, '/monitoring' do
+  request.body.rewind
+  request_payload = JSON.parse request.body.read
+
+  token = request_payload["token"]
+  name = request_payload["name"]
+
   time_series_hash = {
       metric: {
-        type: "custom.googleapis.com/samples/sinatra1"
+        type: "custom.googleapis.com/#{name}"
       },
       resource: {
         type: "global"
@@ -74,11 +107,13 @@ route :get, :post, '/monitoring' do
           }
         },
         value: {
-          double_value: 123.45
+          int64_value: token
         }
       }]
     }
   time_series = Google::Monitoring::V3::TimeSeries.decode_json time_series_hash.to_json
+
+  p time_series
 
   monitoring.create_time_series "projects/#{project_id}", [time_series]
 
