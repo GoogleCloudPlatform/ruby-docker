@@ -6,25 +6,24 @@ require 'open3'
 
 # Grab project_id from gcloud sdk
 project_id = ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id
-fail "ENV GOOGLE_CLOUD_PROJECT missing." unless project_id
-# service_name = "sinatra_sample_app"
-# serivce_version = ENV['USER']
 
-#######################################
-# Setup ErrorReporting Middleware
-use Google::Cloud::ErrorReporting::Middleware
+if project_id
+  #######################################
+  # Setup ErrorReporting Middleware
+  use Google::Cloud::ErrorReporting::Middleware
 
-#######################################
-# Setup Logging Middleware
-use Google::Cloud::Logging::Middleware
+  #######################################
+  # Setup Logging Middleware
+  use Google::Cloud::Logging::Middleware
 
-#######################################
-# Setup Trace Middleware
-use Google::Cloud::Trace::Middleware
+  #######################################
+  # Setup Trace Middleware
+  use Google::Cloud::Trace::Middleware
 
-#######################################
-# Setup Monitoring
-monitoring = Google::Cloud::Monitoring::V3::MetricServiceClient.new
+  #######################################
+  # Setup Monitoring
+  monitoring = Google::Cloud::Monitoring::V3::MetricServiceClient.new
+end
 
 
 set :environment, :production
@@ -45,6 +44,8 @@ get '/_ah/health' do
 end
 
 route :get, :post, '/exception' do
+  fail "project_id missing." unless project_id
+
   begin
     fail "Test error from sinatra app"
   rescue => e
@@ -54,6 +55,8 @@ route :get, :post, '/exception' do
 end
 
 route :get, :post, '/logging_standard' do
+  fail "project_id missing." unless project_id
+
   request.body.rewind
   request_payload = JSON.parse request.body.read
 
@@ -65,6 +68,8 @@ route :get, :post, '/logging_standard' do
 end
 
 route :get, :post, "/logging_custom" do
+  fail "project_id missing." unless project_id
+
   request.body.rewind
   request_payload = JSON.parse request.body.read
 
@@ -86,6 +91,8 @@ route :get, :post, "/logging_custom" do
 end
 
 route :get, :post, '/monitoring' do
+  fail "project_id missing." unless project_id
+
   request.body.rewind
   request_payload = JSON.parse request.body.read
 
