@@ -7,23 +7,22 @@ require 'open3'
 # Grab project_id from gcloud sdk
 project_id = ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id
 
-if project_id
-  #######################################
-  # Setup ErrorReporting Middleware
-  # use Google::Cloud::ErrorReporting::Middleware
+#######################################
+# Setup ErrorReporting Middleware
+# use Google::Cloud::ErrorReporting::Middleware
 
-  #######################################
-  # Setup Logging Middleware
-  # use Google::Cloud::Logging::Middleware
+#######################################
+# Setup Logging Middleware
+use Google::Cloud::Logging::Middleware if project_id
 
-  #######################################
-  # Setup Trace Middleware
-  # use Google::Cloud::Trace::Middleware
+#######################################
+# Setup Trace Middleware
+# use Google::Cloud::Trace::Middleware
 
-  #######################################
-  # Setup Monitoring
-  # monitoring = Google::Cloud::Monitoring::V3::MetricServiceClient.new
-end
+#######################################
+# Setup Monitoring
+# monitoring = Google::Cloud::Monitoring::V3::MetricServiceClient.new
+
 
 
 set :environment, :production
