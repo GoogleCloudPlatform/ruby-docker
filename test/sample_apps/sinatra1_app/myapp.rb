@@ -7,9 +7,6 @@ require 'open3'
 # Grab project_id from gcloud sdk
 project_id = ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id
 
-p "**************************************************************************"
-p "zomg", project_id
-
 if project_id
   #######################################
   # Setup ErrorReporting Middleware
