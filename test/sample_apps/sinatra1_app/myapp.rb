@@ -10,7 +10,7 @@ project_id = ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id
 if project_id
   #######################################
   # Setup ErrorReporting Middleware
-  use Google::Cloud::ErrorReporting::Middleware
+  # use Google::Cloud::ErrorReporting::Middleware
 
   #######################################
   # Setup Logging Middleware
