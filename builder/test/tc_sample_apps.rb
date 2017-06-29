@@ -29,7 +29,7 @@ class TestSampleApps < ::Minitest::Test
   def test_rack_app
     run_app_test "rack_app"
     assert_file_contents "#{TMP_DIR}/Dockerfile",
-        /CMD \["bundle","exec","rackup","-p","8080"\]/
+        /CMD exec bundle exec rackup -p \$PORT/
   end
 
   def test_sinatra1_app
@@ -47,7 +47,7 @@ class TestSampleApps < ::Minitest::Test
   def test_rails4_app
     run_app_test "rails4_app", has_assets: true
     assert_file_contents "#{TMP_DIR}/Dockerfile",
-        /CMD \["bundle","exec","bin\/rails","s"\]/
+        /CMD exec bundle exec bin\/rails s/
   end
 
   def run_app_test app_name, ruby_version: "", has_assets: false
