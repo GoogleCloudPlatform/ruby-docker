@@ -120,8 +120,6 @@ route :get, :post, '/monitoring' do
     }
   time_series = Google::Monitoring::V3::TimeSeries.decode_json time_series_hash.to_json
 
-  p time_series
-
   monitoring.create_time_series "projects/#{project_id}", [time_series]
 
   "Time series submitted."
