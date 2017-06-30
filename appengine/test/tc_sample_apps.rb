@@ -5,7 +5,7 @@ require_relative "../../test/test_helper"
 # Tests of a bunch of sample apps. Treats every subdirectory of the test
 # directory that contains a Dockerfile as a sample app. Builds the docker
 # image, runs the server, and hits the root of the server, expecting the
-# string "ruby app" to be returned.
+# string "Hello World!" to be returned.
 #
 # This is supposed to exercise the base image extended in various ways, so
 # the sample app Dockerfiles should all inherit FROM the base image, which
@@ -42,10 +42,10 @@ class TestSampleApps < ::Minitest::Test
 
     ::Dir.chdir TMP_DIR do |dir|
       build_docker_image "", app_name do |image|
-        run_docker_daemon "-p 8080:8080 #{image}" do |container|
+        run_docker_daemon "-it -p 8080:8080 #{image}" do |container|
           assert_cmd_output \
               "docker exec #{container} curl -s -S http://127.0.0.1:8080",
-              "ruby app", 10
+              "Hello World!", 10
         end
       end
     end

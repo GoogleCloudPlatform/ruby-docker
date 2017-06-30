@@ -66,7 +66,7 @@ module TestHelper
     number = "%.08x" % rand(0x100000000)
     container = "ruby-test-container-#{container_root}-#{number}"
     begin
-      assert_cmd_succeeds("docker run --name #{container} -d #{args}")
+      assert_cmd_succeeds("docker run --name #{container} #{args}")
       yield container
     ensure
       execute_cmd("docker kill #{container}")

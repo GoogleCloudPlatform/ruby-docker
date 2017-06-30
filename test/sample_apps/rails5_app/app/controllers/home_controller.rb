@@ -4,7 +4,7 @@ class HomeController < ApplicationController
     unless Rails.env == "production"
       raise "Wrong Rails environment: #{Rails.env}"
     end
-    render :text => "ruby app"
+    render :text => "Hello World!"
   end
 
 end
