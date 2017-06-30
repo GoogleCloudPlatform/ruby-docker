@@ -5,9 +5,9 @@ require "google/cloud/monitoring/v3"
 require 'open3'
 
 # Grab project_id from gcloud sdk
-project_id = ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id
+project_id = ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id.to_s
 
-if project_id
+unless project_id.empty?
   #######################################
   # Setup ErrorReporting Middleware
   use Google::Cloud::ErrorReporting::Middleware
@@ -44,7 +44,7 @@ get '/_ah/health' do
 end
 
 route :get, :post, '/exception' do
-  fail "project_id missing." unless project_id
+  fail "project_id missing." if project_id.empty?
 
   begin
     fail "Test error from sinatra app"
@@ -55,7 +55,7 @@ route :get, :post, '/exception' do
 end
 
 route :get, :post, '/logging_standard' do
-  fail "project_id missing." unless project_id
+  fail "project_id missing." if project_id.empty?
 
   request.body.rewind
   request_payload = JSON.parse request.body.read
@@ -68,7 +68,7 @@ route :get, :post, '/logging_standard' do
 end
 
 route :get, :post, "/logging_custom" do
-  fail "project_id missing." unless project_id
+  fail "project_id missing." if project_id.empty?
 
   request.body.rewind
   request_payload = JSON.parse request.body.read
@@ -91,7 +91,7 @@ route :get, :post, "/logging_custom" do
 end
 
 route :get, :post, '/monitoring' do
-  fail "project_id missing." unless project_id
+  fail "project_id missing." if project_id.empty?
 
   request.body.rewind
   request_payload = JSON.parse request.body.read
