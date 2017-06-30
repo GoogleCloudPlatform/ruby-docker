@@ -27,40 +27,20 @@ class BuildScript
   end
 
   def main
-    build_scripts = collect_build_scripts
-    unless build_scripts.empty?
+    unless @build.build_scripts.empty?
       install_binaries
       install_bundle
       setup_env_variables
       start_services
-      run_build_scripts build_scripts
+      run_build_scripts
       stop_services
       @build.cleanup_file_perms
     end
   end
 
-  def collect_build_scripts
-    raw_build_scripts = @build.runtime_config["build_scripts"]
-    case raw_build_scripts
-      when nil then default_build_scripts
-      when '' then []
-      when ::String then [raw_build_scripts]
-      when ::Array then raw_build_scripts
-      else []
-    end
-  end
-
-  def default_build_scripts
-    if ::File.directory?("app/assets") && ::File.file?("config/application.rb")
-      ["bundle exec rake assets:precompile || true"]
-    else
-      []
-    end
-  end
-
   def install_binaries
     ruby_version = @build.ruby_version
-    packages = @build.runtime_config["packages"] || []
+    packages = @build.install_packages
     rbenv_dir = @build.rbenv_dir
     if !ruby_version.empty? || !packages.empty?
       @build.log "Initializing apt-get in build container..."
@@ -141,8 +121,8 @@ class BuildScript
     end
   end
 
-  def run_build_scripts build_scripts
-    build_scripts.each do |script|
+  def run_build_scripts
+    @build.build_scripts.each do |script|
       @build.log "Running build script: #{script}"
       @build.ensure_cmd script
     end
