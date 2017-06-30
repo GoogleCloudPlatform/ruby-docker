@@ -42,7 +42,7 @@ class TestSampleApps < ::Minitest::Test
 
     ::Dir.chdir TMP_DIR do |dir|
       build_docker_image "", app_name do |image|
-        run_docker_daemon "-p 8080:8080 #{image}" do |container|
+        run_docker_daemon "-it -p 8080:8080 #{image}" do |container|
           assert_cmd_output \
               "docker exec #{container} curl -s -S http://127.0.0.1:8080",
               "Hello World!", 10
