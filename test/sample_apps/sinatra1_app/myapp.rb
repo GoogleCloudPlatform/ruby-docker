@@ -5,9 +5,10 @@ require "google/cloud/monitoring/v3"
 require 'open3'
 
 # Grab project_id from gcloud sdk
-project_id = ENV["GOOGLE_CLOUD_PROJECT"] || Google::Cloud.env.project_id
+project_id = ENV["GOOGLE_CLOUD_PROJECT"] || ENV["GCLOUD_PROJECT"] || ENV["DEVSHELL_PROJECT_ID"] # || Google::Cloud.env.project_id
 
 puts "******************************************************************"
+p Google::Cloud.env.compute_engine?
 p project_id
 
 #######################################
