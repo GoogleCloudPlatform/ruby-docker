@@ -1,3 +1,5 @@
 runtime: ruby
 env: flex
 entrypoint: bundle exec bin/rails s
+env_variables:
+  SECRET_KEY_BASE: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"

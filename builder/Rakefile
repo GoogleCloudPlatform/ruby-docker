@@ -57,4 +57,35 @@ end
 desc "Build local docker image and run tests for all steps"
 task :test => ["build:local", "test:only"]
 
+desc "Build local docker image for build tools"
+task "build:tools:local", :image do |t, args|
+  image = args[:image] || "ruby-build-tools"
+  ::Dir.chdir "build_tools" do
+    sh "cp Dockerfile.in Dockerfile"
+    sh "docker build --pull --no-cache -t #{image} ."
+  end
+end
+
+desc "Build local docker image for dockerfile generator"
+task "build:generator:local", [:image, :build_tools_image] do |t, args|
+  image = args[:image] || "ruby-generate-dockerfile"
+  build_tools_image = args[:build_tools_image] || "ruby-build-tools"
+  ::Dir.chdir "generate_dockerfile" do
+    sh "sed -e 's|$BASE_IMAGE|gcr.io/google-appengine/ruby:latest|g;" \
+      " s|$BUILD_TOOLS_IMAGE|#{build_tools_image}|g'" \
+      " < Dockerfile.in > Dockerfile"
+    sh "docker build --pull --no-cache -t #{image} ."
+  end
+end
+
+desc "Build local docker images for new builder"
+task "build:local_new" => ["build:tools:local", "build:generator:local"]
+
+Rake::TestTask.new "test_new:only" do |t|
+  t.test_files = FileList['test/test_*.rb']
+end
+
+desc "Build local docker image and run tests for all steps"
+task :test_new => ["build:local_new", "test_new:only"]
+
 task :default => :test
