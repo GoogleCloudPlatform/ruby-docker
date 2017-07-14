@@ -20,11 +20,21 @@ module TestHelper
   end
 
   # Assert that execution of the given command produces a zero exit code.
-  def assert_cmd_succeeds(cmd)
+  def assert_cmd_succeeds cmd
     puts cmd
     system cmd
     exit_code = $?.exitstatus
     if exit_code != 0
+      flunk "Got exit code #{exit_code} when executing \"#{cmd}\""
+    end
+  end
+
+  # Assert that execution of the given command produces a nonzero exit code.
+  def assert_cmd_fails cmd
+    puts cmd
+    system cmd
+    exit_code = $?.exitstatus
+    if exit_code == 0
       flunk "Got exit code #{exit_code} when executing \"#{cmd}\""
     end
   end
@@ -76,7 +86,7 @@ module TestHelper
 
   # Build a docker image with the given arguments. Yields the image name.
   # Automatically cleans up the generated image afterward.
-  def build_docker_image(args, image_root="generic")
+  def build_docker_image(args="", image_root="generic")
     number = "%.08x" % rand(0x100000000)
     image = "ruby-test-image-#{image_root}-#{number}"
     begin
