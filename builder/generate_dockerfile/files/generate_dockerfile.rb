@@ -69,6 +69,7 @@ class GenerateDockerfile
     end
   end
 
+  # Should go away after internal issue b/63630627 is fixed.
   def setup_access_token
     cmd = 'curl -s -H "Metadata-Flavor: Google"' \
       ' http://metadata.google.internal/computeMetadata/v1/instance/' \

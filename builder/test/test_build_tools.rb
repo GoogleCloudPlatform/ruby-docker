@@ -31,7 +31,8 @@ class TestBuildTools < ::Minitest::Test
           /^\d+\.\d+/
         assert_docker_output "#{image} /build_tools/cloud_sql_proxy --version",
           /Cloud SQL Proxy/
-        assert_docker_output "#{image} /build_tools/with_runtime 'echo OK'",
+        assert_docker_output \
+          "#{image} /build_tools/access_cloud_sql --lenient && echo OK",
           /OK/
       end
     end

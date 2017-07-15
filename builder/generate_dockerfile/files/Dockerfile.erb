@@ -123,13 +123,14 @@ RUN mkdir /cloudsql
 <% end %>
 
 ## If your build scripts need credentials for access to cloud resources, you
-## should provide an appropriate JSON credentials file and set the
+## may provide an appropriate JSON credentials file and set the
 ## GOOGLE_APPLICATION_CREDENTIALS path accordingly:
 # COPY my-build-credentials.json /build_tools/credentials.json
 # ENV GOOGLE_APPLICATION_CREDENTIALS=/build_tools/credentials.json
-
 <% if @access_token_file %>
+
 ## Temporary access token during an App Engine deployment.
+## This should go away after internal issue b/63630627 is fixed.
 RUN mv <%= @access_token_file %> /build_tools/access_token
 ENV GOOGLE_ACCESS_TOKEN_FILE=/build_tools/access_token
 <% end %>
@@ -142,14 +143,23 @@ RUN bundle install --deployment --without="development test" && rbenv rehash
 <% end %>
 
 ## Run application build scripts here.
-## Scripts that require access to the application runtime context---such as
-## credentials, CloudSQL instances, and so forth---should be passed as the
-## argument to /build_tools/with_runtime.
+## Scripts that require access to the application CloudSQL instances should
+## run /build_tools/access_cloud_sql first to start the cloud_sql_proxy. e.g.
+##   RUN /build_tools/access_cloud_sql && bundle exec rake my_task
+## Otherwise, simply run each build script in order in a separate RUN command.
 <% if @app_config.build_scripts.empty? %>
-# RUN /build_tools/with_runtime "bundle exec rake assets:precompile"
+<% if @app_config.cloud_sql_instances.empty? %>
+# RUN bundle exec rake assets:precompile
+<% else %>
+# RUN /build_tools/access_cloud_sql && bundle exec rake assets:precompile
+<% end %>
 <% else %>
 <% @app_config.build_scripts.each do |script| %>
-RUN /build_tools/with_runtime "<%= escape_quoted script %>"
+<% if @app_config.cloud_sql_instances.empty? %>
+RUN <%= script %>
+<% else %>
+RUN /build_tools/access_cloud_sql && <%= script %>
+<% end %>
 <% end %>
 <% end %>
 
