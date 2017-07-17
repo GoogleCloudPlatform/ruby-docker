@@ -53,7 +53,7 @@ RUN apt-get update -y && \
         systemtap
 
 # Install node
-RUN mkdir /nodejs && curl https://nodejs.org/dist/v6.10.3/node-v6.10.3-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+RUN mkdir /nodejs && curl -s https://nodejs.org/dist/v6.11.1/node-v6.11.1-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH /nodejs/bin:$PATH
 
 # Install rbenv
@@ -69,16 +69,19 @@ ENV BUNDLER_VERSION 1.15.1
 # Set ruby runtime distribution
 ARG RUNTIME_DISTRIBUTION="ruby-runtime-jessie"
 
+# Default gem installation options
+COPY .gemrc /root/.gemrc
+
 # Install the default ruby binary and bundler.
 RUN (echo "deb http://packages.cloud.google.com/apt ${RUNTIME_DISTRIBUTION} main" \
       | tee /etc/apt/sources.list.d/ruby-runtime-jessie.list) && \
-    (curl https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+    (curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg \
       | apt-key add -) && \
     apt-get update -y && \
     apt-get install -y -q gcp-ruby-$DEFAULT_RUBY_VERSION && \
     rbenv rehash && \
     rbenv global $DEFAULT_RUBY_VERSION && \
-    gem install -q --no-rdoc --no-ri bundler --version $BUNDLER_VERSION && \
+    gem install bundler --version $BUNDLER_VERSION && \
     rbenv rehash
 
 # Tell nokogiri >=1.6 to install using system libraries, for faster builds
