@@ -56,7 +56,12 @@ class GenerateDockerfile
       end
     end.parse! args
     ::Dir.chdir @workspace_dir
-    @app_config = AppConfig.new @workspace_dir
+    begin
+      @app_config = AppConfig.new @workspace_dir
+    rescue AppConfig::Error => ex
+      ::STDERR.puts ex.message
+      exit 1
+    end
     @timestamp = ::Time.now.utc.strftime "%Y-%m-%d %H:%M:%S UTC"
   end
 
@@ -102,11 +107,17 @@ class GenerateDockerfile
 
   def write_dockerfile
     b = binding
+    write_path = "#{@app_config.workspace_dir}/Dockerfile"
+    if ::File.exist? write_path
+      ::STDERR.puts "Unable to generate Dockerfile because one already exists."
+      exit 1
+    end
     template = ::File.read "#{GENERATOR_DIR}/Dockerfile.erb"
     content = ::ERB.new(template, nil, "<>").result(b)
-    ::File.open "#{@app_config.workspace_dir}/Dockerfile", "w" do |file|
+    ::File.open write_path, "w" do |file|
       file.write content
     end
+    puts "Generated Dockerfile"
   end
 
   def write_dockerignore
@@ -121,6 +132,11 @@ class GenerateDockerfile
       (desired_entries - existing_entries).each do |entry|
         file.puts entry
       end
+    end
+    if existing_entries.empty?
+      puts "Generated .dockerignore"
+    else
+      puts "Updated .dockerignore"
     end
   end
 
