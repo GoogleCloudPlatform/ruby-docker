@@ -68,7 +68,7 @@ task "build:tools:local", :image do |t, args|
   image = args[:image] || "ruby-build-tools"
   ::Dir.chdir "build_tools" do
     sh "cp Dockerfile.in Dockerfile"
-    sh "docker build --pull --no-cache -t #{image} ."
+    sh "docker build --no-cache -t #{image} ."
   end
 end
 
@@ -80,7 +80,7 @@ task "build:generator:local", [:image, :build_tools_image] do |t, args|
     sh "sed -e 's|$BASE_IMAGE|gcr.io/google-appengine/ruby:staging|g;" \
       " s|$BUILD_TOOLS_IMAGE|#{build_tools_image}|g'" \
       " < Dockerfile.in > Dockerfile"
-    sh "docker build --pull --no-cache -t #{image} ."
+    sh "docker build --no-cache -t #{image} ."
   end
 end
 
