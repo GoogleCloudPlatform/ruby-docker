@@ -22,12 +22,14 @@ class TestAppConfig < ::Minitest::Test
   EMPTY_HASH = {}.freeze
   EMPTY_ARRAY = [].freeze
   EMPTY_STRING = ''.freeze
+  DEFAULT_CONFIG = "env:flex\nruntime:ruby\n"
 
   TEST_DIR = ::File.dirname __FILE__
   CASES_DIR = ::File.join TEST_DIR, "app_config"
   TMP_DIR = ::File.join TEST_DIR, "tmp"
 
-  def setup_test dir: nil, config: nil, config_file: nil, project: nil
+  def setup_test dir: nil, config: DEFAULT_CONFIG,
+                 config_file: nil, project: nil
     ::Dir.chdir TEST_DIR
     ::FileUtils.rm_rf TMP_DIR
     if dir
@@ -35,19 +37,19 @@ class TestAppConfig < ::Minitest::Test
       ::FileUtils.cp_r full_dir, TMP_DIR
     else
       ::FileUtils.mkdir TMP_DIR
-      ::ENV["GAE_APPLICATION_YAML_PATH"] = config_file
-      ::ENV["PROJECT_ID"] = project
-      if config
-        config_path = ::File.join TMP_DIR, config_file || "app.yaml"
-        ::File.open config_path, "w" do |file|
-          file.write config
-        end
+    end
+    ::ENV["GAE_APPLICATION_YAML_PATH"] = config_file
+    ::ENV["PROJECT_ID"] = project
+    config_path = ::File.join TMP_DIR, config_file || "app.yaml"
+    if config
+      ::File.open config_path, "w" do |file|
+        file.write config
       end
     end
     @app_config = AppConfig.new TMP_DIR
   end
 
-  def test_empty_directory
+  def test_empty_directory_with_config
     setup_test
     assert_equal TMP_DIR, @app_config.workspace_dir
     assert_equal "./app.yaml", @app_config.app_yaml_path
@@ -123,5 +125,89 @@ class TestAppConfig < ::Minitest::Test
   def test_gemfile
     setup_test dir: "gemfile"
     assert @app_config.has_gemfile
+  end
+
+  def test_config_missing
+    ex = assert_raises AppConfig::Error do
+      setup_test config: nil
+    end
+    assert_match /Could not read app engine config file:/, ex.message
+  end
+
+  def test_illegal_env_name
+    config = <<~CONFIG
+      env: flex
+      runtime: ruby
+      env_variables:
+        VAR-1: value1
+    CONFIG
+    ex = assert_raises AppConfig::Error do
+      setup_test config: config
+    end
+    assert_equal "Illegal environment variable name: \"VAR-1\"",
+      ex.message
+  end
+
+  def test_illegal_build_command
+    config = <<~CONFIG
+      env: flex
+      runtime: ruby
+      lifecycle:
+        build: "multiple\\nlines"
+    CONFIG
+    ex = assert_raises AppConfig::Error do
+      setup_test config: config
+    end
+    assert_equal "Illegal newline in build command: \"multiple\\nlines\"",
+      ex.message
+  end
+
+  def test_illegal_sql_instances
+    config = <<~CONFIG
+      env: flex
+      runtime: ruby
+      beta_settings:
+        cloud_sql_instances: bad!instance
+    CONFIG
+    ex = assert_raises AppConfig::Error do
+      setup_test config: config
+    end
+    assert_equal "Illegal cloud sql instance name: \"bad!instance\"",
+      ex.message
+  end
+
+  def test_illegal_entrypoint
+    config = <<~CONFIG
+      env: flex
+      runtime: ruby
+      entrypoint: "multiple\\nlines"
+    CONFIG
+    ex = assert_raises AppConfig::Error do
+      setup_test config: config
+    end
+    assert_equal "Illegal newline in entrypoint: \"multiple\\nlines\"",
+      ex.message
+  end
+
+  def test_illegal_debian_packages
+    config = <<~CONFIG
+      env: flex
+      runtime: ruby
+      runtime_config:
+        packages: bad!package
+    CONFIG
+    ex = assert_raises AppConfig::Error do
+      setup_test config: config
+    end
+    assert_equal "Illegal debian package name: \"bad!package\"",
+      ex.message
+  end
+
+  def test_illegal_ruby_version
+    ex = assert_raises AppConfig::Error do
+      setup_test dir: "bad-ruby-version"
+    end
+    assert_equal "Illegal ruby version: \"bad!version\"",
+      ex.message
   end
 end

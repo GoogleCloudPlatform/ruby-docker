@@ -23,6 +23,9 @@ class AppConfig
   DEFAULT_SERVICE_NAME = "default"
   RAILS_ASSETS_BUILD_SCRIPT = "bundle exec rake assets:precompile || true"
 
+  class Error < ::StandardError
+  end
+
   attr_reader :workspace_dir
   attr_reader :app_yaml_path
   attr_reader :project_id
@@ -53,8 +56,13 @@ class AppConfig
   def init_app_config
     @project_id = ::ENV["PROJECT_ID"] || "(unknown)"
     @app_yaml_path = ::ENV["GAE_APPLICATION_YAML_PATH"] || DEFAULT_APP_YAML_PATH
-    @app_config =
-      ::Psych.load_file("#{@workspace_dir}/#{@app_yaml_path}") rescue {}
+    config_file = "#{@workspace_dir}/#{@app_yaml_path}"
+    begin
+      @app_config = ::Psych.load_file config_file
+    rescue
+      raise AppConfig::Error,
+        "Could not read app engine config file: #{config_file.inspect}"
+    end
     @runtime_config = @app_config["runtime_config"] || {}
     @beta_settings = @app_config["beta_settings"] || {}
     @lifecycle = @app_config["lifecycle"] || {}
@@ -65,7 +73,8 @@ class AppConfig
     @env_variables = @app_config["env_variables"] || {}
     @env_variables.each do |k, v|
       if k !~ %r{\A[a-zA-Z]\w*\z}
-        report_error "Illegal environment variable name: #{k.inspect}"
+        raise AppConfig::Error,
+          "Illegal environment variable name: #{k.inspect}"
       end
     end
   end
@@ -82,7 +91,8 @@ class AppConfig
         Array(raw_build_scripts) : default_build_scripts
     @build_scripts.each do |script|
       if script.include? "\n"
-        report_error "Illegal build command: newlines not permitted"
+        raise AppConfig::Error,
+          "Illegal newline in build command: #{script.inspect}"
       end
     end
   end
@@ -91,7 +101,8 @@ class AppConfig
     @cloud_sql_instances = Array(@beta_settings["cloud_sql_instances"])
     @cloud_sql_instances.each do |name|
       if name !~ %r{\A[\w:.-]+\z}
-        report_error "Illegal cloud sql instance name: #{name.inspect}"
+        raise AppConfig::Error,
+          "Illegal cloud sql instance name: #{name.inspect}"
       end
     end
   end
@@ -102,7 +113,8 @@ class AppConfig
         @app_config["entrypoint"] ||
         DEFAULT_ENTRYPOINT
     if @raw_entrypoint.include? "\n"
-      report_error "Illegal entrypoint: newlines not permitted"
+      raise AppConfig::Error,
+        "Illegal newline in entrypoint: #{@raw_entrypoint.inspect}"
     end
     @entrypoint = decorate_entrypoint @raw_entrypoint
   end
@@ -125,7 +137,7 @@ class AppConfig
     )
     @install_packages.each do |pkg|
       if pkg !~ %r{\A[\w.-]+\z}
-        report_error "Illegal debian package name: #{pkg.inspect}"
+        raise AppConfig::Error, "Illegal debian package name: #{pkg.inspect}"
       end
     end
   end
@@ -134,13 +146,8 @@ class AppConfig
     @ruby_version = ::File.read("#{@workspace_dir}/.ruby-version") rescue ''
     @ruby_version.strip!
     if @ruby_version !~ %r{\A[\w.-]*\z}
-      report_error "Illegal ruby version: #{@ruby_version.inspect}"
+      raise AppConfig::Error, "Illegal ruby version: #{@ruby_version.inspect}"
     end
     @has_gemfile = ::File.readable? "#{@workspace_dir}/Gemfile.lock"
-  end
-
-  def report_error str
-    STDERR.puts str
-    exit 1
   end
 end
