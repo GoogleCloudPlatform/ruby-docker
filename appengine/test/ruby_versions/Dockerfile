@@ -11,7 +11,7 @@ RUN if test -n "$REQUESTED_RUBY_VERSION" -a \
         && git pull \
         && rbenv install -s $REQUESTED_RUBY_VERSION) \
       && rbenv global $REQUESTED_RUBY_VERSION \
-      && gem install -q --no-rdoc --no-ri bundler --version $BUNDLER_VERSION \
+      && gem install bundler --version $BUNDLER_VERSION \
       && apt-get clean \
       && rm -f /var/lib/apt/lists/*_*; \
     fi
