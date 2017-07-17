@@ -52,7 +52,7 @@ RUN apt-get install -y -q <%= @app_config.install_packages.join(' ') %>
 #         && git pull \
 #         && rbenv install -s ${REQUESTED_RUBY_VERSION}) \
 #       && rbenv global ${REQUESTED_RUBY_VERSION} \
-#       && gem install -q --no-rdoc --no-ri bundler --version ${BUNDLER_VERSION}; \
+#       && gem install bundler --version ${BUNDLER_VERSION}; \
 #     fi
 <% else %>
 ARG REQUESTED_RUBY_VERSION="<%= @app_config.ruby_version %>"
@@ -62,7 +62,7 @@ RUN if test ! -x /rbenv/versions/${REQUESTED_RUBY_VERSION}/bin/ruby; then \
         && git pull \
         && rbenv install -s ${REQUESTED_RUBY_VERSION}) \
       && rbenv global ${REQUESTED_RUBY_VERSION} \
-      && gem install -q --no-rdoc --no-ri bundler --version ${BUNDLER_VERSION}; \
+      && gem install bundler --version ${BUNDLER_VERSION}; \
     fi
 <% end %>
 
