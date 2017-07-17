@@ -16,7 +16,7 @@
 # Working image, downloads all the tools into the /app directory.
 
 # Use the Ruby base image as a tool to download things.
-FROM gcr.io/google-appengine/ruby:latest AS builder
+FROM gcr.io/google-appengine/ruby:latest
 
 # Install build script files.
 COPY files/ /app/
@@ -42,4 +42,4 @@ RUN curl -s https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 \
 
 FROM scratch
 
-COPY --from=builder /app/ /build_tools/
+COPY --from=0 /app/ /build_tools/
