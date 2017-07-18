@@ -1,10 +1,6 @@
 steps:
-  - name: 'gcr.io/gcp-runtimes/ruby/build-app:latest'
-  - name: 'gcr.io/gcp-runtimes/ruby/gen-dockerfile:latest'
-    args:
-    - '--base-image'
-    - 'gcr.io/google-appengine/ruby:latest'
-    - '--enable-packages'
+  - name: 'gcr.io/gcp-runtimes/ruby/generate-dockerfile:latest'
+    args: ['--capture-access-token']
   - name: 'gcr.io/cloud-builders/docker:latest'
     args: ['build', '-t', '$_OUTPUT_IMAGE', '.']
 images:

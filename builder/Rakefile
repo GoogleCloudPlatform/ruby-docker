@@ -15,11 +15,14 @@
 require "rake/testtask"
 require "erb"
 
+::Dir.chdir(::File.dirname __FILE__)
+
+
+# BEGIN DEPRECATED
+
 STEPS = ["build_app", "gen_dockerfile"]
 DEFAULT_BASE_IMAGE_TAG = "latest"
 DEFAULT_BUILDER_TAG = "same"
-
-::Dir.chdir(::File.dirname __FILE__)
 
 STEPS.each do |step|
   desc "Build local docker image for #{step}"
@@ -41,28 +44,31 @@ STEPS.each do |step|
 end
 
 desc "Build local docker image for all steps"
-task "build:local" => STEPS.map { |step| "build:#{step}:local" }
+task "build:local_old" => STEPS.map { |step| "build:#{step}:local" }
 
 desc "Generate pipeline ruby.yaml"
-task "build:pipeline", :base_image_tag, :builder_tag do |t, args|
+task "build:pipeline_old", :base_image_tag, :builder_tag do |t, args|
   base_image_tag = args[:base_image_tag] || DEFAULT_BASE_IMAGE_TAG
   builder_tag = args[:builder_tag] || DEFAULT_BUILDER_TAG
-  sh "./build_pipeline.sh #{base_image_tag} #{builder_tag}"
+  sh "./build_pipeline_old.sh #{base_image_tag} #{builder_tag}"
 end
 
-Rake::TestTask.new "test:only" do |t|
+Rake::TestTask.new "test_old:only" do |t|
   t.test_files = FileList['test/tc_*.rb']
 end
 
 desc "Build local docker image and run tests for all steps"
-task :test => ["build:local", "test:only"]
+task :test_old => ["build:local_old", "test_old:only"]
+
+# END DEPRECATED
+
 
 desc "Build local docker image for build tools"
 task "build:tools:local", :image do |t, args|
   image = args[:image] || "ruby-build-tools"
   ::Dir.chdir "build_tools" do
     sh "cp Dockerfile.in Dockerfile"
-    sh "docker build --pull --no-cache -t #{image} ."
+    sh "docker build --no-cache -t #{image} ."
   end
 end
 
@@ -71,21 +77,21 @@ task "build:generator:local", [:image, :build_tools_image] do |t, args|
   image = args[:image] || "ruby-generate-dockerfile"
   build_tools_image = args[:build_tools_image] || "ruby-build-tools"
   ::Dir.chdir "generate_dockerfile" do
-    sh "sed -e 's|$BASE_IMAGE|gcr.io/google-appengine/ruby:latest|g;" \
+    sh "sed -e 's|$BASE_IMAGE|gcr.io/google-appengine/ruby:staging|g;" \
       " s|$BUILD_TOOLS_IMAGE|#{build_tools_image}|g'" \
       " < Dockerfile.in > Dockerfile"
-    sh "docker build --pull --no-cache -t #{image} ."
+    sh "docker build --no-cache -t #{image} ."
   end
 end
 
 desc "Build local docker images for new builder"
-task "build:local_new" => ["build:tools:local", "build:generator:local"]
+task "build:local" => ["build:tools:local", "build:generator:local"]
 
-Rake::TestTask.new "test_new:only" do |t|
+Rake::TestTask.new "test:only" do |t|
   t.test_files = FileList['test/test_*.rb']
 end
 
 desc "Build local docker image and run tests for all steps"
-task :test_new => ["build:local_new", "test_new:only"]
+task :test => ["build:local", "test:only"]
 
 task :default => :test
