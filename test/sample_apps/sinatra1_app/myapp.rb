@@ -1,3 +1,4 @@
+require 'json'
 require 'sinatra'
 require "sinatra/multi_route"
 require 'stackdriver'
@@ -43,6 +44,10 @@ get '/_ah/health' do
   "Success"
 end
 
+get '/custom' do
+  "{}"
+end
+
 route :get, :post, '/exception' do
   fail "project_id missing." if project_id.empty?
 
@@ -64,7 +69,8 @@ route :get, :post, '/logging_standard' do
   level = request_payload["level"].to_sym
 
   logger.add level, token
-  "Log entry submitted"
+
+  'appengine.googleapis.com%2Fruby_app_log'
 end
 
 route :get, :post, "/logging_custom" do
@@ -101,7 +107,7 @@ route :get, :post, '/monitoring' do
 
   time_series_hash = {
       metric: {
-        type: "custom.googleapis.com/#{name}"
+        type: name
       },
       resource: {
         type: "global"
@@ -114,7 +120,7 @@ route :get, :post, '/monitoring' do
           }
         },
         value: {
-          int64_value: token
+          int64_value: token.to_i
         }
       }]
     }
