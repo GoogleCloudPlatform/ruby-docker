@@ -70,8 +70,6 @@ class TestSampleApps < ::Minitest::Test
       build_docker_image "--no-cache" do |image|
         yield image
         run_docker_daemon "-p 8080:8080 #{image}" do |container|
-          sleep(5)
-          assert_cmd_succeeds "docker logs #{container}"
           assert_cmd_output \
               "docker exec #{container} curl -s -S http://127.0.0.1:8080",
               "Hello World!", 10
