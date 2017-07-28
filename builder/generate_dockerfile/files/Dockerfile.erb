@@ -110,8 +110,7 @@ ENV <%= k %>="<%= escape_quoted v %>"
 
 ## If your build scripts need access to your application's CloudSQL instances,
 ## list them here, comma-delimited. This environment variable tells the
-## "with_runtime" script to run the CloudSQL Proxy that provides access to
-## your databases.
+## "access_cloud_sql" script which databases to connect to.
 ## Also, make sure the /cloudsql directory is created because the CloudSQL
 ## Proxy will open sockets in that directory.
 <% if @app_config.cloud_sql_instances.empty? %>
@@ -127,13 +126,6 @@ RUN mkdir /cloudsql
 ## GOOGLE_APPLICATION_CREDENTIALS path accordingly:
 # COPY my-build-credentials.json /build_tools/credentials.json
 # ENV GOOGLE_APPLICATION_CREDENTIALS=/build_tools/credentials.json
-<% if @access_token_file %>
-
-## Temporary access token during an App Engine deployment.
-## This should go away after internal issue b/63630627 is fixed.
-RUN mv <%= @access_token_file %> /build_tools/access_token
-ENV GOOGLE_ACCESS_TOKEN_FILE=/build_tools/access_token
-<% end %>
 
 ## If the application uses bundler, install the bundle here.
 <% if @app_config.has_gemfile %>
