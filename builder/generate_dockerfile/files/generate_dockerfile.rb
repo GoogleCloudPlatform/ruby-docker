@@ -37,7 +37,6 @@ class GenerateDockerfile
     @base_image = DEFAULT_BASE_IMAGE
     @build_tools_image = DEFAULT_BUILD_TOOLS_IMAGE
     @testing = false
-    @access_token_file = false
     ::OptionParser.new do |opts|
       opts.on "-t" do
         @testing = true
@@ -51,9 +50,6 @@ class GenerateDockerfile
       opts.on "--build-tools-image=IMAGE" do |image|
         @build_tools_image = image
       end
-      opts.on "--capture-access-token" do
-        @access_token_file = nil
-      end
     end.parse! args
     ::Dir.chdir @workspace_dir
     begin
@@ -66,43 +62,11 @@ class GenerateDockerfile
   end
 
   def main
-    setup_access_token if @access_token_file.nil?
     write_dockerfile
     write_dockerignore
     if @testing
       system "chmod -R a+w #{@app_config.workspace_dir}"
     end
-  end
-
-  # Should go away after internal issue b/63630627 is fixed.
-  def setup_access_token
-    cmd = 'curl -s -H "Metadata-Flavor: Google"' \
-      ' http://metadata.google.internal/computeMetadata/v1/instance/' \
-      'service-accounts/default/token'
-    json = `#{cmd}`
-    unless json.start_with? '{"'
-      ::STDERR.puts "Unable to auth because metadata query failed."
-      exit 1
-    end
-    token_data = ::JSON.parse json
-    access_token = token_data["access_token"]
-    unless access_token
-      ::STDERR.puts "Unable to auth because credentials are missing."
-      exit 1
-    end
-
-    10.times do
-      @access_token_file = "google_access_token_#{"%08d" % rand(100000000)}"
-      access_token_path = "#{@app_config.workspace_dir}/#{@access_token_file}"
-      unless ::File.exist? access_token_path
-        ::File.open access_token_path, "w" do |file|
-          file.write access_token
-        end
-        return
-      end
-    end
-    ::STDERR.puts "Unable to find a free path for the access token"
-    exit 1
   end
 
   def write_dockerfile

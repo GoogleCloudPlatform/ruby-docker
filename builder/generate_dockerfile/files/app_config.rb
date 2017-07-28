@@ -21,7 +21,6 @@ class AppConfig
   DEFAULT_APP_YAML_PATH = "./app.yaml"
   DEFAULT_ENTRYPOINT = "bundle exec rackup -p $PORT"
   DEFAULT_SERVICE_NAME = "default"
-  RAILS_ASSETS_BUILD_SCRIPT = "bundle exec rake assets:precompile || true"
 
   class Error < ::StandardError
   end
@@ -42,13 +41,13 @@ class AppConfig
 
   def initialize workspace_dir
     @workspace_dir = workspace_dir
-    init_app_config
+    init_app_config  # Must be called first
     init_env_variables
-    init_build_scripts
-    init_cloud_sql_instances
-    init_entrypoint
     init_packages
     init_ruby_config
+    init_cloud_sql_instances
+    init_entrypoint
+    init_build_scripts  # Must be called after init_entrypoint
   end
 
   private
@@ -80,12 +79,6 @@ class AppConfig
   end
 
   def init_build_scripts
-    if ::File.directory?("#{@workspace_dir}/app/assets") &&
-        ::File.file?("#{@workspace_dir}/config/application.rb")
-      default_build_scripts = [RAILS_ASSETS_BUILD_SCRIPT]
-    else
-      default_build_scripts = []
-    end
     raw_build_scripts = @lifecycle["build"] || @runtime_config["build"]
     @build_scripts = raw_build_scripts ?
         Array(raw_build_scripts) : default_build_scripts
@@ -94,6 +87,18 @@ class AppConfig
         raise AppConfig::Error,
           "Illegal newline in build command: #{script.inspect}"
       end
+    end
+  end
+
+  def default_build_scripts
+    if !::File.directory?("#{@workspace_dir}/app/assets") ||
+        !::File.file?("#{@workspace_dir}/config/application.rb")
+      return []
+    end
+    if @entrypoint =~ /(rcloadenv\s.+\s--\s)/
+      ["bundle exec #{$1}rake assets:precompile || true"]
+    else
+      ["bundle exec rake assets:precompile || true"]
     end
   end
 

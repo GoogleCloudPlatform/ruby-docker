@@ -27,16 +27,9 @@ if [ -z "${BUILD_CLOUDSQL_INSTANCES}" ]; then
   fi
 fi
 
-# Should go away after internal issue b/63630627 is fixed.
-if [ -z "${GOOGLE_APPLICATION_CREDENTIALS}" -a -n "${GOOGLE_ACCESS_TOKEN_FILE}" ]; then
-  TOKEN_PARAM="-token=$(cat ${GOOGLE_ACCESS_TOKEN_FILE})"
-else
-  TOKEN_PARAM=
-fi
-
 rm -f /build_tools/cloud_sql_proxy.log
 touch /build_tools/cloud_sql_proxy.log
-/build_tools/cloud_sql_proxy -dir=/cloudsql ${TOKEN_PARAM} -instances=${BUILD_CLOUDSQL_INSTANCES} > /build_tools/cloud_sql_proxy.log 2>&1 &
+/build_tools/cloud_sql_proxy -dir=/cloudsql -instances=${BUILD_CLOUDSQL_INSTANCES} > /build_tools/cloud_sql_proxy.log 2>&1 &
 if (timeout ${SQL_TIMEOUT}s tail -f --lines=+1 /build_tools/cloud_sql_proxy.log &) | grep -qe 'Ready for new connections'; then
   echo "Started cloud_sql_proxy."
 else

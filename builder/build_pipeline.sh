@@ -12,7 +12,7 @@ show_usage() {
   echo "Usage: ./build.sh [-i <base-image-tag>] [-t <image-tag>] [-b upload-bucket]" >&2
   echo "Flags:" >&2
   echo '  -i: set the base image tag (defaults to latest, or use "staging")' >&2
-  echo '  -t: set the pipeline images tag (defaults to same as base image, or use "new")' >&2
+  echo '  -t: set the pipeline images tag (defaults to "new"; you can also use "same")' >&2
   echo '  -b: set the gs bucket to upload to (omit to skip uploading)' >&2
 }
 
@@ -73,11 +73,11 @@ if [ -z "$PROJECT" ]; then
   exit 1
 fi
 
-$DIRNAME/build_new.sh -i $BASE_IMAGE_TAG -t $IMAGE_TAG
+$DIRNAME/build.sh -i $BASE_IMAGE_TAG -t $IMAGE_TAG
 
 mkdir -p $DIRNAME/pipeline
 sed -e "s|\$PROJECT|${PROJECT}|g; s|\$BUILDER_TAG|${IMAGE_TAG}|g" \
-  < $DIRNAME/ruby-new.yaml.in > $DIRNAME/pipeline/ruby-$IMAGE_TAG.yaml
+  < $DIRNAME/ruby.yaml.in > $DIRNAME/pipeline/ruby-$IMAGE_TAG.yaml
 sed -e "s|\$BUILDER_TAG|${IMAGE_TAG}|g" \
   < $DIRNAME/runtimes.yaml.in > $DIRNAME/pipeline/runtimes.yaml
 echo -n $IMAGE_TAG > $DIRNAME/pipeline/ruby.version
