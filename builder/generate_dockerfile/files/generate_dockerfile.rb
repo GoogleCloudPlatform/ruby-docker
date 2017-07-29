@@ -107,6 +107,10 @@ class GenerateDockerfile
   def escape_quoted str
     str.gsub("\\", "\\\\").gsub("\"", "\\\"").gsub("\n", "\\n")
   end
+
+  def render_env hash
+    hash.map{ |k,v| "#{k}=\"#{escape_quoted v}\"" }.join(" \\\n    ")
+  end
 end
 
 GenerateDockerfile.new(::ARGV).main

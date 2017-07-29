@@ -75,9 +75,9 @@ class TestGenerateDockerfile < ::Minitest::Test
         VAR3: "\\"quoted\\"\\nnewline"
     CONFIG
     run_generate_dockerfile "rack_app", config: config
-    assert_dockerfile_line "ENV VAR1=\"value1\""
-    assert_dockerfile_line "ENV VAR2=\"with space\""
-    assert_dockerfile_line "ENV VAR3=\"\\\\\"quoted\\\\\"\\\\nnewline\""
+    assert_dockerfile_line "ENV VAR1=\"value1\" \\\\\\n" +
+      "    VAR2=\"with space\" \\\\\\n" +
+      "    VAR3=\"\\\\\"quoted\\\\\"\\\\nnewline\""
   end
 
   def test_sql_instances
