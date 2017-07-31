@@ -103,9 +103,7 @@ COPY . /app/
 <% if @app_config.env_variables.empty? %>
 # ENV NAME="value"
 <% else %>
-<% @app_config.env_variables.each do |k, v| %>
-ENV <%= k %>="<%= escape_quoted v %>"
-<% end %>
+ENV <%= render_env @app_config.env_variables %>
 <% end %>
 
 ## If your build scripts need access to your application's CloudSQL instances,
