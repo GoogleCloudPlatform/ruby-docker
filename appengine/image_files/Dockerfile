@@ -64,7 +64,7 @@ ENV PATH $RBENV_ROOT/shims:$RBENV_ROOT/bin:$PATH
 
 # Preinstalled default ruby version.
 ENV DEFAULT_RUBY_VERSION 2.3.4
-ENV BUNDLER_VERSION 1.15.1
+ENV BUNDLER_VERSION 1.15.3
 
 # Set ruby runtime distribution
 ARG RUNTIME_DISTRIBUTION="ruby-runtime-jessie"
