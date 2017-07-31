@@ -1,9 +1,5 @@
 test/tmp
 pipeline
-build_steps/gen_dockerfile.yaml
-build_steps/build_app.yaml
-build_steps/gen_dockerfile/Dockerfile
-build_steps/build_app/Dockerfile
 build_tools/Dockerfile
 build_tools/cloudbuild.yaml
 generate_dockerfile/Dockerfile

@@ -18,51 +18,6 @@ require "erb"
 ::Dir.chdir(::File.dirname __FILE__)
 
 
-# BEGIN DEPRECATED
-
-STEPS = ["build_app", "gen_dockerfile"]
-DEFAULT_BASE_IMAGE_TAG = "latest"
-DEFAULT_BUILDER_TAG = "same"
-
-STEPS.each do |step|
-  desc "Build local docker image for #{step}"
-  task "build:#{step}:local", :image do |t, args|
-    image = args[:image] || "ruby-#{step.gsub '_', '-'}"
-    ::Dir.chdir "build_steps" do
-      sh "sed -e 's/$BASE_IMAGE_TAG/latest/g'" \
-        " < #{step}/Dockerfile.in > #{step}/Dockerfile"
-      sh "docker build --pull --no-cache -t #{image} -f #{step}/Dockerfile ."
-    end
-  end
-
-  desc "Build #{step} to a given tag and project"
-  task "build:#{step}", :base_image_tag, :builder_tag do |t, args|
-    base_image_tag = args[:base_image_tag] || DEFAULT_BASE_IMAGE_TAG
-    builder_tag = args[:builder_tag] || DEFAULT_BUILDER_TAG
-    sh "./build_step.sh #{step} -i #{base_image_tag} -t #{builder_tag}"
-  end
-end
-
-desc "Build local docker image for all steps"
-task "build:local_old" => STEPS.map { |step| "build:#{step}:local" }
-
-desc "Generate pipeline ruby.yaml"
-task "build:pipeline_old", :base_image_tag, :builder_tag do |t, args|
-  base_image_tag = args[:base_image_tag] || DEFAULT_BASE_IMAGE_TAG
-  builder_tag = args[:builder_tag] || DEFAULT_BUILDER_TAG
-  sh "./build_pipeline_old.sh #{base_image_tag} #{builder_tag}"
-end
-
-Rake::TestTask.new "test_old:only" do |t|
-  t.test_files = FileList['test/tc_*.rb']
-end
-
-desc "Build local docker image and run tests for all steps"
-task :test_old => ["build:local_old", "test_old:only"]
-
-# END DEPRECATED
-
-
 desc "Build local docker image for build tools"
 task "build:tools:local", :image do |t, args|
   image = args[:image] || "ruby-build-tools"
