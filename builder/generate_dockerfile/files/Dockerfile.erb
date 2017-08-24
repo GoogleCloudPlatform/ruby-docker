@@ -89,7 +89,7 @@ RUN apt-get clean && rm -f /var/lib/apt/lists/*_*
 FROM augmented-base AS app-build
 
 ## Obtain common build tools, including nodejs, yarn, cloud_sql_proxy, and the
-## with_runtime wrapper script, from this image.
+## access_cloud_sql script, from this image.
 COPY --from=<%= @build_tools_image %> /build_tools/ /build_tools/
 
 ## Ensure the above tools are in the PATH
