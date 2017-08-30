@@ -73,6 +73,7 @@ class TestAppConfig < ::Minitest::Test
       env_variables:
         VAR1: value1
         VAR2: value2
+        VAR3: 123
       beta_settings:
         cloud_sql_instances: cloud-sql-instance-name
       runtime_config:
@@ -82,7 +83,7 @@ class TestAppConfig < ::Minitest::Test
         build: bundle exec rake hello
     CONFIG
     setup_test config: config
-    assert_equal({"VAR1" => "value1", "VAR2" => "value2"},
+    assert_equal({"VAR1" => "value1", "VAR2" => "value2", "VAR3" => "123"},
                  @app_config.env_variables)
     assert_equal ["cloud-sql-instance-name"], @app_config.cloud_sql_instances
     assert_equal ["bundle exec rake hello"], @app_config.build_scripts

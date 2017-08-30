@@ -69,12 +69,13 @@ class AppConfig
   end
 
   def init_env_variables
-    @env_variables = @app_config["env_variables"] || {}
-    @env_variables.each do |k, v|
+    @env_variables = {}
+    (@app_config["env_variables"] || {}).each do |k, v|
       if k !~ %r{\A[a-zA-Z]\w*\z}
         raise AppConfig::Error,
           "Illegal environment variable name: #{k.inspect}"
       end
+      @env_variables[k.to_s] = v.to_s
     end
   end
 
