@@ -11,6 +11,8 @@ RUN if test -n "$REQUESTED_RUBY_VERSION" -a \
         && git pull \
         && rbenv install -s $REQUESTED_RUBY_VERSION) \
       && rbenv global $REQUESTED_RUBY_VERSION \
+      && (ruby -e "exit(Gem::rubygems_version < Gem::Version.new('$DEFAULT_RUBYGEMS_VERSION') ? 1 : 0)" \
+        || gem update --system $DEFAULT_RUBYGEMS_VERSION) \
       && gem install bundler --version $BUNDLER_VERSION \
       && apt-get clean \
       && rm -f /var/lib/apt/lists/*_*; \
