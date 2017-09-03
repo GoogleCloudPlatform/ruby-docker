@@ -75,7 +75,7 @@ class TestAppConfig < ::Minitest::Test
         VAR2: value2
         VAR3: 123
       beta_settings:
-        cloud_sql_instances: cloud-sql-instance-name
+        cloud_sql_instances: cloud-sql-instance-name,instance2
       runtime_config:
         foo: bar
         packages: libgeos
@@ -85,7 +85,8 @@ class TestAppConfig < ::Minitest::Test
     setup_test config: config
     assert_equal({"VAR1" => "value1", "VAR2" => "value2", "VAR3" => "123"},
                  @app_config.env_variables)
-    assert_equal ["cloud-sql-instance-name"], @app_config.cloud_sql_instances
+    assert_equal ["cloud-sql-instance-name", "instance2"],
+                 @app_config.cloud_sql_instances
     assert_equal ["bundle exec rake hello"], @app_config.build_scripts
     assert_equal "exec bundle exec bin/rails s", @app_config.entrypoint
     assert_equal ["libgeos"], @app_config.install_packages

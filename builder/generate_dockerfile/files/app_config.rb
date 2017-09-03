@@ -104,7 +104,8 @@ class AppConfig
   end
 
   def init_cloud_sql_instances
-    @cloud_sql_instances = Array(@beta_settings["cloud_sql_instances"])
+    @cloud_sql_instances = Array(@beta_settings["cloud_sql_instances"]).
+      flat_map{ |a| a.split(",") }
     @cloud_sql_instances.each do |name|
       if name !~ %r{\A[\w:.-]+\z}
         raise AppConfig::Error,
