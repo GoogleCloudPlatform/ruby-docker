@@ -133,7 +133,7 @@ class TestAppConfig < ::Minitest::Test
     ex = assert_raises AppConfig::Error do
       setup_test config: nil
     end
-    assert_match /Could not read app engine config file:/, ex.message
+    assert_match %r{Could not read app engine config file:}, ex.message
   end
 
   def test_illegal_env_name

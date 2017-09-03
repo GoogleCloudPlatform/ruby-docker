@@ -52,6 +52,9 @@ RUN apt-get install -y -q <%= @app_config.install_packages.join(' ') %>
 #         && git pull \
 #         && rbenv install -s ${REQUESTED_RUBY_VERSION}) \
 #       && rbenv global ${REQUESTED_RUBY_VERSION} \
+#       && (ruby -e "exit(Gem::rubygems_version < \
+#                    Gem::Version.new('$DEFAULT_RUBYGEMS_VERSION') ? 1 : 0)" \
+#         || gem update --system $DEFAULT_RUBYGEMS_VERSION) \
 #       && gem install bundler --version ${BUNDLER_VERSION}; \
 #     fi
 <% else %>
@@ -62,6 +65,9 @@ RUN if test ! -x /rbenv/versions/${REQUESTED_RUBY_VERSION}/bin/ruby; then \
         && git pull \
         && rbenv install -s ${REQUESTED_RUBY_VERSION}) \
       && rbenv global ${REQUESTED_RUBY_VERSION} \
+      && (ruby -e "exit(Gem::rubygems_version < \
+                   Gem::Version.new('$DEFAULT_RUBYGEMS_VERSION') ? 1 : 0)" \
+        || gem update --system $DEFAULT_RUBYGEMS_VERSION) \
       && gem install bundler --version ${BUNDLER_VERSION}; \
     fi
 <% end %>

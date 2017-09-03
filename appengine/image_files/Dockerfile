@@ -53,7 +53,7 @@ RUN apt-get update -y && \
         systemtap
 
 # Install node
-RUN mkdir /nodejs && curl -s https://nodejs.org/dist/v6.11.1/node-v6.11.1-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+RUN mkdir /nodejs && curl -s https://nodejs.org/dist/v6.11.2/node-v6.11.2-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH /nodejs/bin:$PATH
 
 # Install rbenv
@@ -63,8 +63,9 @@ RUN git clone https://github.com/sstephenson/rbenv.git $RBENV_ROOT && \
 ENV PATH $RBENV_ROOT/shims:$RBENV_ROOT/bin:$PATH
 
 # Preinstalled default ruby version.
-ENV DEFAULT_RUBY_VERSION 2.3.4
-ENV BUNDLER_VERSION 1.15.3
+ENV DEFAULT_RUBY_VERSION=2.3.4 \
+    DEFAULT_RUBYGEMS_VERSION=2.6.13 \
+    BUNDLER_VERSION=1.15.4
 
 # Set ruby runtime distribution
 ARG RUNTIME_DISTRIBUTION="ruby-runtime-jessie"
@@ -81,6 +82,8 @@ RUN (echo "deb http://packages.cloud.google.com/apt ${RUNTIME_DISTRIBUTION} main
     apt-get install -y -q gcp-ruby-$DEFAULT_RUBY_VERSION && \
     rbenv rehash && \
     rbenv global $DEFAULT_RUBY_VERSION && \
+    (ruby -e "exit(Gem::rubygems_version < Gem::Version.new('$DEFAULT_RUBYGEMS_VERSION') ? 1 : 0)" \
+      || gem update --system $DEFAULT_RUBYGEMS_VERSION) && \
     gem install bundler --version $BUNDLER_VERSION && \
     rbenv rehash
 
