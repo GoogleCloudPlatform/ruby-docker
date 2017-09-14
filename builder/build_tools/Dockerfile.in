@@ -23,7 +23,7 @@ COPY files/ /app/
 
 # Install NodeJS
 RUN mkdir /app/nodejs \
-    && curl -s https://nodejs.org/dist/v6.11.2/node-v6.11.2-linux-x64.tar.gz \
+    && curl -s https://nodejs.org/dist/v6.11.3/node-v6.11.3-linux-x64.tar.gz \
       | tar xzf - --directory=/app/nodejs --strip-components=1
 
 # Install Yarn
