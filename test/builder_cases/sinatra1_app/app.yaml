@@ -1,0 +1,5 @@
+runtime: ruby
+env: flex
+entrypoint: bundle exec ruby myapp.rb -p $PORT
+env_variables:
+  GOOGLE_CLOUD_PROJECT: ""
