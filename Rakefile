@@ -45,6 +45,11 @@ Rake::TestTask.new "test:base:only" do |t|
   t.test_files = FileList['test/tc_base_*.rb']
 end
 
+desc "Run subsequent tests faster by omitting some slow low-priority ones"
+task "faster" do
+  ::ENV["FASTER_TESTS"] = "true"
+end
+
 desc "Build local docker images and run all tests"
 task "test" => ["build", "test:only"]
 

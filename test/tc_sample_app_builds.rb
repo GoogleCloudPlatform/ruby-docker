@@ -17,7 +17,7 @@ require_relative "test_helper"
 require "fileutils"
 
 
-class TestSampleApps < ::Minitest::Test
+class TestSampleAppBuilds < ::Minitest::Test
   include TestHelper
 
   TEST_DIR = ::File.dirname __FILE__
@@ -25,10 +25,20 @@ class TestSampleApps < ::Minitest::Test
   APPS_DIR = ::File.join TEST_DIR, "sample_apps"
   TMP_DIR = ::File.join TEST_DIR, "tmp"
 
-  def test_rack_app
-    run_app_test "rack_app" do |image|
-      assert_docker_output "#{image} test ! -d /app/public/assets", nil
+  unless ::ENV["FASTER_TESTS"]
+
+    def test_rack_app
+      run_app_test "rack_app" do |image|
+        assert_docker_output "#{image} test ! -d /app/public/assets", nil
+      end
     end
+
+    def test_rails4_app
+      run_app_test "rails4_app" do |image|
+        assert_docker_output "#{image} test -d /app/public/assets", nil
+      end
+    end
+
   end
 
   def test_sinatra1_app
@@ -39,12 +49,6 @@ class TestSampleApps < ::Minitest::Test
 
   def test_rails5_app
     run_app_test "rails5_app" do |image|
-      assert_docker_output "#{image} test -d /app/public/assets", nil
-    end
-  end
-
-  def test_rails4_app
-    run_app_test "rails4_app" do |image|
       assert_docker_output "#{image} test -d /app/public/assets", nil
     end
   end
