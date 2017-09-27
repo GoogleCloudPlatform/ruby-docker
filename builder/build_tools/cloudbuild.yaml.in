@@ -1,6 +1,0 @@
-steps:
-  - name: 'gcr.io/cloud-builders/docker:latest'
-    args: ['build', '--no-cache', '-t', 'gcr.io/$PROJECT/ruby/build-tools:$IMAGE_TAG', '.']
-
-images:
-  - 'gcr.io/$PROJECT/ruby/build-tools:$IMAGE_TAG'

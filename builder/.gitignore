@@ -1,6 +1,0 @@
-test/tmp
-pipeline
-build_tools/Dockerfile
-build_tools/cloudbuild.yaml
-generate_dockerfile/Dockerfile
-generate_dockerfile/cloudbuild.yaml

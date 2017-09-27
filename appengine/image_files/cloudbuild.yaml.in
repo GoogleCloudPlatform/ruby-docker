@@ -1,8 +1,0 @@
-steps:
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--pull', '--no-cache', '-t', '$IMAGE', '.']
-  - name: 'gcr.io/gcp-runtimes/structure_test'
-    args: ['--image', '$IMAGE', '-v', '--config', '/workspace/test_base_image.json']
-
-images:
-  - '$IMAGE'
