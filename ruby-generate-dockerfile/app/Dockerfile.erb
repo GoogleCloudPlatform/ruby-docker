@@ -145,11 +145,7 @@ RUN bundle install --deployment --without="development test" && rbenv rehash
 <% end %>
 <% else %>
 <% @app_config.build_scripts.each do |script| %>
-<% if @app_config.cloud_sql_instances.empty? %>
 RUN <%= script %>
-<% else %>
-RUN /build_tools/access_cloud_sql && <%= script %>
-<% end %>
 <% end %>
 <% end %>
 
