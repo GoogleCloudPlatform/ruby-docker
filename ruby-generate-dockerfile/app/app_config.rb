@@ -96,11 +96,19 @@ class AppConfig
         !::File.file?("#{@workspace_dir}/config/application.rb")
       return []
     end
-    if @entrypoint =~ /(rcloadenv\s.+\s--\s)/
-      ["bundle exec #{$1}rake assets:precompile || true"]
+    [rails_asset_precompile_script]
+  end
+
+  def rails_asset_precompile_script
+    script = if @entrypoint =~ /(rcloadenv\s.+\s--\s)/
+      "bundle exec #{$1}rake assets:precompile || true"
     else
-      ["bundle exec rake assets:precompile || true"]
+      "bundle exec rake assets:precompile || true"
     end
+    unless @cloud_sql_instances.empty?
+      script = "/build_tools/access_cloud_sql && #{script}"
+    end
+    script
   end
 
   def init_cloud_sql_instances

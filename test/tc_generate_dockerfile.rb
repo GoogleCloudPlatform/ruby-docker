@@ -103,25 +103,19 @@ class TestGenerateDockerfile < ::Minitest::Test
     assert_dockerfile_line "RUN bundle exec rake do:something:else"
   end
 
-  def test_custom_build_scripts_with_cloud_sql
-    config = <<~CONFIG
-      lifecycle:
-        build:
-          - bundle exec rake do:something
-          - bundle exec rake do:something:else
-      beta_settings:
-        cloud_sql_instances: my-proj:my-region:my-db
-    CONFIG
-    run_generate_dockerfile "rack_app", config: config
-    assert_dockerfile_line "RUN /build_tools/access_cloud_sql &&" \
-        " bundle exec rake do:something"
-    assert_dockerfile_line "RUN /build_tools/access_cloud_sql &&" \
-        " bundle exec rake do:something:else"
-  end
-
   def test_rails_default_build_scripts
     run_generate_dockerfile "rails5_app"
     assert_dockerfile_line "RUN bundle exec rake assets:precompile \\|\\| true"
+  end
+
+  def test_rails_default_build_scripts_with_cloud_sql
+    config = <<~CONFIG
+      beta_settings:
+        cloud_sql_instances: my-proj:my-region:my-db
+    CONFIG
+    run_generate_dockerfile "rails5_app", config: config
+    assert_dockerfile_line "RUN /build_tools/access_cloud_sql &&" \
+        " bundle exec rake assets:precompile \\|\\| true"
   end
 
   def test_entrypoint
