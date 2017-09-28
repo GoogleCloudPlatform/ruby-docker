@@ -21,7 +21,7 @@ require_relative "test_helper"
 
 class TestRubyVersions < ::Minitest::Test
 
-  VERSIONS = [
+  COMPLETE_VERSIONS = [
     # 2.0 is obsolete, but we keep it for testing patchlevel notation and
     # installation from source.
     "2.0.0-p648",
@@ -53,6 +53,17 @@ class TestRubyVersions < ::Minitest::Test
     ""
   ]
 
+  FASTER_VERSIONS = [
+    # Test only the latest patch of each supported minor version, plus the
+    # case of no requested version.
+    "2.2.8",
+    "2.3.5",
+    "2.4.2",
+    ""
+  ]
+
+
+  VERSIONS = ::ENV["FASTER_TESTS"] ? FASTER_VERSIONS : COMPLETE_VERSIONS
 
   DOCKERFILE = <<~DOCKERFILE_CONTENT
     FROM ruby-base
