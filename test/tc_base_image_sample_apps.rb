@@ -26,7 +26,7 @@ require_relative "test_helper"
 # the sample app Dockerfiles should all inherit FROM the base image, which
 # will be called "ruby-base".
 
-class TestSampleApps < ::Minitest::Test
+class TestBaseImageSampleApps < ::Minitest::Test
 
   include TestHelper
 
@@ -35,23 +35,27 @@ class TestSampleApps < ::Minitest::Test
   TMP_DIR = ::File.join TEST_DIR, "tmp"
 
 
-  def test_rack_app
-    run_app_test "rack_app", <<~DOCKERFILE
-      FROM ruby-base
-      COPY . /app/
-      RUN bundle install && rbenv rehash
-      ENTRYPOINT bundle exec rackup -p 8080 -E production config.ru
-    DOCKERFILE
-  end
+  unless ::ENV["FASTER_TESTS"]
 
-  def test_rails4_app
-    run_app_test "rails4_app", <<~DOCKERFILE
-      FROM ruby-base
-      COPY . /app/
-      RUN bundle install && rbenv rehash
-      ENV SECRET_KEY_BASE=a12345
-      ENTRYPOINT bundle exec bin/rails server -p 8080
-    DOCKERFILE
+    def test_rack_app
+      run_app_test "rack_app", <<~DOCKERFILE
+        FROM ruby-base
+        COPY . /app/
+        RUN bundle install && rbenv rehash
+        ENTRYPOINT bundle exec rackup -p 8080 -E production config.ru
+      DOCKERFILE
+    end
+
+    def test_rails4_app
+      run_app_test "rails4_app", <<~DOCKERFILE
+        FROM ruby-base
+        COPY . /app/
+        RUN bundle install && rbenv rehash
+        ENV SECRET_KEY_BASE=a12345
+        ENTRYPOINT bundle exec bin/rails server -p 8080
+      DOCKERFILE
+    end
+
   end
 
   def test_rails5_app
