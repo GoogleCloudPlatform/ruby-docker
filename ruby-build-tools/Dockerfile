@@ -23,7 +23,7 @@ COPY access_cloud_sql /app/
 
 # Install NodeJS
 RUN mkdir /app/nodejs \
-    && curl -s https://nodejs.org/dist/v6.11.3/node-v6.11.3-linux-x64.tar.gz \
+    && curl -s https://nodejs.org/dist/v6.11.4/node-v6.11.4-linux-x64.tar.gz \
       | tar xzf - --directory=/app/nodejs --strip-components=1
 
 # Install Yarn

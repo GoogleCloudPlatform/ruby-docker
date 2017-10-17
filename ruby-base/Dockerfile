@@ -68,7 +68,7 @@ RUN apt-get update -y && \
         systemtap
 
 # Install node
-RUN mkdir /nodejs && curl -s https://nodejs.org/dist/v6.11.3/node-v6.11.3-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+RUN mkdir /nodejs && curl -s https://nodejs.org/dist/v6.11.4/node-v6.11.4-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH /nodejs/bin:$PATH
 
 # Install rbenv
