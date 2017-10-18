@@ -37,7 +37,7 @@ class AppConfig
   attr_reader :entrypoint
   attr_reader :install_packages
   attr_reader :ruby_version
-  attr_reader :has_gemfile
+  def has_gemfile?; @has_gemfile; end
 
   def initialize workspace_dir
     @workspace_dir = workspace_dir

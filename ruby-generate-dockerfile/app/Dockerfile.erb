@@ -3,10 +3,10 @@
 ## Flexible Environment. It may be modified and used as an App Engine "custom
 ## runtime", or even ported to a different Docker-based hosting environment.
 ##
-## Generated at: <%= @timestamp %>
-## From configuration: <%= @app_config.app_yaml_path %>
-## Project: <%= @app_config.project_id %>
-## Service: <%= @app_config.service_name %>
+## Generated at: <%= timestamp %>
+## From configuration: <%= app_yaml_path %>
+## Project: <%= project_id %>
+## Service: <%= service_name %>
 ################################################################################
 
 
@@ -17,24 +17,28 @@
 ## by both the application's build scripts and the final application runtime
 ## should be installed here.
 
-FROM <%= @base_image %> AS augmented-base
+FROM <%= base_image %> AS augmented-base
+
+## Prevent some warnings that happen when we're apt-get installing in a
+## non-interactive environment.
+ARG DEBIAN_FRONTEND=noninteractive
 
 ## This line is needed to perform Debian package installations. It should be
 ## uncommented if any of the customizations below are used to install
 ## additional Debian packages or a specific version of Ruby.
 ## If your application needs additional Debian repositories for its
 ## installations, you can also add them here.
-<% if @app_config.install_packages.empty? && @app_config.ruby_version.empty? %>
+<% if install_packages.empty? && ruby_version.empty? %>
 # RUN apt-get update -y
 <% else %>
 RUN apt-get update -y
 <% end %>
 
 ## If your application needs to install additional Debian packages, do so here.
-<% if @app_config.install_packages.empty? %>
+<% if install_packages.empty? %>
 # RUN apt-get install -y -q package-name another-package-name
 <% else %>
-RUN apt-get install -y -q <%= @app_config.install_packages.join(' ') %>
+RUN apt-get install -y -q <%= install_packages.join(' ') %>
 <% end %>
 
 ## If your application requires a specific version of Ruby, provide a
@@ -44,8 +48,8 @@ RUN apt-get install -y -q <%= @app_config.install_packages.join(' ') %>
 ## This script attempts to install the requested Ruby version from the GCP-
 ## provided prebuilt binaries if available, and falls back to using rbenv.
 ## It sets the new version as the default, and also installs bundler.
-<% if @app_config.ruby_version.empty? %>
-# ARG REQUESTED_RUBY_VERSION="2.4.1"
+<% if ruby_version.empty? %>
+# ARG REQUESTED_RUBY_VERSION="2.4.2"
 # RUN if test ! -x /rbenv/versions/${REQUESTED_RUBY_VERSION}/bin/ruby; then \
 #       apt-get install -y -q gcp-ruby-${REQUESTED_RUBY_VERSION} \
 #       || (cd /rbenv/plugins/ruby-build \
@@ -55,7 +59,7 @@ RUN apt-get install -y -q <%= @app_config.install_packages.join(' ') %>
 #       && gem install bundler --version ${BUNDLER_VERSION}; \
 #     fi
 <% else %>
-ARG REQUESTED_RUBY_VERSION="<%= @app_config.ruby_version %>"
+ARG REQUESTED_RUBY_VERSION="<%= ruby_version %>"
 RUN if test ! -x /rbenv/versions/${REQUESTED_RUBY_VERSION}/bin/ruby; then \
       apt-get install -y -q gcp-ruby-${REQUESTED_RUBY_VERSION} \
       || (cd /rbenv/plugins/ruby-build \
@@ -69,7 +73,7 @@ RUN if test ! -x /rbenv/versions/${REQUESTED_RUBY_VERSION}/bin/ruby; then \
 ## Clean up apt-get's files to decrease the image size. It should be
 ## uncommented if any of the customizations above are used to install
 ## additional Debian packages or a specific version of Ruby.
-<% if @app_config.install_packages.empty? && @app_config.ruby_version.empty? %>
+<% if install_packages.empty? && ruby_version.empty? %>
 # RUN apt-get clean && rm -f /var/lib/apt/lists/*_*
 <% else %>
 RUN apt-get clean && rm -f /var/lib/apt/lists/*_*
@@ -79,10 +83,10 @@ RUN apt-get clean && rm -f /var/lib/apt/lists/*_*
 ## (stage 2 below) and the final application runtime.
 
 ## Set environment variables requested in the app engine configuration.
-<% if @app_config.env_variables.empty? %>
+<% if env_variables.empty? %>
 # ENV NAME="value"
 <% else %>
-ENV <%= render_env @app_config.env_variables %>
+ENV <%= render_env env_variables %>
 <% end %>
 
 
@@ -97,7 +101,7 @@ FROM augmented-base AS app-build
 
 ## Obtain common build tools, including nodejs, yarn, cloud_sql_proxy, and the
 ## access_cloud_sql script, from this image.
-COPY --from=<%= @build_tools_image %> /build_tools/ /build_tools/
+COPY --from=<%= build_tools_image %> /build_tools/ /build_tools/
 
 ## Ensure the above tools are in the PATH
 ENV PATH /build_tools:/build_tools/nodejs/bin:/build_tools/yarn/bin:${PATH}
@@ -110,11 +114,11 @@ COPY . /app/
 ## "access_cloud_sql" script which databases to connect to.
 ## Also, make sure the /cloudsql directory is created because the CloudSQL
 ## Proxy will open sockets in that directory.
-<% if @app_config.cloud_sql_instances.empty? %>
+<% if cloud_sql_instances.empty? %>
 # ARG BUILD_CLOUDSQL_INSTANCES="my-project:db-region:db-name"
 # RUN mkdir /cloudsql
 <% else %>
-ARG BUILD_CLOUDSQL_INSTANCES="<%= @app_config.cloud_sql_instances.join(',') %>"
+ARG BUILD_CLOUDSQL_INSTANCES="<%= cloud_sql_instances.join(',') %>"
 RUN mkdir /cloudsql
 <% end %>
 
@@ -125,7 +129,7 @@ RUN mkdir /cloudsql
 # ENV GOOGLE_APPLICATION_CREDENTIALS=/build_tools/credentials.json
 
 ## If the application uses bundler, install the bundle here.
-<% if @app_config.has_gemfile %>
+<% if has_gemfile? %>
 RUN bundle install --deployment --without="development test" && rbenv rehash
 <% else %>
 # RUN bundle install --deployment --without="development test" && rbenv rehash
@@ -136,14 +140,14 @@ RUN bundle install --deployment --without="development test" && rbenv rehash
 ## run /build_tools/access_cloud_sql first to start the cloud_sql_proxy. e.g.
 ##   RUN /build_tools/access_cloud_sql && bundle exec rake my_task
 ## Otherwise, simply run each build script in order in a separate RUN command.
-<% if @app_config.build_scripts.empty? %>
-<% if @app_config.cloud_sql_instances.empty? %>
+<% if build_scripts.empty? %>
+<% if cloud_sql_instances.empty? %>
 # RUN bundle exec rake assets:precompile
 <% else %>
 # RUN /build_tools/access_cloud_sql && bundle exec rake assets:precompile
 <% end %>
 <% else %>
-<% @app_config.build_scripts.each do |script| %>
+<% build_scripts.each do |script| %>
 RUN <%= script %>
 <% end %>
 <% end %>
@@ -161,4 +165,4 @@ FROM augmented-base
 COPY --from=app-build /app/ /app/
 
 ## Command to start application.
-CMD <%= @app_config.entrypoint %>
+CMD <%= entrypoint %>
