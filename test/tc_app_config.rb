@@ -62,7 +62,7 @@ class TestAppConfig < ::Minitest::Test
     assert_equal "exec bundle exec rackup -p $PORT", @app_config.entrypoint
     assert_equal EMPTY_ARRAY, @app_config.install_packages
     assert_equal EMPTY_STRING, @app_config.ruby_version
-    refute @app_config.has_gemfile
+    refute @app_config.has_gemfile?
   end
 
   def test_basic_app_yaml
@@ -126,7 +126,7 @@ class TestAppConfig < ::Minitest::Test
 
   def test_gemfile
     setup_test dir: "gemfile"
-    assert @app_config.has_gemfile
+    assert @app_config.has_gemfile?
   end
 
   def test_config_missing

@@ -34,6 +34,7 @@ FROM gcr.io/google-appengine/debian8
 # charlock_holmes  libicu-dev
 # rugged           libgit2-dev
 
+ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -y && \
     apt-get install -y -q --no-install-recommends \
         apt-utils \

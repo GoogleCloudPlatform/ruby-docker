@@ -16,6 +16,7 @@
 
 require "erb"
 require "optparse"
+require "delegate"
 
 require_relative "app_config.rb"
 
@@ -70,7 +71,9 @@ class GenerateDockerfile
   end
 
   def write_dockerfile
-    b = binding
+    b = TemplateCallbacks.new(@app_config, @timestamp, @base_image,
+                              @build_tools_image)
+                         .instance_eval{ binding }
     write_path = "#{@app_config.workspace_dir}/Dockerfile"
     if ::File.exist? write_path
       ::STDERR.puts "Unable to generate Dockerfile because one already exists."
@@ -104,12 +107,25 @@ class GenerateDockerfile
     end
   end
 
-  def escape_quoted str
-    str.gsub("\\", "\\\\").gsub("\"", "\\\"").gsub("\n", "\\n")
-  end
+  class TemplateCallbacks < SimpleDelegator
+    def initialize app_config, timestamp, base_image, build_tools_image
+      @timestamp = timestamp
+      @base_image = base_image
+      @build_tools_image = build_tools_image
+      super app_config
+    end
 
-  def render_env hash
-    hash.map{ |k,v| "#{k}=\"#{escape_quoted v}\"" }.join(" \\\n    ")
+    attr_reader :timestamp
+    attr_reader :base_image
+    attr_reader :build_tools_image
+
+    def escape_quoted str
+      str.gsub("\\", "\\\\").gsub("\"", "\\\"").gsub("\n", "\\n")
+    end
+
+    def render_env hash
+      hash.map{ |k,v| "#{k}=\"#{escape_quoted v}\"" }.join(" \\\n    ")
+    end
   end
 end
 
