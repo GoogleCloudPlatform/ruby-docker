@@ -69,17 +69,19 @@ module TestHelper
       puts("...expected result did not arrive yet (iteration #{iter})...")
       sleep(1)
     end
+    yield if block_given?
     flunk "Expected #{expectation.inspect} but got \"#{actual}\"" +
       " (exit code #{exit_code}) when executing \"#{cmd}\""
   end
 
   # Assert that the given docker run command produces the given output.
   # Automatically cleans up the generated container.
-  def assert_docker_output(args, expectation, container_root="generic")
+  def assert_docker_output(args, expectation, container_root="generic", &block)
     number = "%.08x" % rand(0x100000000)
     container = "ruby-test-container-#{container_root}-#{number}"
     begin
-      assert_cmd_output("docker run --name #{container} #{args}", expectation)
+      assert_cmd_output("docker run --name #{container} #{args}",
+          expectation, &block)
     ensure
       execute_cmd("docker rm #{container}")
     end
