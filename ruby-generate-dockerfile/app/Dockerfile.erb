@@ -78,6 +78,13 @@ RUN apt-get clean && rm -f /var/lib/apt/lists/*_*
 ## Feel free to install any other software needed by both the build process
 ## (stage 2 below) and the final application runtime.
 
+## Set environment variables requested in the app engine configuration.
+<% if @app_config.env_variables.empty? %>
+# ENV NAME="value"
+<% else %>
+ENV <%= render_env @app_config.env_variables %>
+<% end %>
+
 
 ################################################################################
 ## 2. Application build
@@ -97,14 +104,6 @@ ENV PATH /build_tools:/build_tools/nodejs/bin:/build_tools/yarn/bin:${PATH}
 
 ## Copy the application files.
 COPY . /app/
-
-## If your build scripts need any environment variables, set them here.
-## Generally, these will come from the application's app engine configuration.
-<% if @app_config.env_variables.empty? %>
-# ENV NAME="value"
-<% else %>
-ENV <%= render_env @app_config.env_variables %>
-<% end %>
 
 ## If your build scripts need access to your application's CloudSQL instances,
 ## list them here, comma-delimited. This environment variable tells the
