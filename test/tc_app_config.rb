@@ -22,7 +22,9 @@ class TestAppConfig < ::Minitest::Test
   EMPTY_HASH = {}.freeze
   EMPTY_ARRAY = [].freeze
   EMPTY_STRING = ''.freeze
-  DEFAULT_CONFIG = "env: flex\nruntime: ruby\n"
+  DEFAULT_CONFIG_NO_ENTRYPOINT = "env: flex\nruntime: ruby\n"
+  DEFAULT_CONFIG =
+    "env: flex\nruntime: ruby\nentrypoint: bundle exec ruby start.rb\n"
 
   TEST_DIR = ::File.dirname __FILE__
   CASES_DIR = ::File.join TEST_DIR, "app_config"
@@ -59,7 +61,7 @@ class TestAppConfig < ::Minitest::Test
     assert_equal EMPTY_ARRAY, @app_config.cloud_sql_instances
     assert_equal EMPTY_ARRAY, @app_config.build_scripts
     assert_equal EMPTY_HASH, @app_config.runtime_config
-    assert_equal "exec bundle exec rackup -p $PORT", @app_config.entrypoint
+    assert_equal "exec bundle exec ruby start.rb", @app_config.entrypoint
     assert_equal EMPTY_ARRAY, @app_config.install_packages
     assert_equal EMPTY_STRING, @app_config.ruby_version
     refute @app_config.has_gemfile?
@@ -124,9 +126,15 @@ class TestAppConfig < ::Minitest::Test
     assert_equal "2.0.99", @app_config.ruby_version
   end
 
-  def test_gemfile
-    setup_test dir: "gemfile"
+  def test_gemfile_old_name
+    setup_test dir: "gemfile-old"
     assert @app_config.has_gemfile?
+  end
+
+  def test_gemfile_configru
+    setup_test dir: "gemfile-rack", config: DEFAULT_CONFIG_NO_ENTRYPOINT
+    assert @app_config.has_gemfile?
+    assert_equal "exec bundle exec rackup -p $PORT", @app_config.entrypoint
   end
 
   def test_config_missing
@@ -136,10 +144,18 @@ class TestAppConfig < ::Minitest::Test
     assert_match %r{Could not read app engine config file:}, ex.message
   end
 
+  def test_needs_entrypoint
+    ex = assert_raises AppConfig::Error do
+      setup_test config: DEFAULT_CONFIG_NO_ENTRYPOINT
+    end
+    assert_match %r{Please specify an entrypoint}, ex.message
+  end
+
   def test_illegal_env_name
     config = <<~CONFIG
       env: flex
       runtime: ruby
+      entrypoint: bundle exec ruby hello.rb
       env_variables:
         VAR-1: value1
     CONFIG
@@ -154,6 +170,7 @@ class TestAppConfig < ::Minitest::Test
     config = <<~CONFIG
       env: flex
       runtime: ruby
+      entrypoint: bundle exec ruby hello.rb
       lifecycle:
         build: "multiple\\nlines"
     CONFIG
@@ -168,6 +185,7 @@ class TestAppConfig < ::Minitest::Test
     config = <<~CONFIG
       env: flex
       runtime: ruby
+      entrypoint: bundle exec ruby hello.rb
       beta_settings:
         cloud_sql_instances: bad!instance
     CONFIG
@@ -195,6 +213,7 @@ class TestAppConfig < ::Minitest::Test
     config = <<~CONFIG
       env: flex
       runtime: ruby
+      entrypoint: bundle exec ruby hello.rb
       runtime_config:
         packages: bad!package
     CONFIG
