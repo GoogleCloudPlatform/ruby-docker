@@ -19,7 +19,7 @@ require "psych"
 class AppConfig
   DEFAULT_WORKSPACE_DIR = "/workspace"
   DEFAULT_APP_YAML_PATH = "./app.yaml"
-  DEFAULT_ENTRYPOINT = "bundle exec rackup -p $PORT"
+  DEFAULT_RACK_ENTRYPOINT = "bundle exec rackup -p $PORT"
   DEFAULT_SERVICE_NAME = "default"
 
   class Error < ::StandardError
@@ -125,8 +125,14 @@ class AppConfig
   def init_entrypoint
     @raw_entrypoint =
         @runtime_config["entrypoint"] ||
-        @app_config["entrypoint"] ||
-        DEFAULT_ENTRYPOINT
+        @app_config["entrypoint"]
+    if !@raw_entrypoint && ::File.readable?("#{@workspace_dir}/config.ru")
+      @raw_entrypoint = DEFAULT_RACK_ENTRYPOINT
+    end
+    unless @raw_entrypoint
+      raise AppConfig::Error,
+        "Please specify an entrypoint in the App Engine configuration"
+    end
     if @raw_entrypoint.include? "\n"
       raise AppConfig::Error,
         "Illegal newline in entrypoint: #{@raw_entrypoint.inspect}"
@@ -163,6 +169,7 @@ class AppConfig
     if @ruby_version !~ %r{\A[\w.-]*\z}
       raise AppConfig::Error, "Illegal ruby version: #{@ruby_version.inspect}"
     end
-    @has_gemfile = ::File.readable? "#{@workspace_dir}/Gemfile.lock"
+    @has_gemfile = ::File.readable?("#{@workspace_dir}/Gemfile.lock") ||
+        ::File.readable?("#{@workspace_dir}/gems.locked")
   end
 end
