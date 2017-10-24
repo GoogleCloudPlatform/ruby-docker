@@ -99,12 +99,12 @@ ENV <%= render_env env_variables %>
 
 FROM augmented-base AS app-build
 
-## Obtain common build tools, including nodejs, yarn, cloud_sql_proxy, and the
-## access_cloud_sql script, from this image.
+## Obtain common build tools, including nodejs, yarn, gcloud, cloud_sql_proxy,
+## and the access_cloud_sql script, from this image.
 COPY --from=<%= build_tools_image %> /build_tools/ /build_tools/
 
 ## Ensure the above tools are in the PATH
-ENV PATH /build_tools:/build_tools/nodejs/bin:/build_tools/yarn/bin:${PATH}
+ENV PATH /build_tools:/build_tools/google-cloud-sdk/bin:/build_tools/nodejs/bin:/build_tools/yarn/bin:${PATH}
 
 ## Copy the application files.
 COPY . /app/
