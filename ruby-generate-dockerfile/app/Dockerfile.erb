@@ -137,14 +137,14 @@ RUN bundle install --deployment --without="development test" && rbenv rehash
 
 ## Run application build scripts here.
 ## Scripts that require access to the application CloudSQL instances should
-## run /build_tools/access_cloud_sql first to start the cloud_sql_proxy. e.g.
-##   RUN /build_tools/access_cloud_sql && bundle exec rake my_task
+## run access_cloud_sql first to start the cloud_sql_proxy. e.g.
+##   RUN access_cloud_sql && bundle exec rake my_task
 ## Otherwise, simply run each build script in order in a separate RUN command.
 <% if build_scripts.empty? %>
 <% if cloud_sql_instances.empty? %>
 # RUN bundle exec rake assets:precompile
 <% else %>
-# RUN /build_tools/access_cloud_sql && bundle exec rake assets:precompile
+# RUN access_cloud_sql && bundle exec rake assets:precompile
 <% end %>
 <% else %>
 <% build_scripts.each do |script| %>

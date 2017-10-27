@@ -106,7 +106,7 @@ class AppConfig
       "bundle exec rake assets:precompile || true"
     end
     unless @cloud_sql_instances.empty?
-      script = "/build_tools/access_cloud_sql && #{script}"
+      script = "access_cloud_sql --lenient && #{script}"
     end
     script
   end
