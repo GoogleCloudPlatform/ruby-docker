@@ -18,13 +18,15 @@ set -e
 
 SQL_TIMEOUT=10
 
+if [ "$1" == "--lenient" ]; then
+  ERROR_RESULT=0
+else
+  ERROR_RESULT=1
+fi
+
 if [ -z "${BUILD_CLOUDSQL_INSTANCES}" ]; then
   >&2 echo "ERROR: Invoked access_cloud_sql with no CloudSQL instances available"
-  if [ "$1" == "--lenient" ]; then
-    exit 0
-  else
-    exit 1
-  fi
+  exit ${ERROR_RESULT}
 fi
 
 rm -f /build_tools/cloud_sql_proxy.log
@@ -35,5 +37,5 @@ if (timeout ${SQL_TIMEOUT}s tail -f --lines=+1 /build_tools/cloud_sql_proxy.log 
 else
   >&2 echo "ERROR: Failed to start cloud_sql_proxy"
   >&2 cat /build_tools/cloud_sql_proxy.log
-  exit 1
+  exit ${ERROR_RESULT}
 fi

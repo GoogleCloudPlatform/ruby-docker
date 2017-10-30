@@ -114,7 +114,7 @@ class TestGenerateDockerfile < ::Minitest::Test
         cloud_sql_instances: my-proj:my-region:my-db
     CONFIG
     run_generate_dockerfile "rails5_app", config: config
-    assert_dockerfile_line "RUN /build_tools/access_cloud_sql &&" \
+    assert_dockerfile_line "RUN access_cloud_sql --lenient &&" \
         " bundle exec rake assets:precompile \\|\\| true"
   end
 
