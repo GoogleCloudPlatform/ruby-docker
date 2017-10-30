@@ -15,6 +15,7 @@
 require "json"
 require "optparse"
 require "psych"
+require "net/http"
 
 class AppConfig
   DEFAULT_WORKSPACE_DIR = "/workspace"
@@ -28,6 +29,8 @@ class AppConfig
   attr_reader :workspace_dir
   attr_reader :app_yaml_path
   attr_reader :project_id
+  attr_reader :project_id_for_display
+  attr_reader :project_id_for_example
   attr_reader :service_name
   attr_reader :env_variables
   attr_reader :cloud_sql_instances
@@ -42,6 +45,7 @@ class AppConfig
   def initialize workspace_dir
     @workspace_dir = workspace_dir
     init_app_config  # Must be called first
+    init_project_id
     init_env_variables
     init_packages
     init_ruby_config
@@ -53,7 +57,6 @@ class AppConfig
   private
 
   def init_app_config
-    @project_id = ::ENV["PROJECT_ID"] || "(unknown)"
     @app_yaml_path = ::ENV["GAE_APPLICATION_YAML_PATH"] || DEFAULT_APP_YAML_PATH
     config_file = "#{@workspace_dir}/#{@app_yaml_path}"
     begin
@@ -66,6 +69,23 @@ class AppConfig
     @beta_settings = @app_config["beta_settings"] || {}
     @lifecycle = @app_config["lifecycle"] || {}
     @service_name = @app_config["service"] || DEFAULT_SERVICE_NAME
+  end
+
+  def init_project_id
+    @project_id = ::ENV["PROJECT_ID"]
+    unless @project_id
+      http = Net::HTTP.new "169.254.169.254",
+                           open_timeout: 0.1, read_timeout: 0.1
+      begin
+        resp = http.get "/computeMetadata/v1/project/project-id",
+                        {"Metadata-Flavor" => "Google"}
+        @project_id = resp.body if resp.code == "200"
+        http.finish
+      rescue StandardError
+      end
+    end
+    @project_id_for_display = @project_id || "(unknown)"
+    @project_id_for_example = @project_id || "my-project-id"
   end
 
   def init_env_variables
