@@ -55,7 +55,9 @@ class TestAppConfig < ::Minitest::Test
     setup_test
     assert_equal TMP_DIR, @app_config.workspace_dir
     assert_equal "./app.yaml", @app_config.app_yaml_path
-    assert_equal "(unknown)", @app_config.project_id
+    assert_nil @app_config.project_id
+    assert_equal "(unknown)", @app_config.project_id_for_display
+    assert_equal "my-project-id", @app_config.project_id_for_example
     assert_equal "default", @app_config.service_name
     assert_equal EMPTY_HASH, @app_config.env_variables
     assert_equal EMPTY_ARRAY, @app_config.cloud_sql_instances

@@ -18,12 +18,16 @@
 # Use the Ruby base image as a tool to download things.
 FROM ruby-base AS builder
 
+# Versions
+ARG NODEJS_VERSION=6.11.4
+ARG GCLOUD_VERSION=177.0.0
+
 # Install build script files.
 COPY access_cloud_sql /app/
 
 # Install NodeJS
 RUN mkdir /app/nodejs \
-    && curl -s https://nodejs.org/dist/v6.11.4/node-v6.11.4-linux-x64.tar.gz \
+    && curl -s https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.gz \
       | tar xzf - --directory=/app/nodejs --strip-components=1
 
 # Install Yarn
@@ -35,6 +39,12 @@ RUN mkdir /app/yarn \
 RUN curl -s https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 \
       > /app/cloud_sql_proxy \
     && chmod a+x /app/cloud_sql_proxy
+
+# Install Google Cloud SDK
+RUN curl -s https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-linux-x86_64.tar.gz \
+      > /app/google-cloud-sdk.tar.gz \
+    && tar xzf google-cloud-sdk.tar.gz \
+    && rm google-cloud-sdk.tar.gz
 
 
 # Generate a minimal image with only the tool files themselves. This image

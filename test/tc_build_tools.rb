@@ -44,6 +44,9 @@ class TestBuildTools < ::Minitest::Test
         assert_docker_output "#{image} /build_tools/cloud_sql_proxy --version",
           /Cloud SQL Proxy/
         assert_docker_output \
+          "#{image} /build_tools/google-cloud-sdk/bin/gcloud --version",
+          /Google Cloud SDK/
+        assert_docker_output \
           "#{image} /build_tools/access_cloud_sql --lenient && echo OK",
           /OK/
       end
