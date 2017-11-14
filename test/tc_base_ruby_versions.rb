@@ -49,6 +49,8 @@ class TestRubyVersions < ::Minitest::Test
     "2.4.0",
     "2.4.1",
     "2.4.2",
+    # Temporary test for 2.5 previews
+    "2.5.0-preview1",
     # Test for no requested version (i.e. fall back to default)
     ""
   ]
@@ -80,7 +82,7 @@ class TestRubyVersions < ::Minitest::Test
             && git pull \
             && rbenv install -s $REQUESTED_RUBY_VERSION) \
           && rbenv global $REQUESTED_RUBY_VERSION \
-          && gem install bundler --version $BUNDLER_VERSION \
+          && (bundle version || gem install bundler --version $BUNDLER_VERSION) \
           && apt-get clean \
           && rm -f /var/lib/apt/lists/*_*; \
         fi
