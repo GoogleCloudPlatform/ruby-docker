@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+
+gem 'sinatra', '~> 2.0'
+gem "sinatra-contrib", "~> 2.0"
+
+gem "stackdriver", "~> 0.6"
+gem "google-cloud-monitoring", "~> 0.24"
