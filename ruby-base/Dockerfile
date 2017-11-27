@@ -97,7 +97,7 @@ RUN (echo "deb http://packages.cloud.google.com/apt ${RUNTIME_DISTRIBUTION} main
     apt-get install -y -q gcp-ruby-$DEFAULT_RUBY_VERSION && \
     rbenv rehash && \
     rbenv global $DEFAULT_RUBY_VERSION && \
-    gem install bundler --version $BUNDLER_VERSION && \
+    (bundle version || gem install bundler --version $BUNDLER_VERSION) && \
     rbenv rehash
 
 # Tell nokogiri >=1.6 to install using system libraries, for faster builds
