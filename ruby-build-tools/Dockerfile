@@ -19,15 +19,15 @@
 FROM ruby-base AS builder
 
 # Versions
-ARG NODEJS_VERSION=8.9.1
-ARG GCLOUD_VERSION=179.0.0
+ARG nodejs_version=8.9.1
+ARG gcloud_version=180.0.1
 
 # Install build script files.
 COPY access_cloud_sql /app/
 
 # Install NodeJS
 RUN mkdir /app/nodejs \
-    && curl -s https://nodejs.org/dist/v${NODEJS_VERSION}/node-v${NODEJS_VERSION}-linux-x64.tar.gz \
+    && curl -s https://nodejs.org/dist/v${nodejs_version}/node-v${nodejs_version}-linux-x64.tar.gz \
       | tar xzf - --directory=/app/nodejs --strip-components=1
 
 # Install Yarn
@@ -41,10 +41,9 @@ RUN curl -s https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 \
     && chmod a+x /app/cloud_sql_proxy
 
 # Install Google Cloud SDK
-RUN curl -s https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-linux-x86_64.tar.gz \
-      > /app/google-cloud-sdk.tar.gz \
-    && tar xzf google-cloud-sdk.tar.gz \
-    && rm google-cloud-sdk.tar.gz
+RUN mkdir /app/google-cloud-sdk \
+    && curl -s https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${gcloud_version}-linux-x86_64.tar.gz \
+      | tar xzf - --directory=/app/google-cloud-sdk --strip-components=1
 
 
 # Generate a minimal image with only the tool files themselves. This image
