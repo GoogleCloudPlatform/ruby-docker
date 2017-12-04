@@ -32,8 +32,19 @@ task "build:generate-dockerfile" do |t, args|
   sh "docker build --no-cache -t ruby-generate-dockerfile ruby-generate-dockerfile"
 end
 
+desc "Build local docker image for app engine exec wrapper"
+task "build:app-engine-exec-wrapper" do |t, args|
+  sh "docker build --no-cache -t app-engine-exec-wrapper app-engine-exec-wrapper"
+end
+
+desc "Build fake test harness image for app engine exec wrapper"
+task "build:app-engine-exec-harness" do |t, args|
+  sh "docker build --no-cache -t app-engine-exec-harness test/app_engine_exec_wrapper/harness"
+end
+
 desc "Build all local docker images"
-task "build" => ["build:base", "build:build-tools", "build:generate-dockerfile"]
+task "build" => ["build:base", "build:build-tools", "build:generate-dockerfile",
+                 "build:app-engine-exec-wrapper", "build:app-engine-exec-harness"]
 
 desc "Run all tests without doing a build"
 Rake::TestTask.new "test:only" do |t|
@@ -43,6 +54,11 @@ end
 desc "Run base image tests without doing a build"
 Rake::TestTask.new "test:base:only" do |t|
   t.test_files = FileList['test/tc_base_*.rb']
+end
+
+desc "Run app-engine-exec-wrapper tests without doing a build"
+Rake::TestTask.new "test:exec:only" do |t|
+  t.test_files = FileList['test/tc_app_engine_exec_wrapper.rb']
 end
 
 desc "Run subsequent tests faster by omitting some slow low-priority ones"

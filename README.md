@@ -18,19 +18,41 @@ It comprises:
 For more information on using the Ruby runtime, see
 https://cloud.google.com/ruby
 
+This repository also contains a helper image, "app-engine-exec-wrapper" that
+provides a way to execute scripts in an App Engine application's environment.
+See the `app-engine-exec-wrapper` directory for more details.
+
 ## Building and testing
 
-The provided Rakefile builds the three images locally and runs the unit tests
+The provided Rakefile builds all the images locally and runs the unit tests
 in the test directory. It requires Ruby 2.3 and Docker 17.06 or later.
 
-Actual builds can be done using the build scripts in this directory. The
-`build-ruby-runtime-images.sh` script uses Google Cloud Container Builder to
-build the images and upload them to Google Container Registry. The
-`build-ruby-runtime-pipeline.sh` script creates a Ruby runtime builder
-configuration and uploads it to Google Cloud Storage where it can be used.
+Release candidate test builds can be built using the `build-ruby-runtime-*`
+scripts. To perform a test build of all the runtime images into the current
+gcloud project:
 
-The `integration_test` directory contains a sample application that is used
-by the Google Ruby team for internal integration tests.
+    ./build-ruby-runtime-images.sh
+
+Typically you may also want to pass the `-s` flag to tag the images with the
+`staging` tag. Pass the `-h` flag for more information about the options.
+
+To perform a test build of the runtime pipeline config to a GCS bucket:
+
+    ./build-ruby-runtime-pipeline.sh -b my-bucket-name
+
+Official release builds of the Ruby Runtime are generally performed internally
+at Google, using those build scripts.
+
+Official builds of the exec wrapper are done using the
+`build-app-engine-exec-wrapper.sh` and `release-app-engine-exec-wrapper.sh`
+scripts. If you have sufficient permissions, you can perform an official
+release as follows:
+
+    ./build-app-engine-exec-wrapper.sh -p google-appengine -s
+    ./release-app-engine-exec-wrapper.sh -p google-appengine
+
+The `integration_test` directory contains sample applications that are used
+by the Google Ruby team for runtime integration tests.
 
 ## Contributing changes
 
