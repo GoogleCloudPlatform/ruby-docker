@@ -199,6 +199,22 @@ class TestAppConfig < ::Minitest::Test
       ex.message
   end
 
+  def test_dotenv_clashes_with_custom_build
+    config = <<~CONFIG
+      env: flex
+      runtime: ruby
+      entrypoint: bundle exec ruby hello.rb
+      runtime_config:
+        build: ["bundle exec rake hello"]
+        dotenv_config: my-config
+    CONFIG
+    ex = assert_raises AppConfig::Error do
+      setup_test config: config
+    end
+    assert_match /^The `dotenv_config` setting conflicts with the `build`/,
+      ex.message
+  end
+
   def test_illegal_sql_instances
     config = <<~CONFIG
       env: flex

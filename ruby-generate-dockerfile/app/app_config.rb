@@ -100,6 +100,13 @@ class AppConfig
 
   def init_build_scripts
     raw_build_scripts = @runtime_config["build"]
+    if raw_build_scripts && @runtime_config["dotenv_config"]
+      raise AppConfig::Error,
+        "The `dotenv_config` setting conflicts with the `build` setting." +
+        " If you want to build a dotenv file in your list of custom build" +
+        " steps, try adding the build step: `gem install rcloadenv && rbenv " +
+        " rehash && rcloadenv my-config-name > .env`"
+    end
     @build_scripts = raw_build_scripts ?
         Array(raw_build_scripts) : default_build_scripts
     @build_scripts.each do |script|
