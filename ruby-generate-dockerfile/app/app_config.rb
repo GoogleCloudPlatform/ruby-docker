@@ -67,7 +67,6 @@ class AppConfig
     end
     @runtime_config = @app_config["runtime_config"] || {}
     @beta_settings = @app_config["beta_settings"] || {}
-    @lifecycle = @app_config["lifecycle"] || {}
     @service_name = @app_config["service"] || DEFAULT_SERVICE_NAME
   end
 
@@ -100,7 +99,14 @@ class AppConfig
   end
 
   def init_build_scripts
-    raw_build_scripts = @lifecycle["build"] || @runtime_config["build"]
+    raw_build_scripts = @runtime_config["build"]
+    if raw_build_scripts && @runtime_config["dotenv_config"]
+      raise AppConfig::Error,
+        "The `dotenv_config` setting conflicts with the `build` setting." +
+        " If you want to build a dotenv file in your list of custom build" +
+        " steps, try adding the build step: `gem install rcloadenv && rbenv " +
+        " rehash && rcloadenv my-config-name > .env`"
+    end
     @build_scripts = raw_build_scripts ?
         Array(raw_build_scripts) : default_build_scripts
     @build_scripts.each do |script|
@@ -112,14 +118,13 @@ class AppConfig
   end
 
   def default_build_scripts
-    if !::File.directory?("#{@workspace_dir}/app/assets") ||
-        !::File.file?("#{@workspace_dir}/config/application.rb")
-      return []
-    end
-    [rails_asset_precompile_script]
+    [rails_asset_precompile_script, dotenv_from_rc_script].compact
   end
 
   def rails_asset_precompile_script
+    return nil if !::File.directory?("#{@workspace_dir}/app/assets") ||
+        !::File.file?("#{@workspace_dir}/config/application.rb")
+
     script = if @entrypoint =~ /(rcloadenv\s.+\s--\s)/
       "bundle exec #{$1}rake assets:precompile || true"
     else
@@ -129,6 +134,12 @@ class AppConfig
       script = "access_cloud_sql --lenient && #{script}"
     end
     script
+  end
+
+  def dotenv_from_rc_script
+    config_name = @runtime_config["dotenv_config"].to_s
+    return nil if config_name.empty?
+    "gem install rcloadenv && rbenv rehash && rcloadenv #{config_name} > .env"
   end
 
   def init_cloud_sql_instances

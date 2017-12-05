@@ -83,7 +83,6 @@ class TestAppConfig < ::Minitest::Test
       runtime_config:
         foo: bar
         packages: libgeos
-      lifecycle:
         build: bundle exec rake hello
     CONFIG
     setup_test config: config
@@ -121,6 +120,23 @@ class TestAppConfig < ::Minitest::Test
     setup_test dir: "rails"
     assert_equal ["bundle exec rake assets:precompile || true"],
                  @app_config.build_scripts
+  end
+
+  def test_rails_and_dotenv_default_build
+    config = <<~CONFIG
+      env: flex
+      runtime: ruby
+      entrypoint: bundle exec bin/rails s
+      runtime_config:
+        dotenv_config: my-config
+    CONFIG
+    setup_test dir: "rails", config: config
+    assert_equal \
+      [
+        "bundle exec rake assets:precompile || true",
+        "gem install rcloadenv && rbenv rehash && rcloadenv my-config > .env"
+      ],
+      @app_config.build_scripts
   end
 
   def test_ruby_version
@@ -173,13 +189,29 @@ class TestAppConfig < ::Minitest::Test
       env: flex
       runtime: ruby
       entrypoint: bundle exec ruby hello.rb
-      lifecycle:
+      runtime_config:
         build: "multiple\\nlines"
     CONFIG
     ex = assert_raises AppConfig::Error do
       setup_test config: config
     end
     assert_equal "Illegal newline in build command: \"multiple\\nlines\"",
+      ex.message
+  end
+
+  def test_dotenv_clashes_with_custom_build
+    config = <<~CONFIG
+      env: flex
+      runtime: ruby
+      entrypoint: bundle exec ruby hello.rb
+      runtime_config:
+        build: ["bundle exec rake hello"]
+        dotenv_config: my-config
+    CONFIG
+    ex = assert_raises AppConfig::Error do
+      setup_test config: config
+    end
+    assert_match /^The `dotenv_config` setting conflicts with the `build`/,
       ex.message
   end
 

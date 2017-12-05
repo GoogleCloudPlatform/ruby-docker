@@ -93,7 +93,7 @@ class TestGenerateDockerfile < ::Minitest::Test
 
   def test_custom_build_scripts
     config = <<~CONFIG
-      lifecycle:
+      runtime_config:
         build:
           - bundle exec rake do:something
           - bundle exec rake do:something:else
@@ -165,7 +165,7 @@ class TestGenerateDockerfile < ::Minitest::Test
 
   def test_build_scripts_failure
     config = <<~CONFIG
-      lifecycle:
+      runtime_config:
         build:
           - "bundle exec rake do:something\\nwith newline"
     CONFIG
