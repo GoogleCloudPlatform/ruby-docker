@@ -118,7 +118,7 @@ class AppConfig
   end
 
   def default_build_scripts
-    [rails_asset_precompile_script, dotenv_from_rc_script].compact
+    [dotenv_from_rc_script, rails_asset_precompile_script].compact
   end
 
   def rails_asset_precompile_script
@@ -139,7 +139,7 @@ class AppConfig
   def dotenv_from_rc_script
     config_name = @runtime_config["dotenv_config"].to_s
     return nil if config_name.empty?
-    "gem install rcloadenv && rbenv rehash && rcloadenv #{config_name} > .env"
+    "gem install rcloadenv && rbenv rehash && rcloadenv #{config_name} >> .env"
   end
 
   def init_cloud_sql_instances

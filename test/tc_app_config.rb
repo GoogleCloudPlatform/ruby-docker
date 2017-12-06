@@ -133,8 +133,8 @@ class TestAppConfig < ::Minitest::Test
     setup_test dir: "rails", config: config
     assert_equal \
       [
-        "bundle exec rake assets:precompile || true",
-        "gem install rcloadenv && rbenv rehash && rcloadenv my-config > .env"
+        "gem install rcloadenv && rbenv rehash && rcloadenv my-config >> .env",
+        "bundle exec rake assets:precompile || true"
       ],
       @app_config.build_scripts
   end
@@ -211,8 +211,8 @@ class TestAppConfig < ::Minitest::Test
     ex = assert_raises AppConfig::Error do
       setup_test config: config
     end
-    assert_match /^The `dotenv_config` setting conflicts with the `build`/,
-      ex.message
+    assert_match(/^The `dotenv_config` setting conflicts with the `build`/,
+      ex.message)
   end
 
   def test_illegal_sql_instances
