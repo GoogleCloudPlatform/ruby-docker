@@ -19,8 +19,8 @@
 FROM ruby-base AS builder
 
 # Versions
-ARG nodejs_version=8.9.1
-ARG gcloud_version=180.0.1
+ARG nodejs_version=8.9.3
+ARG gcloud_version=183.0.0
 
 # Install build script files.
 COPY access_cloud_sql /app/

@@ -49,24 +49,28 @@ RUN apt-get install -y -q <%= install_packages.join(' ') %>
 ## provided prebuilt binaries if available, and falls back to using rbenv.
 ## It sets the new version as the default, and also installs bundler.
 <% if ruby_version.empty? %>
-# ARG REQUESTED_RUBY_VERSION="2.4.2"
-# RUN if test ! -x /rbenv/versions/${REQUESTED_RUBY_VERSION}/bin/ruby; then \
-#       apt-get install -y -q gcp-ruby-${REQUESTED_RUBY_VERSION} \
-#       || (cd /rbenv/plugins/ruby-build \
+# ARG REQUESTED_RUBY_VERSION="2.4.3"
+# RUN if [ ! -x ${RBENV_ROOT}/versions/${REQUESTED_RUBY_VERSION}/bin/ruby ]; \
+#     then \
+#       apt-get install -y -q ^gcp-ruby-${REQUESTED_RUBY_VERSION}$ \
+#       || (cd ${RBENV_ROOT}/plugins/ruby-build \
 #         && git pull \
 #         && rbenv install -s ${REQUESTED_RUBY_VERSION}) \
 #       && rbenv global ${REQUESTED_RUBY_VERSION} \
-#       && (bundle version || gem install bundler --version ${BUNDLER_VERSION}); \
+#       && (bundle version > /dev/null 2>&1 \
+#         || gem install bundler --version ${BUNDLER_VERSION}); \
 #     fi
 <% else %>
 ARG REQUESTED_RUBY_VERSION="<%= ruby_version %>"
-RUN if test ! -x /rbenv/versions/${REQUESTED_RUBY_VERSION}/bin/ruby; then \
-      apt-get install -y -q gcp-ruby-${REQUESTED_RUBY_VERSION} \
-      || (cd /rbenv/plugins/ruby-build \
+RUN if [ ! -x ${RBENV_ROOT}/versions/${REQUESTED_RUBY_VERSION}/bin/ruby ]; \
+    then \
+      apt-get install -y -q ^gcp-ruby-${REQUESTED_RUBY_VERSION}$ \
+      || (cd ${RBENV_ROOT}/plugins/ruby-build \
         && git pull \
         && rbenv install -s ${REQUESTED_RUBY_VERSION}) \
       && rbenv global ${REQUESTED_RUBY_VERSION} \
-      && (bundle version || gem install bundler --version ${BUNDLER_VERSION}); \
+      && (bundle version > /dev/null 2>&1 \
+        || gem install bundler --version ${BUNDLER_VERSION}); \
     fi
 <% end %>
 
