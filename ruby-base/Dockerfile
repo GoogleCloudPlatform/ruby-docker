@@ -69,7 +69,7 @@ RUN apt-get update -y && \
         systemtap
 
 # Install node
-RUN mkdir /nodejs && curl -s https://nodejs.org/dist/v8.9.3/node-v8.9.3-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+RUN mkdir /nodejs && curl -s https://nodejs.org/dist/v8.9.4/node-v8.9.4-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH /nodejs/bin:$PATH
 
 # Install rbenv
@@ -102,7 +102,8 @@ RUN (echo "deb http://packages.cloud.google.com/apt ${RUNTIME_DISTRIBUTION} main
     rbenv rehash
 
 # Tell nokogiri >=1.6 to install using system libraries, for faster builds
-RUN bundle config build.nokogiri --use-system-libraries
+RUN bundle config build.nokogiri --use-system-libraries \
+    && bundle config silence_root_warning true
 ENV NOKOGIRI_USE_SYSTEM_LIBRARIES 1
 
 # Temporarily replace ImageMagick policy file with one that fixes
