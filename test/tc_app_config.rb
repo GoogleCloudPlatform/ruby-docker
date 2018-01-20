@@ -106,6 +106,17 @@ class TestAppConfig < ::Minitest::Test
     assert_equal "cd myapp; bundle exec bin/rails s", @app_config.entrypoint
   end
 
+  def test_entrypoint_with_env
+    config = <<~CONFIG
+      env: flex
+      runtime: ruby
+      entrypoint: RAILS_ENV=staging bundle exec bin/rails s
+    CONFIG
+    setup_test config: config
+    assert_equal "RAILS_ENV=staging bundle exec bin/rails s",
+                 @app_config.entrypoint
+  end
+
   def test_entrypoint_already_exec
     config = <<~CONFIG
       env: flex

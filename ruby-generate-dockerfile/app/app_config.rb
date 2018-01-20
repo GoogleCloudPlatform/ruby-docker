@@ -179,7 +179,7 @@ class AppConfig
   def decorate_entrypoint entrypoint
     return JSON.generate entrypoint if entrypoint.is_a? Array
     return entrypoint if entrypoint.start_with? "exec "
-    return entrypoint if entrypoint =~ /;|&&|\|/
+    return entrypoint if entrypoint =~ /=|;|&&|\|/
     "exec #{entrypoint}"
   end
 
