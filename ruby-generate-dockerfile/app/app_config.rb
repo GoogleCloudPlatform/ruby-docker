@@ -197,6 +197,12 @@ class AppConfig
   def init_ruby_config
     @ruby_version = ::File.read("#{@workspace_dir}/.ruby-version") rescue ''
     @ruby_version.strip!
+    if @ruby_version == ""
+      result = Dir.chdir(@workspace_dir) { `bundle platform --ruby` }
+      if result.strip =~ %r{^ruby (\d+\.\d+\.\d+)$}
+        @ruby_version = $1
+      end
+    end
     if @ruby_version !~ %r{\A[\w.-]*\z}
       raise AppConfig::Error, "Illegal ruby version: #{@ruby_version.inspect}"
     end
