@@ -180,6 +180,7 @@ class AppConfig
     return JSON.generate entrypoint if entrypoint.is_a? Array
     return entrypoint if entrypoint.start_with? "exec "
     return entrypoint if entrypoint =~ /;|&&|\|/
+    return entrypoint if entrypoint =~ /^\w+=/
     "exec #{entrypoint}"
   end
 
