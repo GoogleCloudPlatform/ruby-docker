@@ -144,6 +144,11 @@ class TestAppConfig < ::Minitest::Test
     assert_equal "2.0.99", @app_config.ruby_version
   end
 
+  def test_bundler_ruby_version
+    setup_test dir: "gemfile-ruby"
+    assert_equal "2.0.98", @app_config.ruby_version
+  end
+
   def test_gemfile_old_name
     setup_test dir: "gemfile-old"
     assert @app_config.has_gemfile?
