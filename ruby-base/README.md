@@ -6,7 +6,7 @@ easy to containerize standard [Rack](http://rack.github.io) applications. It
 is used primarily as the base image for deploying Ruby applications to
 [Google App Engine Flexible](https://cloud.google.com/appengine/docs/flexible/).
 It may also be used as a base image for running applications on
-[Google Container Engine](https://cloud.google.com/container-engine) or any
+[Google Kubernetes Engine](https://cloud.google.com/kubernetes-engine) or any
 other Docker host.
 
 The image can be found at `l.gcr.io/google/ruby`
@@ -41,7 +41,7 @@ If you are using a
 for a Ruby application, you may also use this image as the base image for your
 Dockerfile.
 
-### With Container Engine or other Docker hosts
+### With Kubernetes Engine or other Docker hosts
 
 For other Docker hosts, you may create a Dockerfile based on this image that
 copies your application code, installs dependencies, and declares a command
@@ -63,7 +63,7 @@ may use the following Dockerfile:
 See the next section on the design of the base image for more information on
 what your Dockerfile should do.
 
-For a full example on deploying a Ruby application to Google Container Engine, see [this tutorial](https://cloud.google.com/ruby/tutorials/bookshelf-on-container-engine).
+For a full example on deploying a Ruby application to Google Kubernetes Engine, see [this tutorial](https://cloud.google.com/ruby/tutorials/bookshelf-on-kubernetes-engine).
 
 ## About the Ruby image
 
