@@ -54,6 +54,8 @@ RUN apt-get update -y && \
         libgit2-dev \
         libgmp-dev \
         libicu-dev \
+        libjemalloc-dev \
+        libjemalloc1 \
         libmagickwand-dev \
         libmysqlclient-dev \
         libncurses5-dev \
