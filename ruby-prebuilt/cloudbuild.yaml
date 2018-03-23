@@ -1,15 +1,12 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['pull', '$_OS_BASE_IMAGE:$_TAG']
+    args: ['pull', '$_OS_BASE_IMAGE:$_BASE_TAG']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['tag', '$_OS_BASE_IMAGE:$_TAG', 'ruby-$_OS_NAME']
+    args: ['tag', '$_OS_BASE_IMAGE:$_BASE_TAG', 'ruby-$_OS_NAME']
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_IMAGE:$_TAG',
            '--build-arg', 'ruby_version=$_RUBY_VERSION',
            '.']
-  - name: 'gcr.io/gcp-runtimes/structure_test'
-    args: ['--image', '$_IMAGE:$_TAG', '-v',
-           '--config', '/workspace/structure-test.json']
 
 images:
   - '$_IMAGE:$_TAG'

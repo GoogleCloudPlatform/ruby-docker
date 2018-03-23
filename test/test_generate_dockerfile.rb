@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require "minitest/autorun"
-require_relative "test_helper"
+require_relative "helper"
 require "fileutils"
 
-
 class TestGenerateDockerfile < ::Minitest::Test
-  include TestHelper
+  include Helper
 
   TEST_DIR = ::File.dirname __FILE__
   CASES_DIR = ::File.join TEST_DIR, "builder_cases"
@@ -30,9 +28,7 @@ class TestGenerateDockerfile < ::Minitest::Test
     run_generate_dockerfile "rack_app"
     assert_dockerfile_line "## Service: default"
     assert_dockerfile_commented "RUN apt-get update -y"
-    assert_dockerfile_commented "RUN apt-get install -y -q"
-    assert_dockerfile_commented "ARG REQUESTED_RUBY_VERSION="
-    assert_dockerfile_commented "RUN apt-get clean"
+    assert_dockerfile_line "ARG ruby_version="
     assert_dockerfile_commented "ENV NAME=\"value\""
     assert_dockerfile_line "RUN bundle install"
     assert_dockerfile_commented "ARG BUILD_CLOUDSQL_INSTANCES="
@@ -55,15 +51,21 @@ class TestGenerateDockerfile < ::Minitest::Test
     CONFIG
     run_generate_dockerfile "rack_app", config: config
     assert_dockerfile_line "RUN apt-get update -y"
-    assert_dockerfile_line "RUN apt-get install -y -q libgeos-dev libproj-dev"
-    assert_dockerfile_line "RUN apt-get clean"
+    assert_dockerfile_line "    && apt-get install -y -q libgeos-dev libproj-dev"
   end
 
-  def test_ruby_version
-    run_generate_dockerfile "rack_app", ruby_version: "2.4.1"
-    assert_dockerfile_line "RUN apt-get update -y"
-    assert_dockerfile_line "ARG REQUESTED_RUBY_VERSION=\"2\\.4\\.1\""
-    assert_dockerfile_line "RUN apt-get clean"
+  def test_ruby_version_selfbuilt
+    run_generate_dockerfile "rack_app", ruby_version: "2.3.99"
+    assert_dockerfile_line "ARG ruby_version=\"2\\.3\\.99\""
+    assert_dockerfile_commented "COPY --from="
+    assert_dockerfile_line "        && rbenv install -s"
+  end
+
+  def test_ruby_version_prebuilt
+    run_generate_dockerfile "rack_app", ruby_version: "2.5.0"
+    assert_dockerfile_line "ARG ruby_version=\"2\\.5\\.0\""
+    assert_dockerfile_line "COPY --from="
+    assert_dockerfile_commented "        && rbenv install -s"
   end
 
   def test_env_variables

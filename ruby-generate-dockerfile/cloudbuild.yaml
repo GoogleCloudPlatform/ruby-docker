@@ -1,13 +1,17 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['pull', 'gcr.io/$_BASE_PROJECT_ID/ruby:$_TAG']
+    args: ['pull', '$_BASE_IMAGE:$_TAG']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['tag', 'gcr.io/$_BASE_PROJECT_ID/ruby:$_TAG', 'ruby-base']
+    args: ['tag', '$_BASE_IMAGE:$_TAG', 'ruby-base']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/ruby/generate-dockerfile:$_TAG',
-           '--build-arg', 'BASE_IMAGE=gcr.io/$_BASE_PROJECT_ID/ruby:$_TAG',
-           '--build-arg', 'BUILD_TOOLS_IMAGE=gcr.io/$PROJECT_ID/ruby/build-tools:$_TAG',
+    args: ['build', '-t', '$_IMAGE:$_TAG',
+           '--build-arg', 'base_image=$_OS_BASE_IMAGE:$_TAG',
+           '--build-arg', 'build_tools_image=$_BUILD_TOOLS_IMAGE:$_TAG',
+           '--build-arg', 'prebuilt_ruby_image_base=$_PREBUILT_IMAGE_PREFIX',
+           '--build-arg', 'prebuilt_ruby_image_tag=latest',
+           '--build-arg', 'prebuilt_ruby_versions=$_PREBUILT_RUBY_VERSIONS',
+           '--build-arg', 'default_ruby_version=$_DEFAULT_RUBY_VERSION',
            '.']
 
 images:
-  - 'gcr.io/$PROJECT_ID/ruby/generate-dockerfile:$_TAG'
+  - '$_IMAGE:$_TAG'

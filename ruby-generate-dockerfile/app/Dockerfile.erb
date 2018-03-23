@@ -13,74 +13,79 @@
 ################################################################################
 ## 1. Augmented base image
 ## From a specific snapshot of the Ruby base image, installs the application's
-## desired version of Ruby and any needed Debian packages. Any software needed
+## desired version of Ruby and any needed Ubuntu packages. Any software needed
 ## by both the application's build scripts and the final application runtime
 ## should be installed here.
 
 FROM <%= base_image %> AS augmented-base
 
-## Prevent some warnings that happen when we're apt-get installing in a
-## non-interactive environment.
-ARG DEBIAN_FRONTEND=noninteractive
-
-## This line is needed to perform Debian package installations. It should be
-## uncommented if any of the customizations below are used to install
-## additional Debian packages or a specific version of Ruby.
-## If your application needs additional Debian repositories for its
-## installations, you can also add them here.
-<% if install_packages.empty? && ruby_version.empty? %>
-# RUN apt-get update -y
-<% else %>
-RUN apt-get update -y
-<% end %>
-
-## If your application needs to install additional Debian packages, do so here.
+## If your application needs to install additional Ubuntu packages, do so here.
 <% if install_packages.empty? %>
-# RUN apt-get install -y -q package-name another-package-name
+# ARG DEBIAN_FRONTEND=noninteractive
+# RUN apt-get update -y \
+#     && apt-get install -y -q package-name another-package-name \
+#     && apt-get clean \
+#     && rm -f /var/lib/apt/lists/*_*
 <% else %>
-RUN apt-get install -y -q <%= install_packages.join(' ') %>
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update -y \
+    && apt-get install -y -q <%= install_packages.join(' ') %> \
+    && apt-get clean \
+    && rm -f /var/lib/apt/lists/*_*
 <% end %>
 
-## If your application requires a specific version of Ruby, provide a
-## `.ruby-version` file in your application directory, and also set the
-## version here. If you change the Ruby version in the future, make sure the
-## `.ruby-version` file matches the setting below.
-## This script attempts to install the requested Ruby version from the GCP-
-## provided prebuilt binaries if available, and falls back to using rbenv.
-## It sets the new version as the default, and also installs bundler.
-<% if ruby_version.empty? %>
-# ARG REQUESTED_RUBY_VERSION="2.4.3"
-# RUN if [ ! -x ${RBENV_ROOT}/versions/${REQUESTED_RUBY_VERSION}/bin/ruby ]; \
+## Specify the version of Ruby to use here. This setting is required.
+## If you have a `.ruby-version` file in your application directory and/or a
+## Ruby version specification in your Gemfile, they must match this value.
+ARG ruby_version="<%= ruby_version %>"
+
+<% if prebuilt_ruby_image %>
+## Install Ruby <%= ruby_version %> from a prebuilt image. If a prebuilt image
+## is not available, use the alternate installation method commented below.
+COPY --from=<%= prebuilt_ruby_image %> \
+     /opt/rbenv/versions/${ruby_version} \
+     /opt/rbenv/versions/${ruby_version}
+RUN rbenv global ${ruby_version} \
+    && rbenv rehash \
+    && (bundle version > /dev/null 2>&1 \
+         || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
+    && rbenv rehash
+## Alternate installation for Ruby versions that have no prebuilt image.
+# RUN if [ ! -x ${RBENV_ROOT}/versions/${ruby_version}/bin/ruby ]; \
 #     then \
-#       apt-get install -y -q ^gcp-ruby-${REQUESTED_RUBY_VERSION}$ \
-#       || (cd ${RBENV_ROOT}/plugins/ruby-build \
+#       cd ${RBENV_ROOT}/plugins/ruby-build \
 #         && git pull \
-#         && rbenv install -s ${REQUESTED_RUBY_VERSION}) \
-#       && rbenv global ${REQUESTED_RUBY_VERSION} \
-#       && (bundle version > /dev/null 2>&1 \
-#         || gem install bundler --version ${BUNDLER_VERSION}); \
+#         && rbenv install -s ${ruby_version} \
+#         && rbenv global ${ruby_version} \
+#         && rbenv rehash \
+#         && (bundle version > /dev/null 2>&1 \
+#           || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
+#         && rbenv rehash; \
 #     fi
 <% else %>
-ARG REQUESTED_RUBY_VERSION="<%= ruby_version %>"
-RUN if [ ! -x ${RBENV_ROOT}/versions/${REQUESTED_RUBY_VERSION}/bin/ruby ]; \
+## Install Ruby <%= ruby_version %> by building from source using rbenv and
+## ruby-build. If a prebuilt image is available, the alternate installation
+## method commented below will probably be significantly faster.
+RUN if [ ! -x ${RBENV_ROOT}/versions/${ruby_version}/bin/ruby ]; \
     then \
-      apt-get install -y -q ^gcp-ruby-${REQUESTED_RUBY_VERSION}$ \
-      || (cd ${RBENV_ROOT}/plugins/ruby-build \
+      cd ${RBENV_ROOT}/plugins/ruby-build \
         && git pull \
-        && rbenv install -s ${REQUESTED_RUBY_VERSION}) \
-      && rbenv global ${REQUESTED_RUBY_VERSION} \
-      && (bundle version > /dev/null 2>&1 \
-        || gem install bundler --version ${BUNDLER_VERSION}); \
+        && rbenv install -s ${ruby_version} \
+        && rbenv global ${ruby_version} \
+        && rbenv rehash \
+        && (bundle version > /dev/null 2>&1 \
+          || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
+        && rbenv rehash; \
     fi
-<% end %>
-
-## Clean up apt-get's files to decrease the image size. It should be
-## uncommented if any of the customizations above are used to install
-## additional Debian packages or a specific version of Ruby.
-<% if install_packages.empty? && ruby_version.empty? %>
-# RUN apt-get clean && rm -f /var/lib/apt/lists/*_*
-<% else %>
-RUN apt-get clean && rm -f /var/lib/apt/lists/*_*
+## Alternate installation for Ruby versions that have a prebuilt image.
+# COPY --from=PATH-TO-PREBUILT-IMAGE \
+#      /opt/rbenv/versions/${ruby_version} \
+#      /opt/rbenv/versions/${ruby_version}
+# RUN rbenv global ${ruby_version} \
+#     && rbenv rehash \
+#     && (bundle version > /dev/null 2>&1 \
+#          || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
+#     && rbenv rehash
 <% end %>
 
 ## Feel free to install any other software needed by both the build process
@@ -103,12 +108,19 @@ ENV <%= render_env env_variables %>
 
 FROM augmented-base AS app-build
 
-## Obtain common build tools, including nodejs, yarn, gcloud, cloud_sql_proxy,
+## Obtain common build tools, including yarn, gcloud, cloud_sql_proxy,
 ## and the access_cloud_sql script, from this image.
-COPY --from=<%= build_tools_image %> /build_tools/ /build_tools/
+COPY --from=<%= build_tools_image %> /opt/ /opt/
 
 ## Ensure the above tools are in the PATH
-ENV PATH /build_tools:/build_tools/google-cloud-sdk/bin:/build_tools/nodejs/bin:/build_tools/yarn/bin:${PATH}
+ENV PATH /opt/bin:/opt/google-cloud-sdk/bin:/opt/yarn/bin:${PATH}
+
+## For compatibility with earlier versions of the builder.
+## You can delete this if your custom build steps don't depend on older paths
+## that include /build_tools.
+RUN ln -s /opt /build_tools \
+    && ln -s /opt/bin/cloud_sql_proxy /opt/cloud_sql_proxy \
+    && ln -s /opt/bin/access_cloud_sql /opt/access_cloud_sql
 
 ## Set gcloud project here if your build scripts need to use gcloud.
 <% if project_id %>
@@ -140,7 +152,7 @@ RUN mkdir /cloudsql
 # ENV GOOGLE_APPLICATION_CREDENTIALS=/build_tools/credentials.json
 
 ## If the application uses bundler, install the bundle here.
-<% if has_gemfile? %>
+<% if has_gemfile %>
 RUN bundle install --deployment --without="development test" && rbenv rehash
 <% else %>
 # RUN bundle install --deployment --without="development test" && rbenv rehash

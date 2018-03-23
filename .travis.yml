@@ -10,8 +10,8 @@ before_install:
   - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   - sudo apt-get update
   - sudo apt-get -y install docker-ce
-  - gem install minitest
+  - gem install bundler -v 1.16.1
 
 script:
-  - travis_retry rake build
-  - rake test:only
+  - travis_retry bundle exec rake build
+  - bundle exec rake test:only

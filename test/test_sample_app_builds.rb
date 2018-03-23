@@ -12,13 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require "minitest/autorun"
-require_relative "test_helper"
+require_relative "helper"
 require "fileutils"
 
-
 class TestSampleAppBuilds < ::Minitest::Test
-  include TestHelper
+  include Helper
 
   TEST_DIR = ::File.dirname __FILE__
   CASES_DIR = ::File.join TEST_DIR, "builder_cases"

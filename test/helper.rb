@@ -12,10 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+require "minitest/autorun"
+require "minitest/focus"
+require "minitest/rg"
 
 # A set of helpful methods and assertions for running tests.
 
-module TestHelper
+module Helper
 
   # Execute the given command in a shell.
   def execute_cmd(cmd)

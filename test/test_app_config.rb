@@ -12,11 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require "minitest/autorun"
-require "fileutils"
-
+require_relative "helper"
 require_relative "../ruby-generate-dockerfile/app/app_config.rb"
-
+require "bundler"
+require "fileutils"
 
 class TestAppConfig < ::Minitest::Test
   EMPTY_HASH = {}.freeze
@@ -42,13 +41,13 @@ class TestAppConfig < ::Minitest::Test
     end
     ::ENV["GAE_APPLICATION_YAML_PATH"] = config_file
     ::ENV["PROJECT_ID"] = project
-    config_path = ::File.join TMP_DIR, config_file || "app.yaml"
     if config
+      config_path = ::File.join TMP_DIR, config_file || "app.yaml"
       ::File.open config_path, "w" do |file|
         file.write config
       end
     end
-    @app_config = AppConfig.new TMP_DIR
+    ::Bundler.with_original_env { @app_config = AppConfig.new TMP_DIR }
   end
 
   def test_empty_directory_with_config
@@ -66,7 +65,7 @@ class TestAppConfig < ::Minitest::Test
     assert_equal "exec bundle exec ruby start.rb", @app_config.entrypoint
     assert_equal EMPTY_ARRAY, @app_config.install_packages
     assert_equal EMPTY_STRING, @app_config.ruby_version
-    refute @app_config.has_gemfile?
+    refute @app_config.has_gemfile
   end
 
   def test_basic_app_yaml
@@ -162,12 +161,12 @@ class TestAppConfig < ::Minitest::Test
 
   def test_gemfile_old_name
     setup_test dir: "gemfile-old"
-    assert @app_config.has_gemfile?
+    assert @app_config.has_gemfile
   end
 
   def test_gemfile_configru
     setup_test dir: "gemfile-rack", config: DEFAULT_CONFIG_NO_ENTRYPOINT
-    assert @app_config.has_gemfile?
+    assert @app_config.has_gemfile
     assert_equal "exec bundle exec rackup -p $PORT", @app_config.entrypoint
   end
 

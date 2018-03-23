@@ -22,8 +22,6 @@ require_relative "app_config.rb"
 
 class GenerateDockerfile
   DEFAULT_WORKSPACE_DIR = "/workspace"
-  DEFAULT_BASE_IMAGE = "gcr.io/google-appengine/ruby"
-  DEFAULT_BUILD_TOOLS_IMAGE = "gcr.io/gcp-runtimes/ruby/build-tools"
   GENERATOR_DIR = ::File.absolute_path(::File.dirname __FILE__)
   DOCKERIGNORE_PATHS = [
     ".dockerignore",
@@ -35,27 +33,18 @@ class GenerateDockerfile
 
   def initialize args
     @workspace_dir = DEFAULT_WORKSPACE_DIR
-    @base_image = DEFAULT_BASE_IMAGE
-    @build_tools_image = DEFAULT_BUILD_TOOLS_IMAGE
+    @base_image = nil
+    @build_tools_image = nil
+    @prebuilt_ruby_image_base = nil
+    @prebuilt_ruby_image_tag = nil
+    @prebuilt_ruby_versions = []
+    @default_ruby_version = nil
     @testing = false
-    ::OptionParser.new do |opts|
-      opts.on "-t" do
-        @testing = true
-      end
-      opts.on "--workspace-dir=PATH" do |path|
-        @workspace_dir = ::File.absolute_path path
-      end
-      opts.on "--base-image=IMAGE" do |image|
-        @base_image = image
-      end
-      opts.on "--build-tools-image=IMAGE" do |image|
-        @build_tools_image = image
-      end
-    end.parse! args
+    parse_args args
     ::Dir.chdir @workspace_dir
     begin
-      @app_config = AppConfig.new @workspace_dir
-    rescue AppConfig::Error => ex
+      @app_config = ::AppConfig.new @workspace_dir
+    rescue ::AppConfig::Error => ex
       ::STDERR.puts ex.message
       exit 1
     end
@@ -70,10 +59,42 @@ class GenerateDockerfile
     end
   end
 
+  private
+
+  def parse_args(args)
+    ::OptionParser.new do |opts|
+      opts.on "-t" do
+        @testing = true
+      end
+      opts.on "--workspace-dir=PATH" do |path|
+        @workspace_dir = ::File.absolute_path path
+      end
+      opts.on "--base-image=IMAGE" do |image|
+        @base_image = image
+      end
+      opts.on "--build-tools-image=IMAGE" do |image|
+        @build_tools_image = image
+      end
+      opts.on "--prebuilt-ruby-image-base=BASE" do |base|
+        @prebuilt_ruby_image_base = base
+      end
+      opts.on "--prebuilt-ruby-image-tag=TAG" do |tag|
+        @prebuilt_ruby_image_tag = tag
+      end
+      opts.on "--prebuilt-ruby-versions=VERSIONS" do |versions|
+        @prebuilt_ruby_versions = versions.split(",")
+      end
+      opts.on "--default-ruby-version=VERSION" do |version|
+        @default_ruby_version = version
+      end
+    end.parse! args
+  end
+
   def write_dockerfile
     b = TemplateCallbacks.new(@app_config, @timestamp, @base_image,
-                              @build_tools_image)
-                         .instance_eval{ binding }
+                              @build_tools_image, @prebuilt_ruby_image_base,
+                              @prebuilt_ruby_image_tag, @prebuilt_ruby_versions,
+                              @default_ruby_version).instance_eval{ binding }
     write_path = "#{@app_config.workspace_dir}/Dockerfile"
     if ::File.exist? write_path
       ::STDERR.puts "Unable to generate Dockerfile because one already exists."
@@ -108,16 +129,33 @@ class GenerateDockerfile
   end
 
   class TemplateCallbacks < SimpleDelegator
-    def initialize app_config, timestamp, base_image, build_tools_image
+    def initialize app_config, timestamp, base_image, build_tools_image,
+                   prebuilt_ruby_image_base, prebuilt_ruby_image_tag,
+                   prebuilt_ruby_versions, default_ruby_version
       @timestamp = timestamp
       @base_image = base_image
       @build_tools_image = build_tools_image
+      @prebuilt_ruby_image_base = prebuilt_ruby_image_base
+      @prebuilt_ruby_image_tag = prebuilt_ruby_image_tag
+      @prebuilt_ruby_versions = prebuilt_ruby_versions
+      @default_ruby_version = default_ruby_version
       super app_config
     end
 
     attr_reader :timestamp
     attr_reader :base_image
     attr_reader :build_tools_image
+
+    def ruby_version
+      v = super.to_s
+      v.empty? ? @default_ruby_version : v
+    end
+
+    def prebuilt_ruby_image
+      v = ruby_version
+      return nil unless @prebuilt_ruby_versions.include? v
+      "#{@prebuilt_ruby_image_base}#{v}:#{@prebuilt_ruby_image_tag}"
+    end
 
     def escape_quoted str
       str.gsub("\\", "\\\\").gsub("\"", "\\\"").gsub("\n", "\\n")
@@ -129,4 +167,4 @@ class GenerateDockerfile
   end
 end
 
-GenerateDockerfile.new(::ARGV).main
+::GenerateDockerfile.new(::ARGV).main

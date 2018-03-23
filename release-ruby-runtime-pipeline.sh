@@ -19,31 +19,36 @@ set -e
 
 DIRNAME=$(dirname $0)
 
+UPLOAD_BUCKET=
+RUNTIME_NAME=ruby
 PROJECT=
-IMAGE_NAME="exec-wrapper"
-IMAGE_TAG="staging"
+RUNTIME_VERSION=staging
 AUTO_YES=
 
 show_usage() {
-  echo "Usage: ./release-app-engine-exec-wrapper.sh [flags...]" >&2
-  echo "Flags:" >&2
-  echo '  -n <name>: set the image name (defaults to `exec-wrapper`)' >&2
-  echo '  -p <project>: set the project (defaults to current gcloud config)' >&2
-  echo '  -t <tag>: the image tag to release (defaults to `staging`)' >&2
+  echo 'Usage: release-ruby-runtime-pipeline.sh [flags...]' >&2
+  echo 'Flags:' >&2
+  echo '  -b <bucket>: promote the runtime definition in this gcs bucket (required)' >&2
+  echo '  -n <name>: set the runtime name (defaults to `ruby`)' >&2
+  echo '  -p <project>: set the builder images project (defaults to current gcloud config setting)' >&2
+  echo '  -r <version>: release this runtime (defaults to staging)' >&2
   echo '  -y: automatically confirm' >&2
 }
 
 OPTIND=1
-while getopts ":n:p:t:yh" opt; do
+while getopts ":b:n:p:t:yh" opt; do
   case ${opt} in
+    b)
+      UPLOAD_BUCKET=${OPTARG}
+      ;;
     n)
-      IMAGE_NAME=${OPTARG}
+      RUNTIME_NAME=${OPTARG}
       ;;
     p)
       PROJECT=${OPTARG}
       ;;
-    t)
-      IMAGE_TAG=${OPTARG}
+    r)
+      RUNTIME_VERSION=${OPTARG}
       ;;
     y)
       AUTO_YES="true"
@@ -68,16 +73,23 @@ while getopts ":n:p:t:yh" opt; do
 done
 shift $((OPTIND-1))
 
-if [ -z "${PROJECT}" ]; then
-  PROJECT=$(gcloud config get-value project)
-  echo "**** Using project from gcloud config: ${PROJECT}" >&2
+if [ -z "${UPLOAD_BUCKET}" ]; then
+  echo "Error: -b flag is required." >&2
+  echo >&2
+  show_usage
+  exit 1
 fi
 
-WRAPPER_IMAGE=gcr.io/${PROJECT}/${IMAGE_NAME}
+if [ -z "${PROJECT}" ]; then
+  PROJECT=$(gcloud config get-value project)
+  echo "Using builder image project from gcloud config: ${PROJECT}" >&2
+fi
+
+SOURCE_GS_URL=gs://${UPLOAD_BUCKET}/${RUNTIME_NAME}-default-builder-${RUNTIME_VERSION}.yaml
+RELEASE_GS_URL=gs://${UPLOAD_BUCKET}/${RUNTIME_NAME}-default-builder.yaml
 
 echo
-echo "Releasing exec wrapper:"
-echo "  ${WRAPPER_IMAGE}:${IMAGE_TAG}"
+echo "Releasing runtime: ${SOURCE_GS_URL}"
 if [ -z "${AUTO_YES}" ]; then
   read -r -p "Ok to proceed? [Y/n] " response
   response=${response,,}  # tolower
@@ -86,8 +98,6 @@ if [ -z "${AUTO_YES}" ]; then
     exit 1
   fi
 fi
-echo
 
-gcloud container images add-tag --project ${PROJECT} \
-  ${WRAPPER_IMAGE}:${IMAGE_TAG} ${WRAPPER_IMAGE}:latest -q
-echo "**** Tagged image ${WRAPPER_IMAGE}:${IMAGE_TAG} as latest"
+gsutil cp ${SOURCE_GS_URL} ${RELEASE_GS_URL}
+echo "**** Promoted runtime config ${SOURCE_GS_URL} to ${RELEASE_GS_URL}"

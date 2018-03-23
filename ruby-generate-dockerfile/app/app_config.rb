@@ -13,9 +13,9 @@
 # limitations under the License.
 
 require "json"
+require "net/http"
 require "optparse"
 require "psych"
-require "net/http"
 
 class AppConfig
   DEFAULT_WORKSPACE_DIR = "/workspace"
@@ -40,7 +40,7 @@ class AppConfig
   attr_reader :entrypoint
   attr_reader :install_packages
   attr_reader :ruby_version
-  def has_gemfile?; @has_gemfile; end
+  attr_reader :has_gemfile
 
   def initialize workspace_dir
     @workspace_dir = workspace_dir
@@ -62,7 +62,7 @@ class AppConfig
     begin
       @app_config = ::Psych.load_file config_file
     rescue
-      raise AppConfig::Error,
+      raise ::AppConfig::Error,
         "Could not read app engine config file: #{config_file.inspect}"
     end
     @runtime_config = @app_config["runtime_config"] || {}
@@ -73,14 +73,14 @@ class AppConfig
   def init_project_id
     @project_id = ::ENV["PROJECT_ID"]
     unless @project_id
-      http = Net::HTTP.new "169.254.169.254",
-                           open_timeout: 0.1, read_timeout: 0.1
+      http = ::Net::HTTP.new "169.254.169.254",
+                             open_timeout: 0.1, read_timeout: 0.1
       begin
         resp = http.get "/computeMetadata/v1/project/project-id",
                         {"Metadata-Flavor" => "Google"}
         @project_id = resp.body if resp.code == "200"
         http.finish
-      rescue StandardError
+      rescue ::StandardError
       end
     end
     @project_id_for_display = @project_id || "(unknown)"
@@ -91,7 +91,7 @@ class AppConfig
     @env_variables = {}
     (@app_config["env_variables"] || {}).each do |k, v|
       if k !~ %r{\A[a-zA-Z]\w*\z}
-        raise AppConfig::Error,
+        raise ::AppConfig::Error,
           "Illegal environment variable name: #{k.inspect}"
       end
       @env_variables[k.to_s] = v.to_s
@@ -101,7 +101,7 @@ class AppConfig
   def init_build_scripts
     raw_build_scripts = @runtime_config["build"]
     if raw_build_scripts && @runtime_config["dotenv_config"]
-      raise AppConfig::Error,
+      raise ::AppConfig::Error,
         "The `dotenv_config` setting conflicts with the `build` setting." +
         " If you want to build a dotenv file in your list of custom build" +
         " steps, try adding the build step: `gem install rcloadenv && rbenv " +
@@ -111,7 +111,7 @@ class AppConfig
         Array(raw_build_scripts) : default_build_scripts
     @build_scripts.each do |script|
       if script.include? "\n"
-        raise AppConfig::Error,
+        raise ::AppConfig::Error,
           "Illegal newline in build command: #{script.inspect}"
       end
     end
@@ -147,7 +147,7 @@ class AppConfig
       flat_map{ |a| a.split(",") }
     @cloud_sql_instances.each do |name|
       if name !~ %r{\A[\w:.-]+\z}
-        raise AppConfig::Error,
+        raise ::AppConfig::Error,
           "Illegal cloud sql instance name: #{name.inspect}"
       end
     end
@@ -161,11 +161,11 @@ class AppConfig
       @raw_entrypoint = DEFAULT_RACK_ENTRYPOINT
     end
     unless @raw_entrypoint
-      raise AppConfig::Error,
+      raise ::AppConfig::Error,
         "Please specify an entrypoint in the App Engine configuration"
     end
     if @raw_entrypoint.include? "\n"
-      raise AppConfig::Error,
+      raise ::AppConfig::Error,
         "Illegal newline in entrypoint: #{@raw_entrypoint.inspect}"
     end
     @entrypoint = decorate_entrypoint @raw_entrypoint
@@ -177,7 +177,7 @@ class AppConfig
   # format. Now, we'd like to prepend "exec" so signals get caught properly.
   # However, there are some edge cases that we omit for safety.
   def decorate_entrypoint entrypoint
-    return JSON.generate entrypoint if entrypoint.is_a? Array
+    return ::JSON.generate entrypoint if entrypoint.is_a? Array
     return entrypoint if entrypoint.start_with? "exec "
     return entrypoint if entrypoint =~ /;|&&|\|/
     return entrypoint if entrypoint =~ /^\w+=/
@@ -190,7 +190,7 @@ class AppConfig
     )
     @install_packages.each do |pkg|
       if pkg !~ %r{\A[\w.-]+\z}
-        raise AppConfig::Error, "Illegal debian package name: #{pkg.inspect}"
+        raise ::AppConfig::Error, "Illegal debian package name: #{pkg.inspect}"
       end
     end
   end
@@ -199,13 +199,13 @@ class AppConfig
     @ruby_version = ::File.read("#{@workspace_dir}/.ruby-version") rescue ''
     @ruby_version.strip!
     if @ruby_version == ""
-      result = Dir.chdir(@workspace_dir) { `bundle platform --ruby` }
+      result = ::Dir.chdir(@workspace_dir) { `bundle platform --ruby` }
       if result.strip =~ %r{^ruby (\d+\.\d+\.\d+)$}
         @ruby_version = $1
       end
     end
     if @ruby_version !~ %r{\A[\w.-]*\z}
-      raise AppConfig::Error, "Illegal ruby version: #{@ruby_version.inspect}"
+      raise ::AppConfig::Error, "Illegal ruby version: #{@ruby_version.inspect}"
     end
     @has_gemfile = ::File.readable?("#{@workspace_dir}/Gemfile.lock") ||
         ::File.readable?("#{@workspace_dir}/gems.locked")

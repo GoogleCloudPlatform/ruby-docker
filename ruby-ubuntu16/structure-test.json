@@ -1,0 +1,38 @@
+{
+	"schemaVersion": "1.0.0",
+	"commandTests": [
+		{
+			"name": "test_rbenv_installation",
+			"command": ["rbenv", "--version"],
+			"expectedOutput": ["rbenv [0-9]+\\.[0-9]+\\.[0-9]+"]
+		},
+		{
+			"name": "test_node_execution",
+			"command": ["node", "-e", "console.log(\"Ruby on Google Cloud Platform\")"],
+			"expectedOutput": ["Ruby on Google Cloud Platform\n"]
+		},
+		{
+			"name": "test_rack_env_var",
+			"command": ["sh", "-c", "echo $RACK_ENV"],
+			"expectedOutput": ["production\n"]
+		},
+		{
+			"name": "test_rails_env_var",
+      "command": ["sh", "-c", "echo $RAILS_ENV"],
+			"expectedOutput": ["production\n"]
+		},
+		{
+			"name": "test_imagemagick_installation",
+			"command": ["convert", "-version"],
+			"expectedOutput": ["Version: ImageMagick [0-9]+\\.\\d+.*"]
+		}
+	],
+	"licenseTests": [
+		{
+			"debian": true,
+			"files": [
+				"/opt/nodejs/LICENSE"
+			]
+		}
+	]
+}

@@ -1,2 +1,5 @@
 /test/tmp
 /tmp
+/ruby-base/Dockerfile
+/ruby-prebuilt/Dockerfile
+/prebuilt-versions.txt

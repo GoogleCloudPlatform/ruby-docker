@@ -12,20 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require "minitest/autorun"
-require_relative "test_helper"
-
+require_relative "helper"
 
 class TestBuildTools < ::Minitest::Test
-
-  include TestHelper
+  include Helper
 
   TEST_DIR = ::File.dirname __FILE__
   TMP_DIR = ::File.join TEST_DIR, "tmp"
 
   DOCKERFILE = <<~DOCKERFILE_CONTENT
     FROM ruby-base
-    COPY --from=ruby-build-tools /build_tools/ /build_tools/
+    COPY --from=ruby-build-tools /opt/ /opt/
+    ENV PATH /opt/bin:/opt/google-cloud-sdk/bin:/opt/nodejs/bin:/opt/yarn/bin:${PATH}
   DOCKERFILE_CONTENT
 
   def test_build_tools
@@ -37,17 +35,17 @@ class TestBuildTools < ::Minitest::Test
     end
     ::Dir.chdir TMP_DIR do
       build_docker_image "--no-cache" do |image|
-        assert_docker_output "#{image} /build_tools/nodejs/bin/node --version",
+        assert_docker_output "#{image} /opt/nodejs/bin/node --version",
           /^v\d+\.\d+/
-        assert_docker_output "#{image} /build_tools/yarn/bin/yarn --version",
+        assert_docker_output "#{image} /opt/yarn/bin/yarn --version",
           /^\d+\.\d+/
-        assert_docker_output "#{image} /build_tools/cloud_sql_proxy --version",
+        assert_docker_output "#{image} /opt/bin/cloud_sql_proxy --version",
           /Cloud SQL Proxy/
         assert_docker_output \
-          "#{image} /build_tools/google-cloud-sdk/bin/gcloud --version",
+          "#{image} /opt/google-cloud-sdk/bin/gcloud --version",
           /Google Cloud SDK/
         assert_docker_output \
-          "#{image} /build_tools/access_cloud_sql --lenient && echo OK",
+          "#{image} /opt/bin/access_cloud_sql --lenient && echo OK",
           /OK/
       end
     end

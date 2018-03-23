@@ -1,0 +1,21 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    minitest (5.11.3)
+    minitest-focus (1.1.2)
+      minitest (>= 4, < 6)
+    minitest-rg (5.2.0)
+      minitest (~> 5.0)
+    rake (12.3.0)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  minitest (~> 5.11)
+  minitest-focus (~> 1.1)
+  minitest-rg (~> 5.2)
+  rake (~> 12.0)
+
+BUNDLED WITH
+   1.16.1

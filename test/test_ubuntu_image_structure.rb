@@ -12,19 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
+require_relative "helper"
 require "json"
-require "minitest/autorun"
-require_relative "test_helper"
 
 # Runs structure tests defined in test_base_image.json locally.
 
-class TestBaseImageStructure < ::Minitest::Test
-
-  include TestHelper
+class TestUbuntuImageStructure < ::Minitest::Test
+  include Helper
 
   BASE_DIR = ::File.dirname ::File.dirname __FILE__
-  CONFIG_FILE = ::File.join BASE_DIR, "ruby-base/structure-test.json"
+  CONFIG_FILE = ::File.join BASE_DIR, "ruby-ubuntu16/structure-test.json"
   CONFIG_DATA = ::JSON.load ::IO.read CONFIG_FILE
 
   CONFIG_DATA["commandTests"].each do |test_config|
@@ -34,7 +31,7 @@ class TestBaseImageStructure < ::Minitest::Test
       command = command_array.map{ |a| "'#{a}'" }.join(" ")
       expectations = test_config["expectedOutput"].map { |e| ::Regexp.new e }
       assert_docker_output \
-          "--entrypoint=#{binary} ruby-base #{command}",
+          "--entrypoint=#{binary} ruby-ubuntu16 #{command}",
           expectations
     end
   end

@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-require "minitest/autorun"
-require_relative "test_helper"
-
+require_relative "helper"
 
 # Tests of a bunch of sample apps. Treats every subdirectory of the test
 # directory that contains a Dockerfile as a sample app. Builds the docker
@@ -27,8 +24,7 @@ require_relative "test_helper"
 # will be called "ruby-base".
 
 class TestBaseImageSampleApps < ::Minitest::Test
-
-  include TestHelper
+  include Helper
 
   TEST_DIR = ::File.dirname __FILE__
   APPS_DIR = ::File.join TEST_DIR, "sample_apps"

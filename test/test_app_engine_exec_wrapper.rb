@@ -12,12 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-require "minitest/autorun"
-require_relative "test_helper"
+require_relative "helper"
 
 class TestAppEngineExecWrapper < ::Minitest::Test
-  include TestHelper
+  include Helper
 
   def test_simple
     run_test "simple", {VAR1: "value1", VAR2: "value2"}, "sql:1:2:3"

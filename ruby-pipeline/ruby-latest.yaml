@@ -1,5 +1,5 @@
 steps:
-  - name: 'gcr.io/gcp-runtimes/ruby/generate-dockerfile:latest'
+  - name: 'gcr.io/gcp-runtimes/ruby/ubuntu16/generate-dockerfile:latest'
   - name: 'gcr.io/cloud-builders/docker:latest'
     args: ['build', '--network=cloudbuild', '-t', '$_OUTPUT_IMAGE', '.']
 images:

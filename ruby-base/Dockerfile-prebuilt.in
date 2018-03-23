@@ -16,15 +16,19 @@
 # This is the base Dockerfile for an App Engine Ruby runtime.
 # Dockerfiles for App Engine Ruby apps should inherit FROM this image.
 
-FROM ruby-ubuntu16
+FROM @@RUBY_OS_IMAGE@@
 
 ARG ruby_version
 
 ENV DEFAULT_RUBY_VERSION=${ruby_version}
 
-# Install Ruby, set default Ruby version, and install Bundler
-RUN rbenv install -s ${ruby_version} \
-    && rbenv global ${ruby_version} \
+# Install Ruby from prebuilt image
+COPY --from=@@PREBUILT_RUBY_IMAGE@@ \
+     /opt/rbenv/versions/${ruby_version} \
+     /opt/rbenv/versions/${ruby_version}
+
+# Set default Ruby version and install Bundler
+RUN rbenv global ${ruby_version} \
     && rbenv rehash \
     && (bundle version > /dev/null 2>&1 \
         || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
