@@ -23,6 +23,7 @@ ARG ruby_version
 ENV DEFAULT_RUBY_VERSION=${ruby_version}
 
 # Install Ruby, set default Ruby version, and install Bundler
+ARG RUBY_CONFIGURE_OPTS=--with-jemalloc
 RUN rbenv install -s ${ruby_version} \
     && rbenv global ${ruby_version} \
     && rbenv rehash \

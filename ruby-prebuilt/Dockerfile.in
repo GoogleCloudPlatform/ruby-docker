@@ -17,6 +17,7 @@
 
 FROM @@RUBY_OS_IMAGE@@ AS builder
 ARG ruby_version
+ARG RUBY_CONFIGURE_OPTS=--with-jemalloc
 RUN rbenv install -s ${ruby_version}
 
 FROM scratch

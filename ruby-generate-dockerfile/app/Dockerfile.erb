@@ -51,6 +51,7 @@ RUN rbenv global ${ruby_version} \
          || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
     && rbenv rehash
 ## Alternate installation for Ruby versions that have no prebuilt image.
+# ARG RUBY_CONFIGURE_OPTS=--with-jemalloc
 # RUN if [ ! -x ${RBENV_ROOT}/versions/${ruby_version}/bin/ruby ]; \
 #     then \
 #       cd ${RBENV_ROOT}/plugins/ruby-build \
@@ -66,6 +67,7 @@ RUN rbenv global ${ruby_version} \
 ## Install Ruby <%= ruby_version %> by building from source using rbenv and
 ## ruby-build. If a prebuilt image is available, the alternate installation
 ## method commented below will probably be significantly faster.
+ARG RUBY_CONFIGURE_OPTS=--with-jemalloc
 RUN if [ ! -x ${RBENV_ROOT}/versions/${ruby_version}/bin/ruby ]; \
     then \
       cd ${RBENV_ROOT}/plugins/ruby-build \

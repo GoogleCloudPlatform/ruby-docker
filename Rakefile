@@ -61,8 +61,10 @@ task "build:prebuilt" do |t, args|
     " ruby-prebuilt/Dockerfile.in > ruby-prebuilt/Dockerfile"
   LOCAL_PREBUILT_RUBY_VERSIONS.each do |ruby_version|
     image_name = "#{LOCAL_PREBUILT_RUBY_IMAGE_BASE}#{ruby_version}:#{LOCAL_PREBUILT_RUBY_IMAGE_TAG}"
+    configure_opts = ruby_version < "2.2" ? "" : "--with-jemalloc"
     sh "docker build --no-cache -t #{image_name}" \
       " --build-arg ruby_version=#{ruby_version}" \
+      " --build-arg RUBY_CONFIGURE_OPTS=#{configure_opts}" \
       " ruby-prebuilt"
   end
 end
