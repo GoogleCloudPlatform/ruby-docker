@@ -74,6 +74,11 @@ RUN apt-get update -y \
         tzdata \
     && apt-get clean \
     && rm -f /var/lib/apt/lists/*_*
+RUN apt-get update -y \
+    && apt-get install -y -q --no-install-recommends \
+        libgit2-dev \
+    && apt-get clean \
+    && rm -f /var/lib/apt/lists/*_*
 
 # Prepare file system
 RUN mkdir -p /opt/nodejs \
