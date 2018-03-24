@@ -47,7 +47,7 @@ class TestAppConfig < ::Minitest::Test
         file.write config
       end
     end
-    ::Bundler.with_original_env { @app_config = AppConfig.new TMP_DIR }
+    ::Bundler.with_clean_env { @app_config = AppConfig.new TMP_DIR }
   end
 
   def test_empty_directory_with_config
