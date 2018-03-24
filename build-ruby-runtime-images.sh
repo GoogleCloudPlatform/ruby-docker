@@ -27,6 +27,7 @@ GCLOUD_VERSION=194.0.0
 OS_NAME=ubuntu16
 RUNTIME_NAME=ruby
 BASE_IMAGE_DOCKERFILE=default
+PREBUILT_IMAGE_TAG=latest
 PROJECT=
 IMAGE_TAG=
 STAGING_FLAG=
@@ -40,9 +41,10 @@ fi
 show_usage() {
   echo 'Usage: build-ruby-runtime-images.sh [flags...]' >&2
   echo 'Flags:' >&2
+  echo '  -a <tag>: use this prebuilt image tag (defaults to `latest`)' >&2
   echo '  -i: use prebuilt ruby to build base image' >&2
   echo '  -n <name>: set the runtime name (defaults to `ruby`)' >&2
-  echo '  -o <osname>: build against the given os base image (defaults to ubuntu16)' >&2
+  echo '  -o <osname>: build against the given os base image (defaults to `ubuntu16`)' >&2
   echo '  -p <project>: set the project (defaults to current gcloud config setting)' >&2
   echo '  -r <versions>: comma separated prebuilt ruby versions (defaults to prebuilt-versions.txt)' >&2
   echo '  -s: also tag new images as `staging`' >&2
@@ -51,8 +53,11 @@ show_usage() {
 }
 
 OPTIND=1
-while getopts ":in:o:p:q:r:st:yh" opt; do
+while getopts ":a:in:o:p:q:r:st:yh" opt; do
   case ${opt} in
+    a)
+      PREBUILT_IMAGE_TAG=${OPTARG}
+      ;;
     i)
       BASE_IMAGE_DOCKERFILE="prebuilt"
       ;;
@@ -175,7 +180,7 @@ fi
 
 gcloud container builds submit ${DIRNAME}/ruby-generate-dockerfile \
   --config ${DIRNAME}/ruby-generate-dockerfile/cloudbuild.yaml --project ${PROJECT} \
-  --substitutions ^+^_BASE_IMAGE=${RUBY_BASIC_IMAGE}+_IMAGE=${GENERATE_DOCKERFILE_IMAGE}+_TAG=${IMAGE_TAG}+_OS_BASE_IMAGE=${OS_BASE_IMAGE}+_BUILD_TOOLS_IMAGE=${BUILD_TOOLS_IMAGE}+_PREBUILT_IMAGE_PREFIX=${PREBUILT_IMAGE_PREFIX}+_PREBUILT_RUBY_VERSIONS=${COMMA_PREBUILT_VERSIONS}+_DEFAULT_RUBY_VERSION=${DEFAULT_RUBY_VERSION}
+  --substitutions ^+^_BASE_IMAGE=${RUBY_BASIC_IMAGE}+_IMAGE=${GENERATE_DOCKERFILE_IMAGE}+_TAG=${IMAGE_TAG}+_OS_BASE_IMAGE=${OS_BASE_IMAGE}+_BUILD_TOOLS_IMAGE=${BUILD_TOOLS_IMAGE}+_PREBUILT_IMAGE_PREFIX=${PREBUILT_IMAGE_PREFIX}+_PREBUILT_IMAGE_TAG=${PREBUILT_IMAGE_TAG}+_PREBUILT_RUBY_VERSIONS=${COMMA_PREBUILT_VERSIONS}+_DEFAULT_RUBY_VERSION=${DEFAULT_RUBY_VERSION}
 echo "**** Built image: ${GENERATE_DOCKERFILE_IMAGE}:${IMAGE_TAG}"
 if [ "${STAGING_FLAG}" = "true" ]; then
   gcloud container images add-tag --project ${PROJECT} \

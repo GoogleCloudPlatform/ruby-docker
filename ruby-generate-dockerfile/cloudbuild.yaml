@@ -8,7 +8,7 @@ steps:
            '--build-arg', 'base_image=$_OS_BASE_IMAGE:$_TAG',
            '--build-arg', 'build_tools_image=$_BUILD_TOOLS_IMAGE:$_TAG',
            '--build-arg', 'prebuilt_ruby_image_base=$_PREBUILT_IMAGE_PREFIX',
-           '--build-arg', 'prebuilt_ruby_image_tag=latest',
+           '--build-arg', 'prebuilt_ruby_image_tag=$_PREBUILT_IMAGE_TAG',
            '--build-arg', 'prebuilt_ruby_versions=$_PREBUILT_RUBY_VERSIONS',
            '--build-arg', 'default_ruby_version=$_DEFAULT_RUBY_VERSION',
            '.']

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+::Dir.chdir __dir__
+
 RUNTIME_PROJECT="gcp-runtimes"
 BUNDLER_VERSION="1.16.1"
 DEFAULT_RUBY_VERSION="2.5.0"
@@ -22,7 +24,7 @@ OS_NAME="ubuntu16"
 LOCAL_PREBUILT_RUBY_VERSIONS=["2.4.3", "2.5.0"]
 LOCAL_PREBUILT_RUBY_IMAGE_BASE="ruby-prebuilt-"
 LOCAL_PREBUILT_RUBY_IMAGE_TAG="latest"
-RELEASED_PREBUILT_RUBY_VERSIONS=[]
+RELEASED_PREBUILT_RUBY_VERSIONS=::File.read("prebuilt-versions-official.txt").split("\n")
 RELEASED_PREBUILT_RUBY_IMAGE_BASE="gcr.io/#{RUNTIME_PROJECT}/ruby/#{OS_NAME}/prebuilt/ruby-"
 RELEASED_PREBUILT_RUBY_IMAGE_TAG="staging"
 
@@ -40,8 +42,6 @@ end
 ::ENV["PREBUILT_RUBY_IMAGE_BASE"] = PREBUILT_RUBY_IMAGE_BASE
 ::ENV["PREBUILT_RUBY_IMAGE_TAG"] = PREBUILT_RUBY_IMAGE_TAG
 
-::Dir.chdir __dir__
-
 require "rake/testtask"
 
 desc "Build local docker image for ubuntu16 image"
@@ -57,28 +57,30 @@ task "build:osimage" => "build:#{OS_NAME}"
 
 desc "Build local prebuilt ruby images"
 task "build:prebuilt" do |t, args|
-  sh "sed -e 's|@@RUBY_OS_IMAGE@@|ruby-#{OS_NAME}|g'" \
-    " ruby-prebuilt/Dockerfile.in > ruby-prebuilt/Dockerfile"
-  LOCAL_PREBUILT_RUBY_VERSIONS.each do |ruby_version|
-    image_name = "#{LOCAL_PREBUILT_RUBY_IMAGE_BASE}#{ruby_version}:#{LOCAL_PREBUILT_RUBY_IMAGE_TAG}"
-    configure_opts = ruby_version < "2.2" ? "" : "--with-jemalloc"
-    sh "docker build --no-cache -t #{image_name}" \
-      " --build-arg ruby_version=#{ruby_version}" \
-      " --build-arg RUBY_CONFIGURE_OPTS=#{configure_opts}" \
-      " ruby-prebuilt"
+  if USE_LOCAL_PREBUILT
+    sh "sed -e 's|@@RUBY_OS_IMAGE@@|ruby-#{OS_NAME}|g'" \
+      " ruby-prebuilt/Dockerfile.in > ruby-prebuilt/Dockerfile"
+    LOCAL_PREBUILT_RUBY_VERSIONS.each do |ruby_version|
+      image_name = "#{LOCAL_PREBUILT_RUBY_IMAGE_BASE}#{ruby_version}:#{LOCAL_PREBUILT_RUBY_IMAGE_TAG}"
+      configure_opts = ruby_version < "2.2" ? "" : "--with-jemalloc"
+      sh "docker build --no-cache -t #{image_name}" \
+        " --build-arg ruby_version=#{ruby_version}" \
+        " --build-arg RUBY_CONFIGURE_OPTS=#{configure_opts}" \
+        " ruby-prebuilt"
+    end
   end
 end
 
 desc "Build local docker image for base image"
 task "build:base" do |t, args|
   if PREBUILT_RUBY_VERSIONS.include? DEFAULT_RUBY_VERSION
-    sh "sed -e 's|@@RUBY_OS_IMAGE@@|ruby-#{OS_NAME}|g; s|@@PREBUILT_RUBY_IMAGE@@|" \
-      "#{PREBUILT_RUBY_IMAGE_BASE}#{DEFAULT_RUBY_VERSION}:#{PREBUILT_RUBY_IMAGE_TAG}|g'" \
-      " ruby-base/Dockerfile-prebuilt.in > ruby-base/Dockerfile"
+    image_type = "prebuilt"
   else
-    sh "sed -e 's|@@RUBY_OS_IMAGE@@|ruby-#{OS_NAME}|g'" \
-      " ruby-base/Dockerfile-default.in > ruby-base/Dockerfile"
+    image_type = "default"
   end
+  sh "sed -e 's|@@RUBY_OS_IMAGE@@|ruby-#{OS_NAME}|g; s|@@PREBUILT_RUBY_IMAGE@@|" \
+    "#{PREBUILT_RUBY_IMAGE_BASE}#{DEFAULT_RUBY_VERSION}:#{PREBUILT_RUBY_IMAGE_TAG}|g'" \
+    " ruby-base/Dockerfile-#{image_type}.in > ruby-base/Dockerfile"
   sh "docker build --no-cache -t ruby-base" \
     " --build-arg ruby_version=#{DEFAULT_RUBY_VERSION}" \
     " ruby-base"
