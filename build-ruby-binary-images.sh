@@ -134,6 +134,8 @@ if [ -z "${AUTO_YES}" ]; then
 fi
 echo
 
+sed -e "s|@@RUBY_OS_IMAGE@@|ruby-${OS_NAME}|g" \
+  < ${DIRNAME}/ruby-prebuilt/Dockerfile.in > ${DIRNAME}/ruby-prebuilt/Dockerfile
 for version in "${PREBUILT_VERSIONS[@]}"; do
   if [[ "$version" < 2.2 ]]; then
     CONFIGURE_OPTS=""

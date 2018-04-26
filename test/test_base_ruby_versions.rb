@@ -26,7 +26,7 @@ class TestRubyVersions < ::Minitest::Test
     # 2.1.x and 2.2.x are obsolete, but the GCP prebuilt binaries are still
     # present. We retain one test per minor version to track how it behaves.
     "2.1.10",
-    "2.2.9",
+    "2.2.10",
     # 2.3.x versions are currently supported.
     "2.3.0",
     "2.3.1",
@@ -35,32 +35,34 @@ class TestRubyVersions < ::Minitest::Test
     "2.3.4",
     "2.3.5",
     "2.3.6",
+    "2.3.7",
     # 2.4.x versions are currently supported.
     "2.4.0",
     "2.4.1",
     "2.4.2",
     "2.4.3",
+    "2.4.4",
     # 2.5.x versions are currently supported.
-    "2.5.0"
+    "2.5.0",
+    "2.5.1"
   ]
 
   FASTER_VERSIONS = [
     # Test only the latest patch of each supported minor version, plus the
     # case of no requested version.
-    "2.3.6",
-    "2.4.3",
-    "2.5.0"
+    "2.3.7",
+    "2.4.4",
+    "2.5.1"
   ]
 
   PREBUILT_VERSIONS = ::ENV["PREBUILT_RUBY_VERSIONS"].to_s.split(",")
   PREBUILT_RUBY_IMAGE_BASE = ::ENV["PREBUILT_RUBY_IMAGE_BASE"]
   PREBUILT_RUBY_IMAGE_TAG = ::ENV["PREBUILT_RUBY_IMAGE_TAG"]
 
-  if ::ENV["FASTER_TESTS"]
+  if ::ENV["FASTER_TESTS"] || ::ENV["USE_LOCAL_PREBUILT"]
     VERSIONS = FASTER_VERSIONS & PREBUILT_VERSIONS
   else
-    VERSIONS = FASTER_VERSIONS
-    # VERSIONS = COMPLETE_VERSIONS
+    VERSIONS = COMPLETE_VERSIONS
   end
 
   DOCKERFILE_SELFBUILT = <<~DOCKERFILE_CONTENT
