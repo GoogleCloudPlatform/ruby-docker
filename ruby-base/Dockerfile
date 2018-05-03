@@ -71,7 +71,7 @@ RUN apt-get update -y && \
         systemtap
 
 # Install node
-RUN mkdir /nodejs && curl -s https://nodejs.org/dist/v8.9.4/node-v8.9.4-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
+RUN mkdir /nodejs && curl -s https://nodejs.org/dist/v8.11.1/node-v8.11.1-linux-x64.tar.gz | tar xvzf - -C /nodejs --strip-components=1
 ENV PATH /nodejs/bin:$PATH
 
 # Install rbenv
@@ -81,7 +81,7 @@ RUN git clone https://github.com/sstephenson/rbenv.git $RBENV_ROOT && \
 ENV PATH $RBENV_ROOT/shims:$RBENV_ROOT/bin:$PATH
 
 # Preinstalled default ruby version.
-ENV DEFAULT_RUBY_VERSION 2.3.6
+ENV DEFAULT_RUBY_VERSION 2.3.7
 ENV BUNDLER_VERSION 1.16.1
 
 # Set ruby runtime distribution
