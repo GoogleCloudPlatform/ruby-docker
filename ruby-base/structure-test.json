@@ -10,11 +10,6 @@
 			"name": "test_bundler_installation",
 			"command": ["bundle", "version"],
 			"expectedOutput": ["Bundler version [0-9]+\\.\\d+.*"]
-		},
-    {
-      "name": "test_ruby_uses_jemalloc",
-      "command": ["ruby", "-r", "rbconfig", "-e", "puts RbConfig::CONFIG[\"LIBS\"]"],
-      "expectedOutput": ["-ljemalloc"]
-    }
+		}
 	]
 }

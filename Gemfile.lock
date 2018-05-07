@@ -6,7 +6,7 @@ GEM
       minitest (>= 4, < 6)
     minitest-rg (5.2.0)
       minitest (~> 5.0)
-    rake (12.3.0)
+    rake (12.3.1)
 
 PLATFORMS
   ruby

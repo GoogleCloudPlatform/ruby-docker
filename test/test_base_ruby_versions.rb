@@ -68,7 +68,6 @@ class TestRubyVersions < ::Minitest::Test
   DOCKERFILE_SELFBUILT = <<~DOCKERFILE_CONTENT
     FROM ruby-ubuntu16
     ARG ruby_version
-    ARG RUBY_CONFIGURE_OPTS=$RUBY_CONFIGURE_OPTS
     RUN rbenv install -s ${ruby_version} \
         && rbenv global ${ruby_version} \
         && rbenv rehash \
@@ -118,8 +117,7 @@ class TestRubyVersions < ::Minitest::Test
         prebuilt_image = "#{PREBUILT_RUBY_IMAGE_BASE}#{version}:#{PREBUILT_RUBY_IMAGE_TAG}"
         file.write DOCKERFILE_PREBUILT.sub("$PREBUILT_RUBY_IMAGE", prebuilt_image)
       else
-        config_opts = version < "2.2" ? "" : "--with-jemalloc"
-        file.write DOCKERFILE_SELFBUILT.sub("$RUBY_CONFIGURE_OPTS", config_opts)
+        file.write DOCKERFILE_SELFBUILT
       end
     end
     ::Dir.chdir TMP_DIR do |dir|
