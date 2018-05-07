@@ -49,8 +49,8 @@ RUN apt-get update -y \
         ca-certificates \
         cmake \
         curl \
-        git \
         file \
+        git \
         imagemagick \
         libcurl3 \
         libcurl3-gnutls \
