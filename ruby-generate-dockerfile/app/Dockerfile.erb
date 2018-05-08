@@ -31,7 +31,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 <% if install_packages.empty? && ruby_version.empty? %>
 # RUN apt-get update -y
 <% else %>
-RUN apt-get update -y
+RUN (curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -) && \
+    apt-get update -y
 <% end %>
 
 ## If your application needs to install additional Debian packages, do so here.
