@@ -36,20 +36,27 @@ show_usage() {
   echo 'Usage: build-ruby-binary-images.sh [flags...]' >&2
   echo 'Flags:' >&2
   echo '  -a <tag>: use this base image tag (defaults to `staging`)' >&2
+  echo '  -c <versions>: comma separated prebuilt ruby versions (defaults to prebuilt-versions.txt)' >&2
   echo '  -n <name>: set the runtime name (defaults to `ruby`)' >&2
   echo '  -o <osname>: build against the given os base image (defaults to ubuntu16)' >&2
   echo '  -p <project>: set the project (defaults to current gcloud config setting)' >&2
-  echo '  -r <versions>: comma separated prebuilt ruby versions (defaults to prebuilt-versions.txt)' >&2
   echo '  -s: also tag new images as `staging`' >&2
   echo '  -t <tag>: set the new image tag (creates a new tag if not provided)' >&2
   echo '  -y: automatically confirm' >&2
 }
 
 OPTIND=1
-while getopts ":n:o:p:r:st:yh" opt; do
+while getopts ":a:c:n:o:p:st:yh" opt; do
   case ${opt} in
     a)
       BASE_IMAGE_TAG=${OPTARG}
+      ;;
+    c)
+      if [ "${OPTARG}" = "none" ]; then
+        PREBUILT_VERSIONS=()
+      else
+        IFS=',' read -r -a PREBUILT_VERSIONS <<< "${OPTARG}"
+      fi
       ;;
     n)
       RUNTIME_NAME=${OPTARG}
@@ -59,13 +66,6 @@ while getopts ":n:o:p:r:st:yh" opt; do
       ;;
     p)
       PROJECT=${OPTARG}
-      ;;
-    r)
-      if [ "${OPTARG}" = "none" ]; then
-        PREBUILT_VERSIONS=()
-      else
-        IFS=',' read -r -a PREBUILT_VERSIONS <<< "${OPTARG}"
-      fi
       ;;
     s)
       STAGING_FLAG="true"

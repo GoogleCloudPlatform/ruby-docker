@@ -18,7 +18,7 @@ RUNTIME_PROJECT="gcp-runtimes"
 BUNDLER_VERSION="1.16.2"
 DEFAULT_RUBY_VERSION="2.3.7"
 NODEJS_VERSION="8.11.2"
-GCLOUD_VERSION="202.0.0"
+GCLOUD_VERSION="204.0.0"
 OS_NAME="ubuntu16"
 
 LOCAL_PREBUILT_RUBY_VERSIONS=["2.3.7", "2.4.4", "2.5.1"]
@@ -41,6 +41,10 @@ end
 ::ENV["PREBUILT_RUBY_VERSIONS"] = PREBUILT_RUBY_VERSIONS.join(",")
 ::ENV["PREBUILT_RUBY_IMAGE_BASE"] = PREBUILT_RUBY_IMAGE_BASE
 ::ENV["PREBUILT_RUBY_IMAGE_TAG"] = PREBUILT_RUBY_IMAGE_TAG
+
+PREBUILT_RUBY_IMAGES = PREBUILT_RUBY_VERSIONS.map do |v|
+  "#{v}=#{PREBUILT_RUBY_IMAGE_BASE}#{v}:#{PREBUILT_RUBY_IMAGE_TAG}"
+end.join(",")
 
 require "rake/testtask"
 
@@ -96,9 +100,7 @@ task "build:generate-dockerfile" do |t, args|
   sh "docker build --no-cache -t ruby-generate-dockerfile" \
     " --build-arg base_image=ruby-#{OS_NAME}" \
     " --build-arg build_tools_image=ruby-build-tools" \
-    " --build-arg prebuilt_ruby_image_base=#{PREBUILT_RUBY_IMAGE_BASE}" \
-    " --build-arg prebuilt_ruby_image_tag=#{PREBUILT_RUBY_IMAGE_TAG}" \
-    " --build-arg prebuilt_ruby_versions=#{PREBUILT_RUBY_VERSIONS.join(',')}" \
+    " --build-arg prebuilt_ruby_images=#{PREBUILT_RUBY_IMAGES}" \
     " --build-arg default_ruby_version=#{DEFAULT_RUBY_VERSION}" \
     " ruby-generate-dockerfile"
 end

@@ -48,8 +48,7 @@ class TestRubyVersions < ::Minitest::Test
   ]
 
   FASTER_VERSIONS = [
-    # Test only the latest patch of each supported minor version, plus the
-    # case of no requested version.
+    # Test only the latest patch of each supported minor version.
     "2.3.7",
     "2.4.4",
     "2.5.1"

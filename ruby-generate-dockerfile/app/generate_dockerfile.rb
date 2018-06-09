@@ -33,12 +33,13 @@ class GenerateDockerfile
 
   def initialize args
     @workspace_dir = DEFAULT_WORKSPACE_DIR
-    @base_image = nil
-    @build_tools_image = nil
-    @prebuilt_ruby_image_base = nil
-    @prebuilt_ruby_image_tag = nil
-    @prebuilt_ruby_versions = []
-    @default_ruby_version = nil
+    @base_image = ::ENV["DEFAULT_RUBY_BASE_IMAGE"]
+    @build_tools_image = ::ENV["DEFAULT_RUBY_BUILD_TOOLS_IMAGE"]
+    @prebuilt_ruby_images = {}
+    ::ENV["DEFAULT_PREBUILT_RUBY_IMAGES"].to_s.split(",").each do |str|
+      add_prebuilt_ruby_image(str)
+    end
+    @default_ruby_version = ::ENV["DEFAULT_RUBY_VERSION"] || ::RUBY_VERSION
     @testing = false
     parse_args args
     ::Dir.chdir @workspace_dir
@@ -75,14 +76,8 @@ class GenerateDockerfile
       opts.on "--build-tools-image=IMAGE" do |image|
         @build_tools_image = image
       end
-      opts.on "--prebuilt-ruby-image-base=BASE" do |base|
-        @prebuilt_ruby_image_base = base
-      end
-      opts.on "--prebuilt-ruby-image-tag=TAG" do |tag|
-        @prebuilt_ruby_image_tag = tag
-      end
-      opts.on "--prebuilt-ruby-versions=VERSIONS" do |versions|
-        @prebuilt_ruby_versions = versions.split(",")
+      opts.on "-p IMAGE", "--prebuilt-image=IMAGE" do |image|
+        add_prebuilt_ruby_image(image)
       end
       opts.on "--default-ruby-version=VERSION" do |version|
         @default_ruby_version = version
@@ -90,10 +85,15 @@ class GenerateDockerfile
     end.parse! args
   end
 
+  def add_prebuilt_ruby_image(str)
+    if str =~ /^(.+)=(.+)$/
+      @prebuilt_ruby_images[$1] = $2
+    end
+  end
+
   def write_dockerfile
     b = TemplateCallbacks.new(@app_config, @timestamp, @base_image,
-                              @build_tools_image, @prebuilt_ruby_image_base,
-                              @prebuilt_ruby_image_tag, @prebuilt_ruby_versions,
+                              @build_tools_image, @prebuilt_ruby_images,
                               @default_ruby_version).instance_eval{ binding }
     write_path = "#{@app_config.workspace_dir}/Dockerfile"
     if ::File.exist? write_path
@@ -130,14 +130,11 @@ class GenerateDockerfile
 
   class TemplateCallbacks < SimpleDelegator
     def initialize app_config, timestamp, base_image, build_tools_image,
-                   prebuilt_ruby_image_base, prebuilt_ruby_image_tag,
-                   prebuilt_ruby_versions, default_ruby_version
+                   prebuilt_ruby_images, default_ruby_version
       @timestamp = timestamp
       @base_image = base_image
       @build_tools_image = build_tools_image
-      @prebuilt_ruby_image_base = prebuilt_ruby_image_base
-      @prebuilt_ruby_image_tag = prebuilt_ruby_image_tag
-      @prebuilt_ruby_versions = prebuilt_ruby_versions
+      @prebuilt_ruby_images = prebuilt_ruby_images
       @default_ruby_version = default_ruby_version
       super app_config
     end
@@ -152,9 +149,7 @@ class GenerateDockerfile
     end
 
     def prebuilt_ruby_image
-      v = ruby_version
-      return nil unless @prebuilt_ruby_versions.include? v
-      "#{@prebuilt_ruby_image_base}#{v}:#{@prebuilt_ruby_image_tag}"
+      @prebuilt_ruby_images[ruby_version]
     end
 
     def escape_quoted str

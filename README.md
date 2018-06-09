@@ -62,8 +62,6 @@ To build and release runtime images, use the `build-ruby-runtime-images.sh` and
 `release-ruby-runtime-images.sh` scripts.
 When building, you may want to set the `-s` flag to tag the build as staging,
 and the `-i` flag to use a prebuilt binary for the convenience base image.
-Finally, you should either set the `-r` flag, or provide a
-`prebuilt-versions.txt` file to tell the runtime which Rubies are prebuilt.
 
 Official release builds of the runtime images are generally performed
 internally at Google. Such builds are roughly equivalent to:
@@ -75,35 +73,36 @@ internally at Google. Such builds are roughly equivalent to:
 
 To build and release prebuilt binary images, use the
 `build-ruby-binary-images.sh` and `release-ruby-binary-images.sh` scripts.
-When building, you should either set the `-r` flag or provide a
+When building, you should either set the `-c` flag or provide a
 `prebuilt-versions.txt` file to tell the runtime which Rubies to build. You may
 also want to set the `-s` flag to mark the new images as staging.
 
 Official release builds of the prebuilt binaries are generally performed
 internally at Google. Such builds are roughly equivalent to:
 
-    ./build-ruby-binary-images.sh -p gcp-runtimes -s -r <versions>
-    ./release-ruby-binary-images.sh -p gcp-runtimes -r <versions>
+    ./build-ruby-binary-images.sh -p gcp-runtimes -s -c <versions>
+    ./release-ruby-binary-images.sh -p gcp-runtimes -c <versions>
 
 ### Runtime pipeline
 
 To build and release the runtime pipeline config, use the
 `build-ruby-runtime-pipeline.sh` and `release-ruby-runtime-pipeline.sh` scripts.
 The `-b` flag is required. You may also want to set the `-s` flag to tag the
-pipeline build as staging.
+pipeline build as staging. Finally, you should either set the `-c` flag, or
+provide a `prebuilt-versions.txt` file to tell the runtime which Rubies are
+prebuilt.
 
 Official release builds of the pipeline are generally performed internally at
 at Google. Such builds are roughly equivalent to:
 
-    ./build-ruby-binary-pipeline.sh -b gcp-runtimes -p gcp-runtimes -s
-    ./release-ruby-binary-pipeline.sh -b gcp-runtimes -p gcp-runtimes
+    ./build-ruby-runtime-pipeline.sh -b gcp-runtimes -p gcp-runtimes -s
+    ./release-ruby-runtime-pipeline.sh -b gcp-runtimes -p gcp-runtimes
 
 ### Exec Wrapper
 
 To build and release the exec wrapper, use the
 `build-app-engine-exec-wrapper.sh` and `release-app-engine-exec-wrapper.sh`
-scripts.
-You may also want to set the `-s` flag to tag the build as staging.
+scripts. You may also want to set the `-s` flag to tag the build as staging.
 
 Official release builds of the wrapper are generally performed internally at
 at Google. Such builds are roughly equivalent to:

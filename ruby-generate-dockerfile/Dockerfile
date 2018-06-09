@@ -15,23 +15,18 @@
 # Use the Ruby base image to get Ruby and its dependencies.
 FROM ruby-base
 
-ARG base_image
-ARG build_tools_image
-ARG prebuilt_ruby_image_base
-ARG prebuilt_ruby_image_tag
-ARG prebuilt_ruby_versions
-ARG default_ruby_version
+ARG base_image=""
+ARG build_tools_image=""
+ARG prebuilt_ruby_images=""
+ARG default_ruby_version=""
+
+ENV DEFAULT_RUBY_BASE_IMAGE=${base_image} \
+    DEFAULT_RUBY_BUILD_TOOLS_IMAGE=${build_tools_image} \
+    DEFAULT_PREBUILT_RUBY_IMAGES=${prebuilt_ruby_images} \
+    DEFAULT_RUBY_VERSION=${default_ruby_version}
 
 # Install the Dockerfile generation script and template.
 COPY app/ /app/
-
-ENV RUBY_BASE_IMAGE=${base_image} \
-    RUBY_BUILD_TOOLS_IMAGE=${build_tools_image} \
-    PREBUILT_RUBY_IMAGE_BASE=${prebuilt_ruby_image_base} \
-    PREBUILT_RUBY_IMAGE_TAG=${prebuilt_ruby_image_tag} \
-    PREBUILT_RUBY_VERSIONS=${prebuilt_ruby_versions} \
-    DEFAULT_RUBY_VERSION=${default_ruby_version}
-
 
 # The entry point runs the generation script.
 ENTRYPOINT ["/app/generate_dockerfile.sh"]

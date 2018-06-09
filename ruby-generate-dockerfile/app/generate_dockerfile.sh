@@ -18,12 +18,4 @@ set -e
 
 WORKSPACE_DIR=$(/bin/pwd)
 cd /app
-ruby generate_dockerfile.rb \
-    --workspace-dir=${WORKSPACE_DIR} \
-    --base-image=${RUBY_BASE_IMAGE} \
-    --build-tools-image=${RUBY_BUILD_TOOLS_IMAGE} \
-    --prebuilt-ruby-image-base=${PREBUILT_RUBY_IMAGE_BASE} \
-    --prebuilt-ruby-image-tag=${PREBUILT_RUBY_IMAGE_TAG} \
-    --prebuilt-ruby-versions=${PREBUILT_RUBY_VERSIONS} \
-    --default-ruby-version=${DEFAULT_RUBY_VERSION} \
-    "$@"
+ruby generate_dockerfile.rb --workspace-dir=${WORKSPACE_DIR} "$@"

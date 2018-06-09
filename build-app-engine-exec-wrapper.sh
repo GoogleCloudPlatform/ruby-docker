@@ -37,18 +37,18 @@ show_usage() {
 
 OPTIND=1
 while getopts ":n:p:st:yh" opt; do
-  case $opt in
+  case ${opt} in
     n)
-      IMAGE_NAME=$OPTARG
+      IMAGE_NAME=${OPTARG}
       ;;
     p)
-      PROJECT=$OPTARG
+      PROJECT=${OPTARG}
       ;;
     s)
       STAGING_FLAG="true"
       ;;
     t)
-      IMAGE_TAG=$OPTARG
+      IMAGE_TAG=${OPTARG}
       ;;
     y)
       AUTO_YES="true"
@@ -58,13 +58,13 @@ while getopts ":n:p:st:yh" opt; do
       exit 0
       ;;
     \?)
-      echo "Invalid option: -$OPTARG" >&2
+      echo "Invalid option: -${OPTARG}" >&2
       echo >&2
       show_usage
       exit 1
       ;;
     :)
-      echo "Option $OPTARG requires a parameter" >&2
+      echo "Option ${OPTARG} requires a parameter" >&2
       echo >&2
       show_usage
       exit 1
@@ -73,47 +73,47 @@ while getopts ":n:p:st:yh" opt; do
 done
 shift $((OPTIND-1))
 
-if [ -z "$PROJECT" ]; then
+if [ -z "${PROJECT}" ]; then
   PROJECT=$(gcloud config get-value project)
-  echo "Using project from gcloud config: $PROJECT" >&2
+  echo "Using project from gcloud config: ${PROJECT}" >&2
 fi
-if [ -z "$IMAGE_TAG" ]; then
+if [ -z "${IMAGE_TAG}" ]; then
   IMAGE_TAG=$(date +%Y-%m-%d-%H%M%S)
-  echo "Creating new IMAGE_TAG: $IMAGE_TAG" >&2
+  echo "Creating new IMAGE_TAG: ${IMAGE_TAG}" >&2
 fi
 
-EXISTING=$(gcloud container images list-tags gcr.io/$PROJECT/$IMAGE_NAME --filter=tags=$IMAGE_TAG --format='get(tags)')
-if [ -n "$EXISTING" ]; then
-  echo "Tag $IMAGE_TAG for gcr.io/$PROJECT/$IMAGE_NAME already exists. Aborting." >&2
+EXISTING=$(gcloud container images list-tags gcr.io/${PROJECT}/${IMAGE_NAME} --filter=tags=${IMAGE_TAG} --format='get(tags)')
+if [ -n "${EXISTING}" ]; then
+  echo "Tag ${IMAGE_TAG} for gcr.io/${PROJECT}/${IMAGE_NAME} already exists. Aborting." >&2
   exit 1
 fi
 
 echo
 echo "Building appengine exec wrapper image:"
-echo "  gcr.io/$PROJECT/$IMAGE_NAME:$IMAGE_TAG"
-if [ "$STAGING_FLAG" = "true" ]; then
+echo "  gcr.io/${PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}"
+if [ "${STAGING_FLAG}" = "true" ]; then
   echo "and tagging as staging."
 else
   echo "but NOT tagging as staging."
 fi
-if [ -z "$AUTO_YES" ]; then
+if [ -z "${AUTO_YES}" ]; then
   read -r -p "Ok to build? [Y/n] " response
   response=${response,,}  # tolower
-  if [[ "$response" =~ ^(no|n)$ ]]; then
+  if [[ "${response}" =~ ^(no|n)$ ]]; then
     echo "Aborting."
     exit 1
   fi
 fi
 echo
 
-gcloud container builds submit $DIRNAME/app-engine-exec-wrapper \
-  --config=$DIRNAME/app-engine-exec-wrapper/cloudbuild.yaml --project $PROJECT \
-  --substitutions _OUTPUT_IMAGE=gcr.io/$PROJECT/$IMAGE_NAME:$IMAGE_TAG
-echo "**** Built image: gcr.io/$PROJECT/$IMAGE_NAME:$IMAGE_TAG"
+gcloud container builds submit ${DIRNAME}/app-engine-exec-wrapper \
+  --config=${DIRNAME}/app-engine-exec-wrapper/cloudbuild.yaml --project ${PROJECT} \
+  --substitutions _OUTPUT_IMAGE=gcr.io/${PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}
+echo "**** Built image: gcr.io/${PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}"
 
 if [ "$STAGING_FLAG" = "true" ]; then
-  gcloud container images add-tag --project $PROJECT \
-    gcr.io/$PROJECT/$IMAGE_NAME:$IMAGE_TAG \
-    gcr.io/$PROJECT/$IMAGE_NAME:staging -q
-  echo "**** Tagged image as gcr.io/$PROJECT/$IMAGE_NAME:staging"
+  gcloud container images add-tag --project ${PROJECT} \
+    gcr.io/${PROJECT}/${IMAGE_NAME}:${IMAGE_TAG} \
+    gcr.io/${PROJECT}/${IMAGE_NAME}:staging -q
+  echo "**** Tagged image as gcr.io/${PROJECT}/${IMAGE_NAME}:staging"
 fi

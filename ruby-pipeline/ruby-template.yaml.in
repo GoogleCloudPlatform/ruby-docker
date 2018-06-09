@@ -1,5 +1,9 @@
 steps:
-  - name: '$GENERATE_DOCKERFILE_IMAGE:$TAG'
+  - name: '@@GENERATE_DOCKERFILE_IMAGE@@:@@TAG@@'
+    args: [@@PREBUILT_IMAGE_ARGS@@
+           '--base-image', '@@RUBY_BASIC_IMAGE@@:@@TAG@@',
+           '--build-tools-image', '@@BUILD_TOOLS_IMAGE@@:@@TAG@@',
+           '--default-ruby-version', '@@DEFAULT_RUBY_VERSION@@']
   - name: 'gcr.io/cloud-builders/docker:latest'
     args: ['build', '--network=cloudbuild', '-t', '$_OUTPUT_IMAGE', '.']
 images:
