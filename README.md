@@ -83,6 +83,14 @@ internally at Google. Such builds are roughly equivalent to:
     ./build-ruby-binary-images.sh -p gcp-runtimes -s -c <versions>
     ./release-ruby-binary-images.sh -p gcp-runtimes -c <versions>
 
+The canonical list of prebuilt binaries is defined in the file
+`ruby-pipeline/ruby-latest.yaml`, which is the template used to build the
+official Ruby runtime. (This file also defines the default Ruby version used if
+an app does not specify a Ruby version.) To add to the canonical list, first
+build and release the prebuilt binary, then add an applicable entry to
+`ruby-pipeline/ruby-latest.yaml` and perform a template build (which must be
+done internally at Google.)
+
 ### Runtime pipeline
 
 To build and release the runtime pipeline config, use the

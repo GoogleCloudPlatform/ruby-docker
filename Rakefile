@@ -24,7 +24,11 @@ OS_NAME="ubuntu16"
 LOCAL_PREBUILT_RUBY_VERSIONS=["2.3.7", "2.4.4", "2.5.1"]
 LOCAL_PREBUILT_RUBY_IMAGE_BASE="ruby-prebuilt-"
 LOCAL_PREBUILT_RUBY_IMAGE_TAG="latest"
-RELEASED_PREBUILT_RUBY_VERSIONS=::File.read("prebuilt-versions.txt").split("\n")
+RELEASED_PREBUILT_RUBY_VERSIONS=::File.readlines("ruby-pipeline/ruby-latest.yaml")
+  .inject([]) do |list, line|
+    list << $1 if line =~ /([\d\.]+)=gcr\.io/
+    list
+  end
 RELEASED_PREBUILT_RUBY_IMAGE_BASE="gcr.io/#{RUNTIME_PROJECT}/ruby/#{OS_NAME}/prebuilt/ruby-"
 RELEASED_PREBUILT_RUBY_IMAGE_TAG="staging"
 
