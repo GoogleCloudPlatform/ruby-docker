@@ -50,7 +50,7 @@ show_usage() {
 }
 
 OPTIND=1
-while getopts ":a:in:o:p:q:r:st:yh" opt; do
+while getopts ":in:o:p:q:st:yh" opt; do
   case ${opt} in
     i)
       BASE_IMAGE_DOCKERFILE="prebuilt"
