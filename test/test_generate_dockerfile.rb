@@ -211,13 +211,13 @@ class TestGenerateDockerfile < ::Minitest::Test
     docker_args = "-v #{TMP_DIR}:/workspace -w /workspace" \
         " -e GAE_APPLICATION_YAML_PATH=#{config_path}" \
         " ruby-generate-dockerfile -t" \
-        " --base-image=gcr.io/google-appengine/ruby:my-test-tag"
+        " --base-image=gcr.io/gcp-runtimes/ruby/ubuntu16:my-test-tag"
     if expect_failure
       assert_cmd_fails "docker run --rm #{docker_args}"
     else
       assert_docker_output docker_args, nil
       assert_file_contents "#{TMP_DIR}/Dockerfile",
-          %r{FROM gcr\.io/google-appengine/ruby:my-test-tag AS augmented-base}
+          %r{FROM gcr\.io/gcp-runtimes/ruby/ubuntu16:my-test-tag AS augmented-base}
       assert_file_contents "#{TMP_DIR}/.dockerignore", /Dockerfile/
     end
   end

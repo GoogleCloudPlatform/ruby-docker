@@ -127,7 +127,7 @@ if [ -z "${RUNTIME_VERSION}" ]; then
 fi
 
 GENERATE_DOCKERFILE_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/generate-dockerfile
-RUBY_BASIC_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/basic
+RUBY_OS_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}
 BUILD_TOOLS_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/build-tools
 PREBUILT_IMAGE_PREFIX=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/prebuilt/ruby-
 VERSIONED_GS_URL=gs://${UPLOAD_BUCKET}/${RUNTIME_NAME}-default-builder-${RUNTIME_VERSION}.yaml
@@ -163,7 +163,7 @@ else
   echo "but NOT uploading it as staging."
 fi
 echo "It references:"
-echo "  ${RUBY_BASIC_IMAGE}:${IMAGE_TAG}"
+echo "  ${RUBY_OS_IMAGE}:${IMAGE_TAG}"
 echo "  ${BUILD_TOOLS_IMAGE}:${IMAGE_TAG}"
 echo "  ${GENERATE_DOCKERFILE_IMAGE}:${IMAGE_TAG}"
 echo "Default Ruby version is ${DEFAULT_RUBY_VERSION}"
@@ -179,7 +179,7 @@ fi
 echo
 mkdir -p ${DIRNAME}/tmp
 sed -e "s|@@GENERATE_DOCKERFILE_IMAGE@@|${GENERATE_DOCKERFILE_IMAGE}|g;\
-        s|@@RUBY_BASIC_IMAGE@@|${RUBY_BASIC_IMAGE}|g;\
+        s|@@RUBY_OS_IMAGE@@|${RUBY_OS_IMAGE}|g;\
         s|@@BUILD_TOOLS_IMAGE@@|${BUILD_TOOLS_IMAGE}|g;\
         s|@@PREBUILT_IMAGE_ARGS@@|${PREBUILT_IMAGE_ARGS}|g;\
         s|@@TAG@@|${IMAGE_TAG}|g;\

@@ -64,7 +64,7 @@ class TestSampleAppBuilds < ::Minitest::Test
 
     assert_docker_output \
         "-v #{TMP_DIR}:/workspace -w /workspace ruby-generate-dockerfile" \
-          " -t --base-image=ruby-base --build-tools-image=ruby-build-tools",
+          " -t --base-image=ruby-ubuntu16 --build-tools-image=ruby-build-tools",
         nil
     ::Dir.chdir TMP_DIR do
       build_docker_image "--no-cache" do |image|
