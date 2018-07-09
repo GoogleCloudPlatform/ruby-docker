@@ -20,9 +20,9 @@
 # version used by the runtime by default if one is not specified by the app.
 BASIC_RUBY_VERSION=2.3.7
 
-DEFAULT_BUNDLER_VERSION=1.16.2
-NODEJS_VERSION=8.11.2
-GCLOUD_VERSION=204.0.0
+DEFAULT_BUNDLER_VERSION=1.16.4
+NODEJS_VERSION=8.12.0
+GCLOUD_VERSION=216.0.0
 
 
 set -e
