@@ -119,7 +119,7 @@ To build and install in the Google Container Registry, you need the
 [GCloud SDK](https://cloud.google.com/sdk) installed and configured and
 authenticated for your project. Then, in this directory, run:
 
-    gcloud container builds submit . --config cloudbuild.yaml \
+    gcloud builds submit . --config cloudbuild.yaml \
       --substitutions _TAG=my-image-tag
 
 Replace `my-image-tag` with the tag you wish to set. The image name will be
