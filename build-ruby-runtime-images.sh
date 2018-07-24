@@ -132,7 +132,7 @@ if [ -z "${AUTO_YES}" ]; then
 fi
 echo
 
-gcloud container builds submit ${DIRNAME}/ruby-${OS_NAME} \
+gcloud builds submit ${DIRNAME}/ruby-${OS_NAME} \
   --config ${DIRNAME}/ruby-${OS_NAME}/cloudbuild.yaml --project ${PROJECT} \
   --substitutions _IMAGE=${OS_BASE_IMAGE},_TAG=${IMAGE_TAG},_BUNDLER_VERSION=${DEFAULT_BUNDLER_VERSION},_NODEJS_VERSION=${NODEJS_VERSION}
 echo "**** Built image: ${OS_BASE_IMAGE}:${IMAGE_TAG}"
@@ -144,7 +144,7 @@ fi
 
 sed -e "s|@@RUBY_OS_IMAGE@@|ruby-${OS_NAME}|g; s|@@PREBUILT_RUBY_IMAGE@@|${PREBUILT_IMAGE_PREFIX}${BASIC_RUBY_VERSION}|g" \
   < ${DIRNAME}/ruby-base/Dockerfile-${BASE_IMAGE_DOCKERFILE}.in > ${DIRNAME}/ruby-base/Dockerfile
-gcloud container builds submit ${DIRNAME}/ruby-base \
+gcloud builds submit ${DIRNAME}/ruby-base \
   --config ${DIRNAME}/ruby-base/cloudbuild.yaml --project ${PROJECT} --timeout 20m \
   --substitutions _OS_NAME=${OS_NAME},_OS_BASE_IMAGE=${OS_BASE_IMAGE},_IMAGE=${RUBY_BASIC_IMAGE},_TAG=${IMAGE_TAG},_RUBY_VERSION=${BASIC_RUBY_VERSION}
 echo "**** Built image: ${RUBY_BASIC_IMAGE}:${IMAGE_TAG}"
@@ -154,7 +154,7 @@ if [ "${STAGING_FLAG}" = "true" ]; then
   echo "**** And tagged as ${RUBY_BASIC_IMAGE}:staging"
 fi
 
-gcloud container builds submit ${DIRNAME}/ruby-build-tools \
+gcloud builds submit ${DIRNAME}/ruby-build-tools \
   --config ${DIRNAME}/ruby-build-tools/cloudbuild.yaml --project ${PROJECT} \
   --substitutions _BASE_IMAGE=${RUBY_BASIC_IMAGE},_IMAGE=${BUILD_TOOLS_IMAGE},_TAG=${IMAGE_TAG},_GCLOUD_VERSION=${GCLOUD_VERSION}
 echo "**** Built image: ${BUILD_TOOLS_IMAGE}:${IMAGE_TAG}"
@@ -164,7 +164,7 @@ if [ "${STAGING_FLAG}" = "true" ]; then
   echo "**** And tagged as ${BUILD_TOOLS_IMAGE}:staging"
 fi
 
-gcloud container builds submit ${DIRNAME}/ruby-generate-dockerfile \
+gcloud builds submit ${DIRNAME}/ruby-generate-dockerfile \
   --config ${DIRNAME}/ruby-generate-dockerfile/cloudbuild.yaml --project ${PROJECT} \
   --substitutions _BASE_IMAGE=${RUBY_BASIC_IMAGE},_IMAGE=${GENERATE_DOCKERFILE_IMAGE},_TAG=${IMAGE_TAG}
 echo "**** Built image: ${GENERATE_DOCKERFILE_IMAGE}:${IMAGE_TAG}"

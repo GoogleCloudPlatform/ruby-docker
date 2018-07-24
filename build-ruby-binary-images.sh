@@ -137,7 +137,7 @@ echo
 sed -e "s|@@RUBY_OS_IMAGE@@|ruby-${OS_NAME}|g" \
   < ${DIRNAME}/ruby-prebuilt/Dockerfile.in > ${DIRNAME}/ruby-prebuilt/Dockerfile
 for version in "${PREBUILT_VERSIONS[@]}"; do
-  gcloud container builds submit ${DIRNAME}/ruby-prebuilt \
+  gcloud builds submit ${DIRNAME}/ruby-prebuilt \
     --config ${DIRNAME}/ruby-prebuilt/cloudbuild.yaml --project ${PROJECT} --timeout 20m \
     --substitutions _OS_NAME=${OS_NAME},_OS_BASE_IMAGE=${OS_BASE_IMAGE},_IMAGE=${PREBUILT_IMAGE_PREFIX}${version},_TAG=${IMAGE_TAG},_BASE_TAG=${BASE_IMAGE_TAG},_RUBY_VERSION=${version}
   echo "**** Built image: ${PREBUILT_IMAGE_PREFIX}${version}:${IMAGE_TAG}"

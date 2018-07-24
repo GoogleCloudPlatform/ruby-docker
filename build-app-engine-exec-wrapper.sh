@@ -106,7 +106,7 @@ if [ -z "${AUTO_YES}" ]; then
 fi
 echo
 
-gcloud container builds submit ${DIRNAME}/app-engine-exec-wrapper \
+gcloud builds submit ${DIRNAME}/app-engine-exec-wrapper \
   --config=${DIRNAME}/app-engine-exec-wrapper/cloudbuild.yaml --project ${PROJECT} \
   --substitutions _OUTPUT_IMAGE=gcr.io/${PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}
 echo "**** Built image: gcr.io/${PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}"
