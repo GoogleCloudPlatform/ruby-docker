@@ -14,7 +14,7 @@ frameworks.
 
 This image is deployed to `gcr.io/google-appengine/exec-wrapper`, and is
 designed to be run as a step in a
-[Cloud Container Builder](https://cloud.google.com/container-builder/) job.
+[Cloud Build](https://cloud.google.com/cloud-build/) job.
 You must send, as arguments, the path of the deployed application image, any
 environment variables to set, any Cloud SQL instances to make available, and
 the command to run. Here is an example Cloud Build configuration:
