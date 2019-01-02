@@ -106,6 +106,7 @@ class GenerateDockerfile
       file.write content
     end
     puts "Generated Dockerfile"
+    puts content
   end
 
   def write_dockerignore
