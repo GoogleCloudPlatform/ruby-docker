@@ -20,6 +20,8 @@ FROM ruby-base AS builder
 
 # Versions
 ARG gcloud_version
+ARG bundler1_version
+ARG bundler2_version
 
 RUN mkdir -p /app/bin
 
@@ -41,10 +43,13 @@ RUN mkdir /app/google-cloud-sdk \
     && (curl -s https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${gcloud_version}-linux-x86_64.tar.gz \
         | tar xzf - --directory=/app/google-cloud-sdk --strip-components=1)
 
+# Pre-download the gems we'll commonly install
+RUN mkdir -p /app/gems \
+    && cd /app/gems \
+    && gem fetch bundler --version ${bundler2_version} \
+    && gem fetch bundler --version ${bundler1_version}
 
 # Generate a minimal image with only the tool files themselves. This image
 # can be downloaded quickly and the files copied into a build image.
-
 FROM scratch
-
 COPY --from=builder /app/ /opt/

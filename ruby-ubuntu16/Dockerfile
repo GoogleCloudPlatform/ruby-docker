@@ -90,6 +90,7 @@ RUN apt-get update -y \
 COPY files /root
 
 ENV PATH=/opt/nodejs/bin:${RBENV_ROOT}/shims:${RBENV_ROOT}/bin:${PATH} \
+    MALLOC_ARENA_MAX=2 \
     RACK_ENV=production \
     RAILS_ENV=production \
     APP_ENV=production \

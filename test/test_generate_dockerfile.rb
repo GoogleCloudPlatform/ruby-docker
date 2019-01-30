@@ -62,7 +62,7 @@ class TestGenerateDockerfile < ::Minitest::Test
   end
 
   def test_ruby_version_prebuilt
-    version = ::ENV["PREBUILT_RUBY_VERSIONS"].to_s.split(",").first || "2.5.1"
+    version = ::ENV["PREBUILT_RUBY_VERSIONS"].to_s.split(",").first || "2.5.3"
     version_escaped = version.gsub(".", "\\.")
     run_generate_dockerfile "rack_app", ruby_version: version
     assert_dockerfile_line "ARG ruby_version=\"#{version_escaped}\""

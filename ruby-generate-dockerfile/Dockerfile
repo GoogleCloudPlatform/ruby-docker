@@ -19,11 +19,15 @@ ARG base_image=""
 ARG build_tools_image=""
 ARG prebuilt_ruby_images=""
 ARG default_ruby_version=""
+ARG bundler1_version=""
+ARG bundler2_version=""
 
 ENV DEFAULT_RUBY_BASE_IMAGE=${base_image} \
     DEFAULT_RUBY_BUILD_TOOLS_IMAGE=${build_tools_image} \
     DEFAULT_PREBUILT_RUBY_IMAGES=${prebuilt_ruby_images} \
-    DEFAULT_RUBY_VERSION=${default_ruby_version}
+    DEFAULT_RUBY_VERSION=${default_ruby_version} \
+    PROVIDED_BUNDLER1_VERSION=${bundler1_version} \
+    PROVIDED_BUNDLER2_VERSION=${bundler2_version}
 
 # Install the Dockerfile generation script and template.
 COPY app/ /app/

@@ -204,7 +204,10 @@ class AppConfig
         @ruby_version = $1
       end
     end
-    if @ruby_version !~ %r{\A[\w.-]*\z}
+    if @ruby_version =~ %r{\Aruby-(\d+\.\d+\.[\w.-]+)\z}
+      @ruby_version = $1
+    end
+    unless @ruby_version.empty? || @ruby_version =~ %r{\A\d+\.\d+\.[\w.-]+\z}
       raise ::AppConfig::Error, "Illegal ruby version: #{@ruby_version.inspect}"
     end
     @has_gemfile = ::File.readable?("#{@workspace_dir}/Gemfile.lock") ||

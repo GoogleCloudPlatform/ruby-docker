@@ -15,10 +15,11 @@
 ::Dir.chdir __dir__
 
 RUNTIME_PROJECT="gcp-runtimes"
-BUNDLER_VERSION="1.16.6"
+BUNDLER1_VERSION="1.17.3"
+BUNDLER2_VERSION="2.0.1"
 DEFAULT_RUBY_VERSION="2.3.8"
-NODEJS_VERSION="8.12.0"
-GCLOUD_VERSION="221.0.0"
+NODEJS_VERSION="10.15.1"
+GCLOUD_VERSION="232.0.0"
 OS_NAME="ubuntu16"
 
 LOCAL_PREBUILT_RUBY_VERSIONS=["2.3.8", "2.4.5", "2.5.3", "2.6.0"]
@@ -45,6 +46,8 @@ end
 ::ENV["PREBUILT_RUBY_VERSIONS"] = PREBUILT_RUBY_VERSIONS.join(",")
 ::ENV["PREBUILT_RUBY_IMAGE_BASE"] = PREBUILT_RUBY_IMAGE_BASE
 ::ENV["PREBUILT_RUBY_IMAGE_TAG"] = PREBUILT_RUBY_IMAGE_TAG
+::ENV["BUNDLER1_VERSION"] = BUNDLER1_VERSION
+::ENV["BUNDLER2_VERSION"] = BUNDLER2_VERSION
 
 PREBUILT_RUBY_IMAGES = PREBUILT_RUBY_VERSIONS.map do |v|
   "#{v}=#{PREBUILT_RUBY_IMAGE_BASE}#{v}:#{PREBUILT_RUBY_IMAGE_TAG}"
@@ -55,7 +58,7 @@ require "rake/testtask"
 desc "Build local docker image for ubuntu16 image"
 task "build:ubuntu16" do |t, args|
   sh "docker build --pull --no-cache -t ruby-ubuntu16" \
-    " --build-arg bundler_version=#{BUNDLER_VERSION}" \
+    " --build-arg bundler_version=#{BUNDLER2_VERSION}" \
     " --build-arg nodejs_version=#{NODEJS_VERSION}" \
     " ruby-ubuntu16"
 end
@@ -89,6 +92,8 @@ task "build:base" do |t, args|
     " ruby-base/Dockerfile-#{image_type}.in > ruby-base/Dockerfile"
   sh "docker build --no-cache -t ruby-base" \
     " --build-arg ruby_version=#{DEFAULT_RUBY_VERSION}" \
+    " --build-arg bundler1_version=#{BUNDLER1_VERSION}" \
+    " --build-arg bundler2_version=#{BUNDLER2_VERSION}" \
     " ruby-base"
 end
 
@@ -96,6 +101,8 @@ desc "Build local docker image for build-tools image"
 task "build:build-tools" do |t, args|
   sh "docker build --no-cache -t ruby-build-tools" \
     " --build-arg gcloud_version=#{GCLOUD_VERSION}" \
+    " --build-arg bundler1_version=#{BUNDLER1_VERSION}" \
+    " --build-arg bundler2_version=#{BUNDLER2_VERSION}" \
     " ruby-build-tools"
 end
 
@@ -106,6 +113,8 @@ task "build:generate-dockerfile" do |t, args|
     " --build-arg build_tools_image=ruby-build-tools" \
     " --build-arg prebuilt_ruby_images=#{PREBUILT_RUBY_IMAGES}" \
     " --build-arg default_ruby_version=#{DEFAULT_RUBY_VERSION}" \
+    " --build-arg bundler1_version=#{BUNDLER1_VERSION}" \
+    " --build-arg bundler2_version=#{BUNDLER2_VERSION}" \
     " ruby-generate-dockerfile"
 end
 

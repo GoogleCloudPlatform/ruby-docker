@@ -36,27 +36,35 @@ class TestRubyVersions < ::Minitest::Test
     "2.3.5",
     "2.3.6",
     "2.3.7",
+    "2.3.8",
     # 2.4.x versions are currently supported.
     "2.4.0",
     "2.4.1",
     "2.4.2",
     "2.4.3",
     "2.4.4",
+    "2.4.5",
     # 2.5.x versions are currently supported.
     "2.5.0",
-    "2.5.1"
+    "2.5.1",
+    "2.5.3",
+    # 2.6.0 versions are currently supported.
+    "2.6.0"
   ]
 
   FASTER_VERSIONS = [
     # Test only the latest patch of each supported minor version.
-    "2.3.7",
-    "2.4.4",
-    "2.5.1"
+    "2.3.8",
+    "2.4.5",
+    "2.5.3",
+    "2.6.0"
   ]
 
   PREBUILT_VERSIONS = ::ENV["PREBUILT_RUBY_VERSIONS"].to_s.split(",")
   PREBUILT_RUBY_IMAGE_BASE = ::ENV["PREBUILT_RUBY_IMAGE_BASE"]
   PREBUILT_RUBY_IMAGE_TAG = ::ENV["PREBUILT_RUBY_IMAGE_TAG"]
+  BUNDLER1_VERSION = ::ENV["BUNDLER1_VERSION"]
+  BUNDLER2_VERSION = ::ENV["BUNDLER2_VERSION"]
 
   if ::ENV["FASTER_TESTS"] || ::ENV["USE_LOCAL_PREBUILT"]
     VERSIONS = FASTER_VERSIONS & PREBUILT_VERSIONS
@@ -67,11 +75,12 @@ class TestRubyVersions < ::Minitest::Test
   DOCKERFILE_SELFBUILT = <<~DOCKERFILE_CONTENT
     FROM ruby-ubuntu16
     ARG ruby_version
+    COPY --from=ruby-build-tools /opt/gems/ /opt/gems/
     RUN rbenv install -s ${ruby_version} \
         && rbenv global ${ruby_version} \
         && rbenv rehash \
-        && (bundle version > /dev/null 2>&1 \
-            || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
+        && (gem install /opt/gems/bundler-#{BUNDLER2_VERSION}.gem; \
+            gem install /opt/gems/bundler-#{BUNDLER1_VERSION}.gem) \
         && rbenv rehash
     CMD ruby --version
   DOCKERFILE_CONTENT
@@ -79,13 +88,14 @@ class TestRubyVersions < ::Minitest::Test
   DOCKERFILE_PREBUILT = <<~DOCKERFILE_CONTENT
     FROM ruby-ubuntu16
     ARG ruby_version
+    COPY --from=ruby-build-tools /opt/gems/ /opt/gems/
     COPY --from=$PREBUILT_RUBY_IMAGE \
          /opt/rbenv/versions/${ruby_version} \
          /opt/rbenv/versions/${ruby_version}
     RUN rbenv global ${ruby_version} \
         && rbenv rehash \
-        && (bundle version > /dev/null 2>&1 \
-            || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
+        && (gem install /opt/gems/bundler-#{BUNDLER2_VERSION}.gem; \
+            gem install /opt/gems/bundler-#{BUNDLER1_VERSION}.gem) \
         && rbenv rehash
     CMD ruby --version
   DOCKERFILE_CONTENT
@@ -123,7 +133,8 @@ class TestRubyVersions < ::Minitest::Test
       build_docker_image(
           "--build-arg ruby_version=#{version}",
           mangled_version) do |image|
-        assert_docker_output(image, /ruby\s#{version_output}/, mangled_version)
+        assert_docker_output(image, /ruby\s#{version_output}/, "ruby-#{mangled_version}")
+        assert_docker_output("#{image} bundle version", /Bundler version/, "bundler-#{mangled_version}")
       end
     end
   end

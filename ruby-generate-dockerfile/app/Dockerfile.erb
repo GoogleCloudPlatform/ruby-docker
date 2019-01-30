@@ -39,6 +39,9 @@ RUN apt-get update -y \
 ## Ruby version specification in your Gemfile, they must match this value.
 ARG ruby_version="<%= ruby_version %>"
 
+## Commonly installed gems (e.g. bundler) are available from this image.
+COPY --from=<%= build_tools_image %> /opt/gems/ /opt/gems/
+
 <% if prebuilt_ruby_image %>
 ## Install Ruby <%= ruby_version %> from a prebuilt image. If a prebuilt image
 ## is not available, use the alternate installation method commented below.
@@ -47,8 +50,8 @@ COPY --from=<%= prebuilt_ruby_image %> \
      /opt/rbenv/versions/${ruby_version}
 RUN rbenv global ${ruby_version} \
     && rbenv rehash \
-    && (bundle version > /dev/null 2>&1 \
-         || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
+    && (gem install /opt/gems/bundler-<%= @bundler2_version %>.gem ; \
+        gem install /opt/gems/bundler-<%= @bundler1_version %>.gem) \
     && rbenv rehash
 ## Alternate installation for Ruby versions that have no prebuilt image.
 # RUN if [ ! -x ${RBENV_ROOT}/versions/${ruby_version}/bin/ruby ]; \
@@ -58,8 +61,8 @@ RUN rbenv global ${ruby_version} \
 #         && rbenv install -s ${ruby_version} \
 #         && rbenv global ${ruby_version} \
 #         && rbenv rehash \
-#         && (bundle version > /dev/null 2>&1 \
-#           || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
+#         && (gem install /opt/gems/bundler-<%= @bundler2_version %>.gem ; \
+#             gem install /opt/gems/bundler-<%= @bundler1_version %>.gem) \
 #         && rbenv rehash; \
 #     fi
 <% else %>
@@ -73,8 +76,8 @@ RUN if [ ! -x ${RBENV_ROOT}/versions/${ruby_version}/bin/ruby ]; \
         && rbenv install -s ${ruby_version} \
         && rbenv global ${ruby_version} \
         && rbenv rehash \
-        && (bundle version > /dev/null 2>&1 \
-          || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
+        && (gem install /opt/gems/bundler-<%= @bundler2_version %>.gem ; \
+            gem install /opt/gems/bundler-<%= @bundler1_version %>.gem) \
         && rbenv rehash; \
     fi
 ## Alternate installation for Ruby versions that have a prebuilt image.
@@ -83,8 +86,8 @@ RUN if [ ! -x ${RBENV_ROOT}/versions/${ruby_version}/bin/ruby ]; \
 #      /opt/rbenv/versions/${ruby_version}
 # RUN rbenv global ${ruby_version} \
 #     && rbenv rehash \
-#     && (bundle version > /dev/null 2>&1 \
-#          || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
+#     && (gem install /opt/gems/bundler-<%= @bundler2_version %>.gem ; \
+#         gem install /opt/gems/bundler-<%= @bundler1_version %>.gem) \
 #     && rbenv rehash
 <% end %>
 

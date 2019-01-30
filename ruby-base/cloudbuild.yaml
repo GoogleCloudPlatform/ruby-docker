@@ -6,6 +6,8 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_IMAGE:$_TAG',
            '--build-arg', 'ruby_version=$_RUBY_VERSION',
+           '--build-arg', 'bundler1_version=$_BUNDLER1_VERSION',
+           '--build-arg', 'bundler2_version=$_BUNDLER2_VERSION',
            '.']
   - name: 'gcr.io/gcp-runtimes/structure_test'
     args: ['--image', '$_IMAGE:$_TAG', '-v',

@@ -40,6 +40,8 @@ class GenerateDockerfile
       add_prebuilt_ruby_image(str)
     end
     @default_ruby_version = ::ENV["DEFAULT_RUBY_VERSION"] || ::RUBY_VERSION
+    @bundler1_version = ::ENV["PROVIDED_BUNDLER1_VERSION"]
+    @bundler2_version = ::ENV["PROVIDED_BUNDLER2_VERSION"]
     @testing = false
     parse_args args
     ::Dir.chdir @workspace_dir
@@ -94,7 +96,8 @@ class GenerateDockerfile
   def write_dockerfile
     b = TemplateCallbacks.new(@app_config, @timestamp, @base_image,
                               @build_tools_image, @prebuilt_ruby_images,
-                              @default_ruby_version).instance_eval{ binding }
+                              @default_ruby_version, @bundler1_version,
+                              @bundler2_version).instance_eval{ binding }
     write_path = "#{@app_config.workspace_dir}/Dockerfile"
     if ::File.exist? write_path
       ::STDERR.puts "Unable to generate Dockerfile because one already exists."
@@ -131,12 +134,15 @@ class GenerateDockerfile
 
   class TemplateCallbacks < SimpleDelegator
     def initialize app_config, timestamp, base_image, build_tools_image,
-                   prebuilt_ruby_images, default_ruby_version
+                   prebuilt_ruby_images, default_ruby_version,
+                   bundler1_version, bundler2_version
       @timestamp = timestamp
       @base_image = base_image
       @build_tools_image = build_tools_image
       @prebuilt_ruby_images = prebuilt_ruby_images
       @default_ruby_version = default_ruby_version
+      @bundler1_version = bundler1_version
+      @bundler2_version = bundler2_version
       super app_config
     end
 
