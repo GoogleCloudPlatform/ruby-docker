@@ -79,9 +79,9 @@ class TestRubyVersions < ::Minitest::Test
     RUN rbenv install -s ${ruby_version} \
         && rbenv global ${ruby_version} \
         && rbenv rehash \
-        && (gem install /opt/gems/bundler-#{BUNDLER2_VERSION}.gem; \
-            gem install /opt/gems/bundler-#{BUNDLER1_VERSION}.gem) \
-        && rbenv rehash
+        && (gem install /opt/gems/bundler-#{BUNDLER1_VERSION}.gem ; \
+            gem install /opt/gems/bundler-#{BUNDLER2_VERSION}.gem ; \
+            rbenv rehash)
     CMD ruby --version
   DOCKERFILE_CONTENT
 
@@ -94,9 +94,9 @@ class TestRubyVersions < ::Minitest::Test
          /opt/rbenv/versions/${ruby_version}
     RUN rbenv global ${ruby_version} \
         && rbenv rehash \
-        && (gem install /opt/gems/bundler-#{BUNDLER2_VERSION}.gem; \
-            gem install /opt/gems/bundler-#{BUNDLER1_VERSION}.gem) \
-        && rbenv rehash
+        && (gem install /opt/gems/bundler-#{BUNDLER1_VERSION}.gem ; \
+            gem install /opt/gems/bundler-#{BUNDLER2_VERSION}.gem ; \
+            rbenv rehash)
     CMD ruby --version
   DOCKERFILE_CONTENT
 

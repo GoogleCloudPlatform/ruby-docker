@@ -28,6 +28,6 @@ ENV DEFAULT_RUBY_VERSION=${ruby_version}
 RUN rbenv install -s ${ruby_version} \
     && rbenv global ${ruby_version} \
     && rbenv rehash \
-    && (gem install bundler --version ${bundler2_version}; \
-        gem install bundler --version ${bundler1_version}) \
-    && rbenv rehash
+    && (gem install bundler --version ${bundler1_version} ; \
+        gem install bundler --version ${bundler2_version} ; \
+        rbenv rehash)
