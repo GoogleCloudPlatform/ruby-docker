@@ -6,6 +6,8 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', '$_IMAGE:$_TAG',
            '--build-arg', 'gcloud_version=$_GCLOUD_VERSION',
+           '--build-arg', 'bundler1_version=$_BUNDLER1_VERSION',
+           '--build-arg', 'bundler2_version=$_BUNDLER2_VERSION',
            '.']
 
 images:

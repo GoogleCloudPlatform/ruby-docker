@@ -19,6 +19,8 @@
 FROM @@RUBY_OS_IMAGE@@
 
 ARG ruby_version
+ARG bundler1_version
+ARG bundler2_version
 
 ENV DEFAULT_RUBY_VERSION=${ruby_version}
 
@@ -30,6 +32,6 @@ COPY --from=@@PREBUILT_RUBY_IMAGE@@ \
 # Set default Ruby version and install Bundler
 RUN rbenv global ${ruby_version} \
     && rbenv rehash \
-    && (bundle version > /dev/null 2>&1 \
-        || gem install bundler --version ${DEFAULT_BUNDLER_VERSION}) \
-    && rbenv rehash
+    && (gem install bundler --version ${bundler1_version} ; \
+        gem install bundler --version ${bundler2_version} ; \
+        rbenv rehash)

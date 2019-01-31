@@ -20,9 +20,10 @@
 # version used by the runtime by default if one is not specified by the app.
 BASIC_RUBY_VERSION=2.3.8
 
-DEFAULT_BUNDLER_VERSION=1.16.6
-NODEJS_VERSION=8.12.0
-GCLOUD_VERSION=221.0.0
+BUNDLER1_VERSION=1.17.3
+BUNDLER2_VERSION=2.0.1
+NODEJS_VERSION=10.15.1
+GCLOUD_VERSION=232.0.0
 
 
 set -e
@@ -134,7 +135,7 @@ echo
 
 gcloud builds submit ${DIRNAME}/ruby-${OS_NAME} \
   --config ${DIRNAME}/ruby-${OS_NAME}/cloudbuild.yaml --project ${PROJECT} \
-  --substitutions _IMAGE=${OS_BASE_IMAGE},_TAG=${IMAGE_TAG},_BUNDLER_VERSION=${DEFAULT_BUNDLER_VERSION},_NODEJS_VERSION=${NODEJS_VERSION}
+  --substitutions _IMAGE=${OS_BASE_IMAGE},_TAG=${IMAGE_TAG},_BUNDLER_VERSION=${BUNDLER2_VERSION},_NODEJS_VERSION=${NODEJS_VERSION}
 echo "**** Built image: ${OS_BASE_IMAGE}:${IMAGE_TAG}"
 if [ "${STAGING_FLAG}" = "true" ]; then
   gcloud container images add-tag --project ${PROJECT} \
@@ -146,7 +147,7 @@ sed -e "s|@@RUBY_OS_IMAGE@@|ruby-${OS_NAME}|g; s|@@PREBUILT_RUBY_IMAGE@@|${PREBU
   < ${DIRNAME}/ruby-base/Dockerfile-${BASE_IMAGE_DOCKERFILE}.in > ${DIRNAME}/ruby-base/Dockerfile
 gcloud builds submit ${DIRNAME}/ruby-base \
   --config ${DIRNAME}/ruby-base/cloudbuild.yaml --project ${PROJECT} --timeout 20m \
-  --substitutions _OS_NAME=${OS_NAME},_OS_BASE_IMAGE=${OS_BASE_IMAGE},_IMAGE=${RUBY_BASIC_IMAGE},_TAG=${IMAGE_TAG},_RUBY_VERSION=${BASIC_RUBY_VERSION}
+  --substitutions _OS_NAME=${OS_NAME},_OS_BASE_IMAGE=${OS_BASE_IMAGE},_IMAGE=${RUBY_BASIC_IMAGE},_TAG=${IMAGE_TAG},_RUBY_VERSION=${BASIC_RUBY_VERSION},_BUNDLER1_VERSION=${BUNDLER1_VERSION},_BUNDLER2_VERSION=${BUNDLER2_VERSION}
 echo "**** Built image: ${RUBY_BASIC_IMAGE}:${IMAGE_TAG}"
 if [ "${STAGING_FLAG}" = "true" ]; then
   gcloud container images add-tag --project ${PROJECT} \
@@ -156,7 +157,7 @@ fi
 
 gcloud builds submit ${DIRNAME}/ruby-build-tools \
   --config ${DIRNAME}/ruby-build-tools/cloudbuild.yaml --project ${PROJECT} \
-  --substitutions _BASE_IMAGE=${RUBY_BASIC_IMAGE},_IMAGE=${BUILD_TOOLS_IMAGE},_TAG=${IMAGE_TAG},_GCLOUD_VERSION=${GCLOUD_VERSION}
+  --substitutions _BASE_IMAGE=${RUBY_BASIC_IMAGE},_IMAGE=${BUILD_TOOLS_IMAGE},_TAG=${IMAGE_TAG},_GCLOUD_VERSION=${GCLOUD_VERSION},_BUNDLER1_VERSION=${BUNDLER1_VERSION},_BUNDLER2_VERSION=${BUNDLER2_VERSION}
 echo "**** Built image: ${BUILD_TOOLS_IMAGE}:${IMAGE_TAG}"
 if [ "${STAGING_FLAG}" = "true" ]; then
   gcloud container images add-tag --project ${PROJECT} \
@@ -166,7 +167,7 @@ fi
 
 gcloud builds submit ${DIRNAME}/ruby-generate-dockerfile \
   --config ${DIRNAME}/ruby-generate-dockerfile/cloudbuild.yaml --project ${PROJECT} \
-  --substitutions _BASE_IMAGE=${RUBY_BASIC_IMAGE},_IMAGE=${GENERATE_DOCKERFILE_IMAGE},_TAG=${IMAGE_TAG}
+  --substitutions _BASE_IMAGE=${RUBY_BASIC_IMAGE},_IMAGE=${GENERATE_DOCKERFILE_IMAGE},_TAG=${IMAGE_TAG},_BUNDLER1_VERSION=${BUNDLER1_VERSION},_BUNDLER2_VERSION=${BUNDLER2_VERSION}
 echo "**** Built image: ${GENERATE_DOCKERFILE_IMAGE}:${IMAGE_TAG}"
 if [ "${STAGING_FLAG}" = "true" ]; then
   gcloud container images add-tag --project ${PROJECT} \

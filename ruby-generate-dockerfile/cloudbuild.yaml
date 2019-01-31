@@ -4,7 +4,10 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['tag', '$_BASE_IMAGE:$_TAG', 'ruby-base']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', '$_IMAGE:$_TAG', '.']
+    args: ['build', '-t', '$_IMAGE:$_TAG',
+           '--build-arg', 'bundler1_version=$_BUNDLER1_VERSION',
+           '--build-arg', 'bundler2_version=$_BUNDLER2_VERSION',
+           '.']
 
 images:
   - '$_IMAGE:$_TAG'
