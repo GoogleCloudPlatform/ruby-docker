@@ -76,8 +76,8 @@ RUN apt-get update -y \
         systemtap \
         tzdata \
     && apt-get install -y -q --no-install-recommends libgit2-dev \
-    && apt-get clean \
     && apt-get upgrade -yq \
+    && apt-get clean \
     && rm -f /var/lib/apt/lists/*_* \
     && mkdir -p /opt/nodejs \
     && rm -f /etc/ImageMagick-6/policy.xml \
