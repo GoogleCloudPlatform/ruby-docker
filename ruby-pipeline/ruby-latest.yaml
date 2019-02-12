@@ -45,5 +45,7 @@ steps:
            '--prebuilt-image=2.6.0=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.6.0:latest',
            '--prebuilt-image=2.6.1=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.6.1:latest',
            '--default-ruby-version=2.3.8']
-  - name: 'gcr.io/kaniko-project/executor:v0.9.0'
-    args: ['--destination=$_OUTPUT_IMAGE']
+  - name: 'gcr.io/cloud-builders/docker:latest'
+    args: ['build', '--network=cloudbuild', '-t', '$_OUTPUT_IMAGE', '.']
+images:
+  - '$_OUTPUT_IMAGE'
