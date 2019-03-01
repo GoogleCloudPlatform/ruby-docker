@@ -47,19 +47,6 @@ For other Docker hosts, you may create a Dockerfile based on this image that
 copies your application code, installs dependencies, and declares a command
 or entrypoint.
 
-For example, if you have a Rack-based application with a `config.ru` file, you
-may use the following Dockerfile:
-
-    # Use the Ruby base image
-    FROM l.gcr.io/google/ruby:latest
-
-    # Copy application files and install the bundle
-    COPY . /app/
-    RUN bundle install && rbenv rehash
-
-    # Default container command invokes rackup to start the server.
-    CMD ["bundle", "exec", "rackup", "--port=8080"]
-
 See the next section on the design of the base image for more information on
 what your Dockerfile should do.
 
