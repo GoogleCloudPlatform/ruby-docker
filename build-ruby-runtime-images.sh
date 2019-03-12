@@ -18,12 +18,12 @@
 # This is the Ruby version that is installed in the "basic" convenience image
 # and that is used to run generate-dockerfile. It is NOT the same as the Ruby
 # version used by the runtime by default if one is not specified by the app.
-BASIC_RUBY_VERSION=2.3.8
+BASIC_RUBY_VERSION=2.6.1
 
 BUNDLER1_VERSION=1.17.3
 BUNDLER2_VERSION=2.0.1
-NODEJS_VERSION=10.15.1
-GCLOUD_VERSION=232.0.0
+NODEJS_VERSION=10.15.2
+GCLOUD_VERSION=237.0.0
 
 
 set -e
