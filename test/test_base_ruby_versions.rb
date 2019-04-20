@@ -23,19 +23,10 @@ class TestRubyVersions < ::Minitest::Test
     # 2.0 is obsolete, but we keep it for testing patchlevel notation and
     # installation from source.
     "2.0.0-p648",
-    # 2.1.x and 2.2.x are obsolete, but the GCP prebuilt binaries are still
+    # 2.1.x thru 2.3.x are obsolete, but the GCP prebuilt binaries are still
     # present. We retain one test per minor version to track how it behaves.
     "2.1.10",
     "2.2.10",
-    # 2.3.x versions are currently supported.
-    "2.3.0",
-    "2.3.1",
-    "2.3.2",
-    "2.3.3",
-    "2.3.4",
-    "2.3.5",
-    "2.3.6",
-    "2.3.7",
     "2.3.8",
     # 2.4.x versions are currently supported.
     "2.4.0",
@@ -44,20 +35,25 @@ class TestRubyVersions < ::Minitest::Test
     "2.4.3",
     "2.4.4",
     "2.4.5",
+    "2.4.6",
     # 2.5.x versions are currently supported.
     "2.5.0",
     "2.5.1",
     "2.5.3",
+    "2.5.4",
+    "2.5.5",
     # 2.6.0 versions are currently supported.
-    "2.6.0"
+    "2.6.0",
+    "2.6.1",
+    "2.6.2",
+    "2.6.3"
   ]
 
   FASTER_VERSIONS = [
     # Test only the latest patch of each supported minor version.
-    "2.3.8",
-    "2.4.5",
-    "2.5.3",
-    "2.6.0"
+    "2.4.6",
+    "2.5.5",
+    "2.6.3"
   ]
 
   PREBUILT_VERSIONS = ::ENV["PREBUILT_RUBY_VERSIONS"].to_s.split(",")
