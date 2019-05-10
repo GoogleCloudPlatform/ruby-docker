@@ -49,7 +49,7 @@ steps:
            '--prebuilt-image=2.6.1=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.6.1:latest',
            '--prebuilt-image=2.6.2=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.6.2:latest',
            '--prebuilt-image=2.6.3=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.6.3:latest',
-           '--default-ruby-version=2.6.2']
+           '--default-ruby-version=2.6.3']
   - name: 'gcr.io/cloud-builders/docker:latest'
     args: ['build', '--network=cloudbuild', '-t', '$_OUTPUT_IMAGE', '.']
 images:
