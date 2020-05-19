@@ -49,21 +49,25 @@ class TestRubyVersions < ::Minitest::Test
     "2.5.6",
     "2.5.7",
     "2.5.8",
-    # 2.6.0 versions are currently supported.
+    # 2.6.x versions are currently supported.
     "2.6.0",
     "2.6.1",
     "2.6.2",
     "2.6.3",
     "2.6.4",
     "2.6.5",
-    "2.6.6"
+    "2.6.6",
+    # 2.7.x versions are currently supported.
+    "2.7.0",
+    "2.7.1"
   ]
 
   FASTER_VERSIONS = [
     # Test only the latest patch of each supported minor version.
     "2.4.10",
     "2.5.8",
-    "2.6.6"
+    "2.6.6",
+    "2.7.1"
   ]
 
   PREBUILT_VERSIONS = ::ENV["PREBUILT_RUBY_VERSIONS"].to_s.split(",")
