@@ -86,6 +86,7 @@ if [ -n "${SQL_INSTANCES}" ]; then
   /buildstep/cloud_sql_proxy -dir=/cloudsql -instances=${SQL_INSTANCES} > cloud_sql_proxy.log 2>&1 &
   if (timeout ${SQL_TIMEOUT}s tail -f --lines=+1 cloud_sql_proxy.log &) | grep -qe 'Ready for new connections'; then
     echo "cloud_sql_proxy is running."
+    echo "Connections: ${SQL_INSTANCES}."
   else
     >&2 echo "ERROR: Failed to start cloud_sql_proxy"
     >&2 cat cloud_sql_proxy.log
