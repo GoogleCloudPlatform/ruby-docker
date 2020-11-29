@@ -1,0 +1,31 @@
+name: "CI tests"
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  tests:
+    if: ${{ github.repository == 'GoogleCloudPlatform/ruby-docker' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Ruby 2.7
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "2.7"
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Install dependencies
+        shell: bash
+        run: "bundle install && gem install --no-document toys"
+      - name: Build
+        shell: bash
+        run: bundle exec rake build
+      - name: Test
+        shell: bash
+        run: bundle exec rake test:only

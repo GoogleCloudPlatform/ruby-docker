@@ -68,6 +68,9 @@ fi
 
 CONTAINER=$(cat /proc/1/cgroup | sed -n 's|^.*/docker/\([a-f0-9]*\)|\1|p' | awk 'NR==1')
 if [ -z "$CONTAINER" ]; then
+  CONTAINER=$(basename $(cat /proc/1/cpuset))
+fi
+if [ -z "$CONTAINER" ]; then
   >&2 echo "ERROR: Unable to determine current container"
   exit 1
 fi
