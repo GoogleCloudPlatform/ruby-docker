@@ -28,4 +28,4 @@ jobs:
         run: bundle exec rake build
       - name: Test
         shell: bash
-        run: bundle exec rake test:only
+        run: bundle exec rake faster test:only
