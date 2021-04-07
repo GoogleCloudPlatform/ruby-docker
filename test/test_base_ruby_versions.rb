@@ -59,7 +59,9 @@ class TestRubyVersions < ::Minitest::Test
     "2.6.6",
     # 2.7.x versions are currently supported.
     "2.7.0",
-    "2.7.1"
+    "2.7.1",
+    "2.7.2",
+    "2.7.3"
   ]
 
   FASTER_VERSIONS = [
@@ -67,7 +69,7 @@ class TestRubyVersions < ::Minitest::Test
     "2.4.10",
     "2.5.8",
     "2.6.6",
-    "2.7.1"
+    "2.7.3"
   ]
 
   PREBUILT_VERSIONS = ::ENV["PREBUILT_RUBY_VERSIONS"].to_s.split(",")
