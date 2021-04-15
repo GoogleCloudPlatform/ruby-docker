@@ -40,7 +40,7 @@ class TestBuildTools < ::Minitest::Test
         assert_docker_output "#{image} /opt/yarn/bin/yarn --version",
           /^\d+\.\d+/
         assert_docker_output "#{image} /opt/bin/cloud_sql_proxy --version",
-          /Cloud SQL Proxy/
+          /Cloud SQL (?:Proxy|Auth proxy)/
         assert_docker_output \
           "#{image} /opt/google-cloud-sdk/bin/gcloud --version",
           /Google Cloud SDK/
