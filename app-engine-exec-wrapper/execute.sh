@@ -26,7 +26,7 @@ PRE_PULL=true
 CONTAINER_NETWORK=cloudbuild
 
 OPTIND=1
-while getopts ":e:i:n:s:t:xP" opt; do
+while getopts ":e:i:n:s:t:xP:r" opt; do
   case $opt in
     e)
       ENV_PARAMS+=(-e "$OPTARG")
@@ -48,6 +48,9 @@ while getopts ":e:i:n:s:t:xP" opt; do
       ;;
     P)
       PRE_PULL=
+      ;;
+    r)
+      ENTRYPOINT=
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -97,10 +100,14 @@ if [ -n "${SQL_INSTANCES}" ]; then
   fi
 fi
 
+if [ -n "${ENTRYPOINT}" ]; then
+  ENTRYPOINT="--entrypoint ${ENTRYPOINT}"
+fi
+
 echo
 echo "---------- EXECUTE COMMAND ----------"
 echo "$@"
-docker run --rm --volumes-from=${CONTAINER} --network=${CONTAINER_NETWORK} "${ENV_PARAMS[@]}" ${IMAGE} "$@"
+docker run --rm "${ENTRYPOINT}" --volumes-from=${CONTAINER} --network=${CONTAINER_NETWORK} "${ENV_PARAMS[@]}" ${IMAGE} "$@"
 
 echo
 echo "---------- CLEANUP ----------"
