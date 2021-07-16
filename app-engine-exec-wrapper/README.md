@@ -7,7 +7,7 @@ deployed to App Engine. In particular, it ensures a suitable CloudSQL Proxy
 is running in the environment.
 
 Its driving use case is running production database migrations for Ruby on
-Rails applications, and we expect similar uses for other languasges and
+Rails applications, and we expect similar uses for other languages and
 frameworks.
 
 ## Usage
