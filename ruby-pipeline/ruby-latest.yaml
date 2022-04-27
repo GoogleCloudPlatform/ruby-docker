@@ -62,17 +62,20 @@ steps:
            '--prebuilt-image=2.6.7=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.6.7:latest',
            '--prebuilt-image=2.6.8=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.6.8:latest',
            '--prebuilt-image=2.6.9=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.6.9:latest',
+           '--prebuilt-image=2.6.9=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.6.10:latest',
            '--prebuilt-image=2.7.0=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.7.0:latest',
            '--prebuilt-image=2.7.1=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.7.1:latest',
            '--prebuilt-image=2.7.2=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.7.2:latest',
            '--prebuilt-image=2.7.3=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.7.3:latest',
            '--prebuilt-image=2.7.4=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.7.4:latest',
            '--prebuilt-image=2.7.5=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.7.5:latest',
+           '--prebuilt-image=2.7.5=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.7.6:latest',
            '--prebuilt-image=3.0.0=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-3.0.0:latest',
            '--prebuilt-image=3.0.1=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-3.0.1:latest',
            '--prebuilt-image=3.0.2=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-3.0.2:latest',
            '--prebuilt-image=3.0.3=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-3.0.3:latest',
-           '--default-ruby-version=2.7.5']
+           '--prebuilt-image=3.0.3=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-3.0.4:latest',
+           '--default-ruby-version=2.7.6']
   - name: 'gcr.io/cloud-builders/docker:latest'
     args: ['build', '--network=cloudbuild', '-t', '$_OUTPUT_IMAGE', '.']
 images:
