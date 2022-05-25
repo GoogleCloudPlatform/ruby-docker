@@ -12,8 +12,8 @@ https://cloud.google.com/appengine/docs/flexible/ruby/
 
 This repository includes:
 
-* The base image atop Ubuntu 16_04, including the OS, common libraries and
-  build dependencies, NodeJS, and rbenv, in the `ruby-ubuntu16` directory.
+* The base image atop Ubuntu 20_04, including the OS, common libraries and
+  build dependencies, NodeJS, and rbenv, in the `ruby-ubuntu20` directory.
 * A Dockerfile and config for building Ruby binary images in the
   `ruby-prebuilt` directory.
 * A convenience image, including the above Ubuntu image and a default

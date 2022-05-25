@@ -96,7 +96,7 @@ class TestRubyVersions < ::Minitest::Test
   end
 
   DOCKERFILE_SELFBUILT = <<~DOCKERFILE_CONTENT
-    FROM ruby-ubuntu16
+    FROM ruby-#{Helper.os_name}
     ARG ruby_version
     COPY --from=ruby-build-tools /opt/gems/ /opt/gems/
     RUN rbenv install -s ${ruby_version} \
@@ -109,7 +109,7 @@ class TestRubyVersions < ::Minitest::Test
   DOCKERFILE_CONTENT
 
   DOCKERFILE_PREBUILT = <<~DOCKERFILE_CONTENT
-    FROM ruby-ubuntu16
+    FROM ruby-#{Helper.os_name}
     ARG ruby_version
     COPY --from=ruby-build-tools /opt/gems/ /opt/gems/
     COPY --from=$PREBUILT_RUBY_IMAGE \

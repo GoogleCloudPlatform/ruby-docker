@@ -19,7 +19,7 @@ set -e
 
 DIRNAME=$(dirname $0)
 
-OS_NAME=ubuntu16
+OS_NAME=ubuntu20
 RUNTIME_NAME=ruby
 PROJECT=
 IMAGE_TAG=staging
@@ -35,7 +35,7 @@ show_usage() {
   echo 'Flags:' >&2
   echo '  -c <versions>: comma separated prebuilt ruby versions (defaults to prebuilt-versions.txt)' >&2
   echo '  -n <name>: set the runtime name (defaults to `ruby`)' >&2
-  echo '  -o <osname>: build against the given os base image (defaults to ubuntu16)' >&2
+  echo '  -o <osname>: build against the given os base image (defaults to ubuntu20)' >&2
   echo '  -p <project>: set the project (defaults to current gcloud config setting)' >&2
   echo '  -t <tag>: the image tag to release (defaults to `staging`)' >&2
   echo '  -y: automatically confirm' >&2

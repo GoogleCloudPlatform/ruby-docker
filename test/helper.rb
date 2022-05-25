@@ -19,6 +19,10 @@ require "minitest/rg"
 # A set of helpful methods and assertions for running tests.
 
 module Helper
+  # The name of the OS currently being used for testing
+  def self.os_name
+    ::ENV["TESTING_OS_NAME"] || "ubuntu20"
+  end
 
   # Execute the given command in a shell.
   def execute_cmd(cmd)

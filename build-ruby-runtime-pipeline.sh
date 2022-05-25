@@ -20,7 +20,7 @@ set -e
 DIRNAME=$(dirname $0)
 
 UPLOAD_BUCKET=
-OS_NAME=ubuntu16
+OS_NAME=ubuntu20
 RUNTIME_NAME=ruby
 PROJECT=
 RUNTIME_VERSION=
@@ -41,7 +41,7 @@ show_usage() {
   echo '  -b <bucket>: upload a new runtime definition to this gcs bucket (required)' >&2
   echo '  -c <versions>: comma separated prebuilt ruby versions (defaults to prebuilt-versions.txt)' >&2
   echo '  -n <name>: set the runtime name (defaults to `ruby`)' >&2
-  echo '  -o <osname>: use the given os base image (defaults to ubuntu16)' >&2
+  echo '  -o <osname>: use the given os base image (defaults to ubuntu20)' >&2
   echo '  -p <project>: set the builder images project (defaults to current gcloud config setting)' >&2
   echo '  -r <version>: set the runtime release (defaults to create a new version)' >&2
   echo '  -s: also upload a staging runtime pipeline (defaults to false)' >&2
