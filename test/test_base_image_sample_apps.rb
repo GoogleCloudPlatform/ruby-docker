@@ -42,16 +42,6 @@ class TestBaseImageSampleApps < ::Minitest::Test
       DOCKERFILE
     end
 
-    def test_rails4_app
-      run_app_test "rails4_app", <<~DOCKERFILE
-        FROM ruby-base
-        COPY . /app/
-        RUN bundle install && rbenv rehash
-        ENV SECRET_KEY_BASE=a12345
-        ENTRYPOINT bundle exec bin/rails server -p 8080
-      DOCKERFILE
-    end
-
   end
 
   def test_rails5_app

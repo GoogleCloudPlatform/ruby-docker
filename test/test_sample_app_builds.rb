@@ -31,12 +31,6 @@ class TestSampleAppBuilds < ::Minitest::Test
       end
     end
 
-    def test_rails4_app
-      run_app_test "rails4_app" do |image|
-        assert_docker_output "#{image} test -d /app/public/assets", nil
-      end
-    end
-
   end
 
   def test_sinatra1_app
