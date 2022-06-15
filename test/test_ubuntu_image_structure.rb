@@ -21,7 +21,7 @@ class TestUbuntuImageStructure < ::Minitest::Test
   include Helper
 
   BASE_DIR = ::File.dirname ::File.dirname __FILE__
-  CONFIG_FILE = ::File.join BASE_DIR, "ruby-ubuntu16/structure-test.json"
+  CONFIG_FILE = ::File.join BASE_DIR, "ruby-#{Helper.os_name}/structure-test.json"
   CONFIG_DATA = ::JSON.load ::IO.read CONFIG_FILE
 
   CONFIG_DATA["commandTests"].each do |test_config|
@@ -31,7 +31,7 @@ class TestUbuntuImageStructure < ::Minitest::Test
       command = command_array.map{ |a| "'#{a}'" }.join(" ")
       expectations = test_config["expectedOutput"].map { |e| ::Regexp.new e }
       assert_docker_output \
-          "--entrypoint=#{binary} ruby-ubuntu16 #{command}",
+          "--entrypoint=#{binary} ruby-#{Helper.os_name} #{command}",
           expectations
     end
   end

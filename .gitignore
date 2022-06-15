@@ -2,3 +2,4 @@
 /tmp
 /ruby-base/Dockerfile
 /ruby-prebuilt/Dockerfile
+/ruby-ubuntu*/Dockerfile

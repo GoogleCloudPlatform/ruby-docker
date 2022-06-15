@@ -24,13 +24,14 @@ BUNDLER1_VERSION=1.17.3
 BUNDLER2_VERSION=2.1.4
 NODEJS_VERSION=16.15.0
 GCLOUD_VERSION=387.0.0
+SSL10_VERSION=1.0.2n-1ubuntu5.9
 
 
 set -e
 
 DIRNAME=$(dirname $0)
 
-OS_NAME=ubuntu16
+OS_NAME=ubuntu20
 RUNTIME_NAME=ruby
 BASE_IMAGE_DOCKERFILE=default
 PROJECT=
@@ -43,7 +44,7 @@ show_usage() {
   echo 'Flags:' >&2
   echo '  -i: use prebuilt ruby to build base image' >&2
   echo '  -n <name>: set the runtime name (defaults to `ruby`)' >&2
-  echo '  -o <osname>: build against the given os base image (defaults to `ubuntu16`)' >&2
+  echo '  -o <osname>: build against the given os base image (defaults to `ubuntu20`)' >&2
   echo '  -p <project>: set the project (defaults to current gcloud config setting)' >&2
   echo '  -s: also tag new images as `staging`' >&2
   echo '  -t <tag>: set the new image tag (creates a new tag if not provided)' >&2
@@ -107,6 +108,7 @@ if [ -z "${IMAGE_TAG}" ]; then
 fi
 
 OS_BASE_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}
+OS_SSL10_BASE_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/ssl10
 RUBY_BASIC_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/basic
 BUILD_TOOLS_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/build-tools
 GENERATE_DOCKERFILE_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/generate-dockerfile
@@ -115,6 +117,9 @@ PREBUILT_IMAGE_PREFIX=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/prebuilt/ruby
 echo
 echo "Building base, tools, and dockerfile generator images:"
 echo "  ${OS_BASE_IMAGE}:${IMAGE_TAG}"
+if [ "${OS_NAME}" != "ubuntu16" ]; then
+  echo "  ${OS_SSL10_BASE_IMAGE}:${IMAGE_TAG}"
+fi
 echo "  ${RUBY_BASIC_IMAGE}:${IMAGE_TAG}"
 echo "  ${BUILD_TOOLS_IMAGE}:${IMAGE_TAG}"
 echo "  ${GENERATE_DOCKERFILE_IMAGE}:${IMAGE_TAG}"
@@ -133,6 +138,22 @@ if [ -z "${AUTO_YES}" ]; then
 fi
 echo
 
+if [ "${OS_NAME}" != "ubuntu16" ]; then
+  sed -e "s|@@IF_SSL10_DEV@@||g" \
+    < ${DIRNAME}/ruby-${OS_NAME}/Dockerfile.in > ${DIRNAME}/ruby-${OS_NAME}/Dockerfile
+  gcloud builds submit ${DIRNAME}/ruby-${OS_NAME} \
+    --config ${DIRNAME}/ruby-${OS_NAME}/cloudbuild.yaml --project ${PROJECT} \
+    --substitutions _IMAGE=${OS_SSL10_BASE_IMAGE},_TAG=${IMAGE_TAG},_BUNDLER_VERSION=${BUNDLER2_VERSION},_NODEJS_VERSION=${NODEJS_VERSION},_SSL10_VERSION=${SSL10_VERSION}
+  echo "**** Built image: ${OS_SSL10_BASE_IMAGE}:${IMAGE_TAG}"
+  if [ "${STAGING_FLAG}" = "true" ]; then
+    gcloud container images add-tag --project ${PROJECT} \
+      ${OS_SSL10_BASE_IMAGE}:${IMAGE_TAG} ${OS_SSL10_BASE_IMAGE}:staging -q
+    echo "**** And tagged as ${OS_SSL10_BASE_IMAGE}:staging"
+  fi
+fi
+
+sed -e "s|@@IF_SSL10_DEV@@|#|g" \
+  < ${DIRNAME}/ruby-${OS_NAME}/Dockerfile.in > ${DIRNAME}/ruby-${OS_NAME}/Dockerfile
 gcloud builds submit ${DIRNAME}/ruby-${OS_NAME} \
   --config ${DIRNAME}/ruby-${OS_NAME}/cloudbuild.yaml --project ${PROJECT} \
   --substitutions _IMAGE=${OS_BASE_IMAGE},_TAG=${IMAGE_TAG},_BUNDLER_VERSION=${BUNDLER2_VERSION},_NODEJS_VERSION=${NODEJS_VERSION}

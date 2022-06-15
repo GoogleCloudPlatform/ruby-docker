@@ -1,0 +1,13 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '$_IMAGE:$_TAG',
+           '--build-arg', 'bundler_version=$_BUNDLER_VERSION',
+           '--build-arg', 'nodejs_version=$_NODEJS_VERSION',
+           '--build-arg', 'ssl10_version=$_SSL10_VERSION',
+           '.']
+  - name: 'gcr.io/gcp-runtimes/structure_test'
+    args: ['--image', '$_IMAGE:$_TAG', '-v',
+           '--config', '/workspace/structure-test.json']
+
+images:
+  - '$_IMAGE:$_TAG'

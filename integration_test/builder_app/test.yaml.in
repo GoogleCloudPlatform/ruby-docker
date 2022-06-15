@@ -1,9 +1,9 @@
 steps:
 - name: '${STAGING_BUILDER_IMAGE}'
-  args: ['--base-image', 'gcr.io/gcp-runtimes/ruby/ubuntu16:staging',
-         '--build-tools-image', 'gcr.io/gcp-runtimes/ruby/ubuntu16/build-tools:staging',
-         '--prebuilt-image', '2.6.6=gcr.io/gcp-runtimes/ruby/ubuntu16/prebuilt/ruby-2.6.6:latest',
-         '--default-ruby-version', '2.6.6']
+  args: ['--base-image', 'gcr.io/gcp-runtimes/ruby/ubuntu20:staging',
+         '--build-tools-image', 'gcr.io/gcp-runtimes/ruby/ubuntu20/build-tools:staging',
+         '--prebuilt-image', '3.1.2=gcr.io/gcp-runtimes/ruby/ubuntu20/prebuilt/ruby-3.1.2:latest',
+         '--default-ruby-version', '3.1.2']
 - name: 'gcr.io/cloud-builders/docker:latest'
   args: ['build', '--network=cloudbuild', '-t', '${_OUTPUT_IMAGE}', '.']
 images:

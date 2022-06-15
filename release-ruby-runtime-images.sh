@@ -19,7 +19,7 @@ set -e
 
 DIRNAME=$(dirname $0)
 
-OS_NAME=ubuntu16
+OS_NAME=ubuntu20
 RUNTIME_NAME=ruby
 PROJECT=
 IMAGE_TAG=staging
@@ -29,7 +29,7 @@ show_usage() {
   echo 'Usage: release-ruby-runtime-images.sh [flags...]' >&2
   echo 'Flags:' >&2
   echo '  -n <name>: set the runtime name (defaults to `ruby`)' >&2
-  echo '  -o <osname>: build against the given os base image (defaults to ubuntu16)' >&2
+  echo '  -o <osname>: build against the given os base image (defaults to ubuntu20)' >&2
   echo '  -p <project>: set the project (defaults to current gcloud config setting)' >&2
   echo '  -t <tag>: the image tag to release (defaults to `staging`)' >&2
   echo '  -y: automatically confirm' >&2
@@ -79,6 +79,7 @@ if [ -z "${PROJECT}" ]; then
 fi
 
 OS_BASE_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}
+OS_SSL10_BASE_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/ssl10
 RUBY_BASIC_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/basic
 BUILD_TOOLS_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/build-tools
 GENERATE_DOCKERFILE_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/generate-dockerfile
@@ -86,6 +87,9 @@ GENERATE_DOCKERFILE_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/generate-
 echo
 echo "Releasing (i.e. tagging as latest) runtime images:"
 echo "  ${OS_BASE_IMAGE}:${IMAGE_TAG}"
+if [ "${OS_NAME}" != "ubuntu16" ]; then
+  echo "  ${OS_SSL10_BASE_IMAGE}:${IMAGE_TAG}"
+fi
 echo "  ${RUBY_BASIC_IMAGE}:${IMAGE_TAG}"
 echo "  ${BUILD_TOOLS_IMAGE}:${IMAGE_TAG}"
 echo "  ${GENERATE_DOCKERFILE_IMAGE}:${IMAGE_TAG}"
@@ -103,6 +107,13 @@ gcloud container images add-tag --project ${PROJECT} \
   ${OS_BASE_IMAGE}:${IMAGE_TAG} \
   ${OS_BASE_IMAGE}:latest -q
 echo "**** Tagged image ${OS_BASE_IMAGE}:${IMAGE_TAG} as latest"
+
+if [ "${OS_NAME}" != "ubuntu16" ]; then
+  gcloud container images add-tag --project ${PROJECT} \
+    ${OS_SSL10_BASE_IMAGE}:${IMAGE_TAG} \
+    ${OS_SSL10_BASE_IMAGE}:latest -q
+  echo "**** Tagged image ${OS_SSL10_BASE_IMAGE}:${IMAGE_TAG} as latest"
+fi
 
 gcloud container images add-tag --project ${PROJECT} \
   ${RUBY_BASIC_IMAGE}:${IMAGE_TAG} \

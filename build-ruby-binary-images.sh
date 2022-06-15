@@ -19,7 +19,7 @@ set -e
 
 DIRNAME=$(dirname $0)
 
-OS_NAME=ubuntu16
+OS_NAME=ubuntu20
 RUNTIME_NAME=ruby
 PROJECT=
 IMAGE_TAG=
@@ -38,7 +38,7 @@ show_usage() {
   echo '  -a <tag>: use this base image tag (defaults to `staging`)' >&2
   echo '  -c <versions>: comma separated prebuilt ruby versions (defaults to prebuilt-versions.txt)' >&2
   echo '  -n <name>: set the runtime name (defaults to `ruby`)' >&2
-  echo '  -o <osname>: build against the given os base image (defaults to ubuntu16)' >&2
+  echo '  -o <osname>: build against the given os base image (defaults to ubuntu20)' >&2
   echo '  -p <project>: set the project (defaults to current gcloud config setting)' >&2
   echo '  -s: also tag new images as `staging`' >&2
   echo '  -t <tag>: set the new image tag (creates a new tag if not provided)' >&2
@@ -111,6 +111,7 @@ if [ -z "${IMAGE_TAG}" ]; then
 fi
 
 OS_BASE_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}
+OS_SSL10_BASE_IMAGE=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/ssl10
 PREBUILT_IMAGE_PREFIX=gcr.io/${PROJECT}/${RUNTIME_NAME}/${OS_NAME}/prebuilt/ruby-
 
 echo
@@ -137,9 +138,14 @@ echo
 sed -e "s|@@RUBY_OS_IMAGE@@|ruby-${OS_NAME}|g" \
   < ${DIRNAME}/ruby-prebuilt/Dockerfile.in > ${DIRNAME}/ruby-prebuilt/Dockerfile
 for version in "${PREBUILT_VERSIONS[@]}"; do
+  if [[ "${version}" < "2.4.0" ]]; then
+    chosen_os_base_image=${OS_SSL10_BASE_IMAGE}
+  else
+    chosen_os_base_image=${OS_BASE_IMAGE}
+  fi
   gcloud builds submit ${DIRNAME}/ruby-prebuilt \
     --config ${DIRNAME}/ruby-prebuilt/cloudbuild.yaml --project ${PROJECT} --timeout 20m \
-    --substitutions _OS_NAME=${OS_NAME},_OS_BASE_IMAGE=${OS_BASE_IMAGE},_IMAGE=${PREBUILT_IMAGE_PREFIX}${version},_TAG=${IMAGE_TAG},_BASE_TAG=${BASE_IMAGE_TAG},_RUBY_VERSION=${version}
+    --substitutions _OS_NAME=${OS_NAME},_OS_BASE_IMAGE=${chosen_os_base_image},_IMAGE=${PREBUILT_IMAGE_PREFIX}${version},_TAG=${IMAGE_TAG},_BASE_TAG=${BASE_IMAGE_TAG},_RUBY_VERSION=${version}
   echo "**** Built image: ${PREBUILT_IMAGE_PREFIX}${version}:${IMAGE_TAG}"
   if [ "${STAGING_FLAG}" = "true" ]; then
     gcloud container images add-tag --project ${PROJECT} \

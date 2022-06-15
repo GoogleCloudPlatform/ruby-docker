@@ -20,9 +20,10 @@ BUNDLER2_VERSION="2.1.4"
 DEFAULT_RUBY_VERSION="2.7.6"
 NODEJS_VERSION="16.15.0"
 GCLOUD_VERSION="387.0.0"
-OS_NAME="ubuntu16"
+SSL10_VERSION="1.0.2n-1ubuntu5.9"
+OS_NAME="ubuntu20"
 
-LOCAL_PREBUILT_RUBY_VERSIONS=["2.6.10", "2.7.6", "3.0.4", "3.1.1"]
+LOCAL_PREBUILT_RUBY_VERSIONS=["2.6.10", "2.7.6", "3.0.4", "3.1.2"]
 LOCAL_PREBUILT_RUBY_IMAGE_BASE="ruby-prebuilt-"
 LOCAL_PREBUILT_RUBY_IMAGE_TAG="latest"
 RELEASED_PREBUILT_RUBY_VERSIONS=::File.readlines("ruby-pipeline/ruby-latest.yaml")
@@ -48,6 +49,7 @@ end
 ::ENV["PREBUILT_RUBY_IMAGE_TAG"] = PREBUILT_RUBY_IMAGE_TAG
 ::ENV["BUNDLER1_VERSION"] = BUNDLER1_VERSION
 ::ENV["BUNDLER2_VERSION"] = BUNDLER2_VERSION
+::ENV["TESTING_OS_NAME"] = OS_NAME
 
 PREBUILT_RUBY_IMAGES = PREBUILT_RUBY_VERSIONS.map do |v|
   "#{v}=#{PREBUILT_RUBY_IMAGE_BASE}#{v}:#{PREBUILT_RUBY_IMAGE_TAG}"
@@ -55,12 +57,17 @@ end.join(",")
 
 require "rake/testtask"
 
-desc "Build local docker image for ubuntu16 image"
-task "build:ubuntu16" do |t, args|
-  sh "docker build --pull --no-cache -t ruby-ubuntu16" \
-    " --build-arg bundler_version=#{BUNDLER2_VERSION}" \
-    " --build-arg nodejs_version=#{NODEJS_VERSION}" \
-    " ruby-ubuntu16"
+["ubuntu16", "ubuntu20"].each do |os_name|
+  desc "Build local docker image for #{os_name} image"
+  task "build:#{os_name}" do |t, args|
+    sh "sed -e 's|@@IF_SSL10_DEV@@|#|g'" \
+      " ruby-#{os_name}/Dockerfile.in > ruby-#{os_name}/Dockerfile"
+    sh "docker build --pull --no-cache -t ruby-#{os_name}" \
+      " --build-arg bundler_version=#{BUNDLER2_VERSION}" \
+      " --build-arg nodejs_version=#{NODEJS_VERSION}" \
+      " --build-arg ssl10_version=#{SSL10_VERSION}" \
+      " ruby-#{os_name}"
+  end
 end
 
 desc "Build local docker image for current OS image"
