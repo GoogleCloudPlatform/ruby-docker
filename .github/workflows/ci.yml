@@ -25,7 +25,7 @@ jobs:
         run: "bundle install && gem install --no-document toys"
       - name: Build
         shell: bash
-        run: bundle exec rake build
+        run: toys build
       - name: Test
         shell: bash
-        run: bundle exec rake faster test:only
+        run: toys test --faster

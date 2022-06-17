@@ -18,10 +18,9 @@ require "fileutils"
 class TestSampleAppBuilds < ::Minitest::Test
   include Helper
 
-  TEST_DIR = ::File.dirname __FILE__
-  CASES_DIR = ::File.join TEST_DIR, "builder_cases"
-  APPS_DIR = ::File.join TEST_DIR, "sample_apps"
-  TMP_DIR = ::File.join TEST_DIR, "tmp"
+  CASES_DIR = ::File.join __dir__, "builder_cases"
+  APPS_DIR = ::File.join __dir__, "sample_apps"
+  TMP_DIR = ::File.join __dir__, "tmp"
 
   unless ::ENV["FASTER_TESTS"]
 

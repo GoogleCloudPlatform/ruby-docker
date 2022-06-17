@@ -18,10 +18,9 @@ require "fileutils"
 class TestGenerateDockerfile < ::Minitest::Test
   include Helper
 
-  TEST_DIR = ::File.dirname __FILE__
-  CASES_DIR = ::File.join TEST_DIR, "builder_cases"
-  APPS_DIR = ::File.join TEST_DIR, "sample_apps"
-  TMP_DIR = ::File.join TEST_DIR, "tmp"
+  CASES_DIR = ::File.join __dir__, "builder_cases"
+  APPS_DIR = ::File.join __dir__, "sample_apps"
+  TMP_DIR = ::File.join __dir__, "tmp"
   CONFIG_HEADER = "runtime: ruby\nenv: flex\n"
 
   def test_default_config
@@ -62,7 +61,8 @@ class TestGenerateDockerfile < ::Minitest::Test
   end
 
   def test_ruby_version_prebuilt
-    version = ::ENV["PREBUILT_RUBY_VERSIONS"].to_s.split(",").first || "2.5.3"
+    version = ::ENV["PRIMARY_RUBY_VERSIONS"].to_s.split(",").last
+    skip "No prebuilt ruby versions" unless version
     version_escaped = version.gsub(".", "\\.")
     run_generate_dockerfile "rack_app", ruby_version: version
     assert_dockerfile_line "ARG ruby_version=\"#{version_escaped}\""
