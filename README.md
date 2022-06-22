@@ -35,18 +35,21 @@ by the Google Ruby team for runtime integration tests.
 
 ## Local builds and tests
 
-The provided Rakefile builds all the images locally and runs the unit tests
-in the test directory. It requires Ruby 2.3 and Docker 17.06 or later.
+[Toys](https://github.com/dazuma/toys) tools are provided to build the images
+locally and run the unit tests in the test directory. The tools require current
+versions of Ruby and Docker.
 
 To perform a local build and test:
 
-    bundle install
-    bundle exec rake
+    gem install toys # If not already present
+    toys build
+    toys test
 
 Note this procedure tests against production prebuilt Ruby binaries by default.
-To create and test locally-built binaries:
+To create and test a small number of locally-built binaries:
 
-    USE_LOCAL_PREBUILT=true bundle exec rake
+    toys build --use-local-prebuilt
+    toys test --use-local-prebuilt
 
 ## Release builds
 

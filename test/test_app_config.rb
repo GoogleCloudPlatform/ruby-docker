@@ -25,29 +25,29 @@ class TestAppConfig < ::Minitest::Test
   DEFAULT_CONFIG =
     "env: flex\nruntime: ruby\nentrypoint: bundle exec ruby start.rb\n"
 
-  TEST_DIR = ::File.dirname __FILE__
-  CASES_DIR = ::File.join TEST_DIR, "app_config"
-  TMP_DIR = ::File.join TEST_DIR, "tmp"
+  CASES_DIR = ::File.join __dir__, "app_config"
+  TMP_DIR = ::File.join __dir__, "tmp"
 
   def setup_test dir: nil, config: DEFAULT_CONFIG,
                  config_file: nil, project: nil
-    ::Dir.chdir TEST_DIR
-    ::FileUtils.rm_rf TMP_DIR
-    if dir
-      full_dir = ::File.join CASES_DIR, dir
-      ::FileUtils.cp_r full_dir, TMP_DIR
-    else
-      ::FileUtils.mkdir TMP_DIR
-    end
-    ::ENV["GAE_APPLICATION_YAML_PATH"] = config_file
-    ::ENV["PROJECT_ID"] = project
-    if config
-      config_path = ::File.join TMP_DIR, config_file || "app.yaml"
-      ::File.open config_path, "w" do |file|
-        file.write config
+    ::Dir.chdir __dir__ do
+      ::FileUtils.rm_rf TMP_DIR
+      if dir
+        full_dir = ::File.join CASES_DIR, dir
+        ::FileUtils.cp_r full_dir, TMP_DIR
+      else
+        ::FileUtils.mkdir TMP_DIR
       end
+      ::ENV["GAE_APPLICATION_YAML_PATH"] = config_file
+      ::ENV["PROJECT_ID"] = project
+      if config
+        config_path = ::File.join TMP_DIR, config_file || "app.yaml"
+        ::File.open config_path, "w" do |file|
+          file.write config
+        end
+      end
+      ::Bundler.with_unbundled_env { @app_config = AppConfig.new TMP_DIR }
     end
-    ::Bundler.with_clean_env { @app_config = AppConfig.new TMP_DIR }
   end
 
   def test_empty_directory_with_config

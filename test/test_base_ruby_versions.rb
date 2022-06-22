@@ -18,85 +18,35 @@ require_relative "helper"
 # versions can be installed and will execute.
 
 class TestRubyVersions < ::Minitest::Test
-
-  COMPLETE_VERSIONS = [
-    # 2.0 is obsolete, but we keep it for testing patchlevel notation and
-    # installation from source.
-    "2.0.0-p648",
-    # 2.1.x thru 2.3.x are obsolete, but the GCP prebuilt binaries are still
-    # present. We retain one test per minor version to track how it behaves.
-    "2.1.10",
-    "2.2.10",
-    "2.3.8",
-    # 2.4.x versions are currently supported.
-    "2.4.0",
-    "2.4.1",
-    "2.4.2",
-    "2.4.3",
-    "2.4.4",
-    "2.4.5",
-    "2.4.6",
-    "2.4.7",
-    # 2.4.8 was withdrawn.
-    "2.4.9",
-    "2.4.10",
-    # 2.5.x versions are currently supported.
-    "2.5.0",
-    "2.5.1",
-    "2.5.3",
-    "2.5.4",
-    "2.5.5",
-    "2.5.6",
-    "2.5.7",
-    "2.5.9",
-    # 2.6.x versions are currently supported.
-    "2.6.0",
-    "2.6.1",
-    "2.6.2",
-    "2.6.3",
-    "2.6.4",
-    "2.6.5",
-    "2.6.6",
-    "2.6.7",
-    "2.6.8",
-    "2.6.9",
-    # 2.7.x versions are currently supported.
-    "2.7.0",
-    "2.7.1",
-    "2.7.2",
-    "2.7.3",
-    "2.7.4",
-    "2.7.5",
-    # 3.0.x versions are currently supported.
-    "3.0.0",
-    "3.0.1",
-    "3.0.2",
-    "3.0.3"
-  ]
-
-  FASTER_VERSIONS = [
-    # Test only the latest patch of each supported minor version.
-    "2.4.10",
-    "2.5.9",
-    "2.6.9",
-    "2.7.5",
-    "3.0.3"
-  ]
-
-  PREBUILT_VERSIONS = ::ENV["PREBUILT_RUBY_VERSIONS"].to_s.split(",")
+  PREBUILT_RUBY_VERSIONS = ::ENV["PREBUILT_RUBY_VERSIONS"].to_s.split(",")
+  PRIMARY_RUBY_VERSIONS = ::ENV["PRIMARY_RUBY_VERSIONS"].to_s.split(",")
   PREBUILT_RUBY_IMAGE_BASE = ::ENV["PREBUILT_RUBY_IMAGE_BASE"]
   PREBUILT_RUBY_IMAGE_TAG = ::ENV["PREBUILT_RUBY_IMAGE_TAG"]
   BUNDLER1_VERSION = ::ENV["BUNDLER1_VERSION"]
   BUNDLER2_VERSION = ::ENV["BUNDLER2_VERSION"]
 
   if ::ENV["FASTER_TESTS"] || ::ENV["USE_LOCAL_PREBUILT"]
-    VERSIONS = FASTER_VERSIONS & PREBUILT_VERSIONS
+    VERSIONS = PRIMARY_RUBY_VERSIONS & PREBUILT_RUBY_VERSIONS
   else
-    VERSIONS = COMPLETE_VERSIONS
+    # Out of the prebuilt list, choose all patches of current versions (i.e.
+    # whose minor version is reflected in the primaries) but only the latest
+    # patch of all other versions. Also add 2.0.0-p648 to test patchlevel
+    # notation and installation from source.
+    VERSIONS = PREBUILT_RUBY_VERSIONS.map do |version|
+      if version =~ /^(\d+\.\d+)/
+        minor = Regexp.last_match[1]
+        next version if PRIMARY_RUBY_VERSIONS.any? { |v| v.start_with? minor }
+        PREBUILT_RUBY_VERSIONS.map do |v|
+          if v.start_with? minor
+            Gem::Version.new v
+          end
+        end.compact.sort.last.to_s
+      end
+    end.compact.uniq + ["2.0.0-p648"]
   end
 
   DOCKERFILE_SELFBUILT = <<~DOCKERFILE_CONTENT
-    FROM ruby-#{Helper.os_name}
+    FROM $OS_IMAGE
     ARG ruby_version
     COPY --from=ruby-build-tools /opt/gems/ /opt/gems/
     RUN rbenv install -s ${ruby_version} \
@@ -123,11 +73,9 @@ class TestRubyVersions < ::Minitest::Test
     CMD ruby --version
   DOCKERFILE_CONTENT
 
-
   include Helper
 
-  TEST_DIR = ::File.dirname __FILE__
-  TMP_DIR = ::File.join TEST_DIR, "tmp"
+  TMP_DIR = ::File.join __dir__, "tmp"
 
   VERSIONS.each do |version|
     mangled_version = version.gsub(".", "_").gsub("-", "_")
@@ -145,11 +93,13 @@ class TestRubyVersions < ::Minitest::Test
     assert_cmd_succeeds "mkdir -p #{TMP_DIR}"
     dockerfile_path = ::File.join TMP_DIR, "Dockerfile"
     ::File.open dockerfile_path, "w" do |file|
-      if PREBUILT_VERSIONS.include? version
+      if PREBUILT_RUBY_VERSIONS.include? version
         prebuilt_image = "#{PREBUILT_RUBY_IMAGE_BASE}#{version}:#{PREBUILT_RUBY_IMAGE_TAG}"
         file.write DOCKERFILE_PREBUILT.sub("$PREBUILT_RUBY_IMAGE", prebuilt_image)
       else
-        file.write DOCKERFILE_SELFBUILT
+        os_image = "ruby-#{Helper.os_name}"
+        os_image = "#{os_image}-ssl10" if version < "2.4"
+        file.write DOCKERFILE_SELFBUILT.sub("$OS_IMAGE", os_image)
       end
     end
     ::Dir.chdir TMP_DIR do |dir|
