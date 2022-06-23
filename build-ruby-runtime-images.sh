@@ -147,7 +147,7 @@ sed -e "s|@@IF_SSL10_DEV@@|#|g" \
   < ${DIRNAME}/ruby-${OS_NAME}/Dockerfile.in > ${DIRNAME}/ruby-${OS_NAME}/Dockerfile
 gcloud builds submit ${DIRNAME}/ruby-${OS_NAME} \
   --config ${DIRNAME}/ruby-${OS_NAME}/cloudbuild.yaml --project ${PROJECT} \
-  --substitutions _IMAGE=${OS_BASE_IMAGE},_TAG=${IMAGE_TAG},_BUNDLER_VERSION=${BUNDLER2_VERSION},_NODEJS_VERSION=${NODEJS_VERSION}
+  --substitutions _IMAGE=${OS_BASE_IMAGE},_TAG=${IMAGE_TAG},_BUNDLER_VERSION=${BUNDLER2_VERSION},_NODEJS_VERSION=${NODEJS_VERSION},_SSL10_VERSION=${SSL10_VERSION}
 echo "**** Built image: ${OS_BASE_IMAGE}:${IMAGE_TAG}"
 if [ "${STAGING_FLAG}" = "true" ]; then
   gcloud container images add-tag --project ${PROJECT} \
