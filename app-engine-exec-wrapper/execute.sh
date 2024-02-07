@@ -104,7 +104,7 @@ if [ -n "${SQL_INSTANCES}" ]; then
 fi
 
 if [ -n "${ENTRYPOINT}" ]; then
-  ENTRYPOINT="--entrypoint \"${ENTRYPOINT}\""
+  ENTRYPOINT="--entrypoint ${ENTRYPOINT}"
 fi
 
 echo
