@@ -81,6 +81,8 @@ if [ -z "$CONTAINER" ]; then
   exit 1
 fi
 
+CLOUDSQL_VOLUME=$(docker inspect -f '{{ range .Mounts }}{{ if eq .Destination "/cloudsql" }}{{ .Source }}{{ end }}{{ end }}' ${CONTAINER})
+
 if [ -n "$PRE_PULL" ]; then
   echo
   echo "---------- INSTALL IMAGE ----------"
@@ -111,7 +113,7 @@ echo
 echo "---------- EXECUTE COMMAND ----------"
 echo "$@"
 
-docker run --rm ${ENTRYPOINT} --volumes-from=${CONTAINER} --network=${CONTAINER_NETWORK} "${ENV_PARAMS[@]}" ${IMAGE} "$@"
+docker run --rm ${ENTRYPOINT} -v ${CLOUDSQL_VOLUME}:/cloudsql --network=${CONTAINER_NETWORK} "${ENV_PARAMS[@]}" ${IMAGE} "$@"
 
 echo
 echo "---------- CLEANUP ----------"
