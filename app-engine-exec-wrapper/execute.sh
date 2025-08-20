@@ -81,6 +81,17 @@ if [ -z "$CONTAINER" ]; then
   exit 1
 fi
 
+VOLUMES=$(docker inspect "$CONTAINER" |
+  awk '
+    /"Source":/      { gsub(/"|,/, "", $2); source=$2 }
+    /"Destination":/ {
+      gsub(/"|,/, "", $2);
+      dest=$2;
+      if (dest != "/workspace")
+        printf("-v %s:%s ", source, dest);
+    }
+  ')
+
 if [ -n "$PRE_PULL" ]; then
   echo
   echo "---------- INSTALL IMAGE ----------"
@@ -111,7 +122,7 @@ echo
 echo "---------- EXECUTE COMMAND ----------"
 echo "$@"
 
-docker run --rm ${ENTRYPOINT} --volumes-from=${CONTAINER} --network=${CONTAINER_NETWORK} "${ENV_PARAMS[@]}" ${IMAGE} "$@"
+docker run --rm ${ENTRYPOINT} ${VOLUMES} --network=${CONTAINER_NETWORK} "${ENV_PARAMS[@]}" ${IMAGE} "$@"
 
 echo
 echo "---------- CLEANUP ----------"
