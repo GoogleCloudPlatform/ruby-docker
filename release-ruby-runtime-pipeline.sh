@@ -99,5 +99,5 @@ if [ -z "${AUTO_YES}" ]; then
   fi
 fi
 
-gsutil cp ${SOURCE_GS_URL} ${RELEASE_GS_URL}
+gcloud storage cp ${SOURCE_GS_URL} ${RELEASE_GS_URL}
 echo "**** Promoted runtime config ${SOURCE_GS_URL} to ${RELEASE_GS_URL}"
